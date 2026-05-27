@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoNR / VoLTE, EPS Fallback & SRVCC | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Voice</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Voice &middot; VoNR, EPS Fallback &amp; SRVCC</div>
+  <h1>Voice: VoNR / VoLTE, EPS Fallback &amp; SRVCC</h1>
+  <p class="lede">
+    5G voice rides on IMS as <b>VoNR</b> (Voice over New Radio). But not every network or device supports VoNR yet,
+    and coverage isn't uniform — so the network needs graceful fallbacks. <b>EPS Fallback</b> moves a call from 5G
+    NR to LTE VoLTE at setup; <b>SRVCC</b> hands an in-progress VoLTE call down to 3G/2G when LTE coverage is lost.
+    I validate that voice continuity holds through all three.
+  </p>
+  <div class="chips">
+    <span class="chip">VoNR / ViNR (IMS)</span><span class="chip">EPS Fallback</span>
+    <span class="chip">SRVCC</span><span class="chip">SIP / RTP</span>
+  </div>
+
+  <section>
+    <h2>The three mechanisms</h2>
+    <table class="cmp">
+      <tr><th></th><th>VoNR</th><th>EPS Fallback</th><th>SRVCC</th></tr>
+      <tr><td>What</td><td>Voice directly on 5G NR via IMS</td><td>5G NR → LTE VoLTE <i>at call setup</i></td><td>LTE VoLTE → 3G/2G CS <i>during a call</i></td></tr>
+      <tr><td>Triggered when</td><td>VoNR supported &amp; good NR voice coverage</td><td>VoNR not supported / weak NR voice</td><td>LTE coverage lost, legacy CS available</td></tr>
+      <tr><td>Timing</td><td>n/a</td><td>Before media starts</td><td>Mid-call</td></tr>
+      <tr><td>I check</td><td>SIP INVITE→200 OK, RTP, QoS flow (5QI 1)</td><td>RRC reconfig NR→LTE, then SIP in LTE, no drop</td><td>Measurement report → SRVCC HO command → CS setup, no drop</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>EPS Fallback flow</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 840 150" role="img" aria-label="EPS fallback flow">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" text-anchor="middle">
+          <rect x="20"  y="55" width="150" height="44" rx="9" fill="#e6f4ee" stroke="#0d9488"/><text x="95" y="74" fill="#0f766e">UE on 5G NR (SA)</text><text x="95" y="90" fill="#64748b" font-size="10">initiates voice</text>
+          <rect x="210" y="55" width="170" height="44" rx="9" fill="#e8eef9" stroke="#2563eb"/><text x="295" y="74" fill="#1e3a8a">gNB/AMF: VoNR not</text><text x="295" y="90" fill="#1e3a8a" font-size="10">available → fallback</text>
+          <rect x="420" y="55" width="160" height="44" rx="9" fill="#eef2f8" stroke="#94a8d0"/><text x="500" y="74" fill="#1e293b">RRC reconfig</text><text x="500" y="90" fill="#64748b" font-size="10">NR → LTE</text>
+          <rect x="620" y="55" width="200" height="44" rx="9" fill="#e6f4ee" stroke="#0d9488"/><text x="720" y="74" fill="#0f766e">VoLTE call (IMS) on LTE</text><text x="720" y="90" fill="#64748b" font-size="10">SIP INVITE flows, no drop</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a)" fill="none">
+          <line x1="170" y1="77" x2="208" y2="77"/><line x1="380" y1="77" x2="418" y2="77"/><line x1="580" y1="77" x2="618" y2="77"/>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:8px"><b>In validation:</b> I confirm the call is <i>not dropped</i> during fallback by tracing the RRC reconfiguration (NR→LTE) followed by the SIP INVITE flow on LTE, and I track <b>EPS Fallback Success Rate</b>.</p>
+  </section>
+
+  <section>
+    <h2>SRVCC flow</h2>
+    <div class="panel">
+      <p style="margin:0">SRVCC keeps an <b>ongoing</b> VoLTE call alive when LTE coverage ends and only 3G/2G CS voice is available: the eNB, MME and MSC coordinate a handover of the IMS voice call to the circuit-switched domain. <b>In validation</b> I trigger a VoLTE call on LTE, walk the UE into 3G-only coverage, and trace <i>Measurement Report → SRVCC Handover Command → CS call setup in 3G</i>, tracking <b>SRVCC Success Rate</b> and Call Drop Rate.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where this fits my hands-on work</h2>
+    <div class="panel case good">
+      <p style="margin:0">On the 5G SA Femto program I validated <b>VoNR, ViNR (video), RTT, SMS over IMS</b> and supplementary services (call waiting/forwarding/hold/resume), VoNR↔ViNR upgrade/downgrade, multi-party (3-way) calls, and simultaneous voice+video+data+SMS — plus <b>IRAT voice continuity</b> (VoNR↔VoLTE) and the rule that a <b>non-VoNR device is barred</b> from the VoNR-only femto (so its voice/911 proceeds on the macro layer). EPS Fallback and SRVCC are the LTE/legacy counterparts of that same voice-continuity discipline.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>EPS Fallback = before media; SRVCC = during call.</b> Different triggers, different KPIs.</li>
+      <li><b>Voice continuity is the success criterion</b> — the call must survive the radio change with no audible gap.</li>
+      <li><b>VoNR needs SA + IMS + correct 5QI 1 QoS flow</b>; missing any one sends the device to fallback.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 23.501/23.502</b> (5G voice, EPS Fallback) · <b>TS 23.216</b> (SRVCC) · <b>TS 24.229</b> (IMS/SIP) · <b>GSMA IR.92/IR.94</b> (VoLTE/ViLTE profiles).</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
