@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-RAT Integration & Scripting | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; RAN Deployment</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Deployment &middot; Integration &amp; Scripting (2G–5G)</div>
+  <h1>Multi-RAT Integration &amp; Scripting</h1>
+  <p class="lede">
+    Across 10,000+ sites I integrated and commissioned RAN spanning <b>2G, 3G, 4G, 5G and NB-IoT</b> on a single
+    multi-mode platform. That means writing the site scripts, merging baseband, converting standalone radios to
+    <b>SRAN</b> (one cabinet serving multiple technologies), expanding sector-carriers, and bringing complex radio
+    topologies on air — through CME, local maintenance terminals, and direct CLI integration.
+  </p>
+  <div class="chips">
+    <span class="chip">SDR / NSDR · SRAN</span><span class="chip">BBU merging</span>
+    <span class="chip">MORAN / MOCN</span><span class="chip">4T6S · Multi-RRU</span>
+    <span class="chip">CME · LMT · CLI</span>
+  </div>
+
+  <section>
+    <h2>Multi-mode site architecture</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 860 230" role="img" aria-label="SRAN multi-mode site">
+        <g font-family="Segoe UI,Arial" font-size="12" font-weight="700" text-anchor="middle">
+          <rect x="40" y="60" width="170" height="120" rx="12" fill="#eef2f8" stroke="#2563eb"/>
+          <text x="125" y="50" fill="#1e3a8a" font-size="13">BBU (multi-mode)</text>
+          <rect x="58" y="78"  width="134" height="26" rx="6" fill="#e8eef9"/><text x="125" y="96" fill="#334155" font-size="11">2G / 3G baseband</text>
+          <rect x="58" y="110" width="134" height="26" rx="6" fill="#e8eef9"/><text x="125" y="128" fill="#334155" font-size="11">4G baseband</text>
+          <rect x="58" y="142" width="134" height="26" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="125" y="160" fill="#0f766e" font-size="11">5G baseband</text>
+          <!-- CPRI -->
+          <rect x="330" y="70" width="150" height="44" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="405" y="90" fill="#1e293b" font-size="11">RRU / AAU</text><text x="405" y="105" fill="#64748b" font-size="10">low band (L700/L900)</text>
+          <rect x="330" y="130" width="150" height="44" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="405" y="150" fill="#1e293b" font-size="11">Massive MIMO AAU</text><text x="405" y="165" fill="#64748b" font-size="10">n41 / n77 (4T6S, 64T64R)</text>
+          <!-- core -->
+          <rect x="600" y="95" width="220" height="56" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="710" y="118" fill="#0f766e">Transport &rarr; Core</text><text x="710" y="136" fill="#0f766e" font-size="10">MORAN / MOCN sharing</text>
+        </g>
+        <g stroke="#1d4ed8" fill="none" stroke-width="1.4">
+          <line x1="210" y1="100" x2="328" y2="92"/><line x1="210" y1="140" x2="328" y2="152"/>
+          <line x1="210" y1="120" x2="598" y2="123"/>
+        </g>
+        <text x="270" y="200" font-family="Segoe UI,Arial" font-size="10.5" fill="#94a3b8">CPRI / eCPRI fronthaul</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Core configuration work — and what each actually means</h2>
+    <table class="cmp">
+      <tr><th>Operation</th><th>What it is &amp; why it's done</th></tr>
+      <tr><td><b>SRAN conversion</b></td><td>Consolidating separate single-RAT radios onto one multi-mode (Single RAN) platform so 2G/3G/4G/5G share baseband, transport and radios — cuts hardware, site visits and power.</td></tr>
+      <tr><td><b>BBU merging</b></td><td>Combining baseband units so multiple technologies/cells run from one BBU — frees slots and simplifies the site, but requires careful cell/clock/transport re-mapping in script.</td></tr>
+      <tr><td><b>SDR / NSDR</b></td><td>Software-defined vs non-software-defined radio configs — determines whether a band can be re-purposed in software or needs hardware change.</td></tr>
+      <tr><td><b>Sector-carrier expansion</b></td><td>Adding carriers/sectors for capacity — the script must extend cell, carrier, and resource mapping without disrupting live cells.</td></tr>
+      <tr><td><b>4T6S / Multi-RRU</b></td><td>Advanced radio topologies (4 transmit / 6 sector, multiple RRUs per cell) for coverage/capacity — sensitive to CPRI mapping and working-mode config.</td></tr>
+      <tr><td><b>MORAN / MOCN</b></td><td>RAN sharing: MORAN = shared radio, separate carriers per operator; MOCN = shared carrier, multiple operators' core networks (multiple PLMNs broadcast).</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>How I worked</h2>
+    <div class="panel">
+      <p style="margin:0">I prepared complex site scripts in <b>CME</b> (configuration management) and applied them via <b>local maintenance terminals</b> and direct <b>CLI</b> for on-site integration — covering refarming, rehoming, IP migration, IP security, and software/licensing updates across <b>BTS, NodeB, eNodeB and gNodeB</b>. Because a single script touches cells, clocks, transport and radios at once, the discipline is in <b>validating the script against the existing config before commit</b> — most integration incidents (see the <a href="icase-library.html">case library</a>) trace back to a working-mode, topology, or peer-end mismatch that a careful pre-check catches.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Representative integrations I delivered</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Massive MIMO &amp; advanced configs</b> across large rollout programs — see <a href="massive-mimo.html">Massive MIMO &amp; advanced radio</a>.</li>
+      <li><b>5G SA/NSA hybrid sites, NR UL/DL decoupling, RedCap, BookBBU</b>, small cells, DAS and LampSite indoor systems.</li>
+      <li><b>NB-IoT</b> rollout for coverage/IoT capacity on 4G expansion programs.</li>
+      <li><b>Like-for-like multi-vendor swaps</b> (2G/4G/5G) with post-acceptance expansion.</li>
+      <li><b>L900Cr2 / refarming</b> scripting and integration at scale (thousands of sites).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Working-mode must match the peer end.</b> A mismatched RF-unit working mode between GU/inter-system ends is a classic conflict-alarm source.</li>
+      <li><b>Validate topology before commit.</b> RRU network-topology/type mismatches surface as setup failures after integration.</li>
+      <li><b>Frequency/MAGROUP overlaps block cell setup</b> — check band plans before adding U900/G900 carriers.</li>
+      <li><b>SRAN conversions touch everything at once</b> — clock, transport, cells — so stage and verify each layer.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; platform context</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 23.251</b> — network sharing (MORAN/MOCN). &nbsp;·&nbsp; <b>3GPP TS 38.401 / 38.300</b> — NG-RAN architecture. &nbsp;·&nbsp; <b>CPRI / eCPRI</b> fronthaul specifications. &nbsp;·&nbsp; Vendor multi-mode (SRAN) configuration practice.</p></div>
+  </section>
+
+  <section>
+    <h2>Platform glossary — hardware &amp; parameters I configure</h2>
+    <p>The objects and parameters I work with day-to-day when scripting and integrating multi-mode sites:</p>
+    <h3>Baseband, boards &amp; connectivity</h3>
+    <table class="cmp">
+      <tr><th>Element</th><th>Role</th></tr>
+      <tr><td><b>BBU</b></td><td>Baseband Unit — the site's processing cabinet hosting the boards below.</td></tr>
+      <tr><td><b>MPT / BBP</b></td><td>Main Processing &amp; Transmission unit / Baseband Processing board — control, transmission and L1/L2 baseband.</td></tr>
+      <tr><td><b>UPEU / UEIU</b></td><td>Power &amp; environment unit / environment-interface unit (external alarms: door, temperature, water).</td></tr>
+      <tr><td><b>UCIU / UTRP</b></td><td>Inter-BBU control link unit / transmission processing unit (backhaul transport into the BBU).</td></tr>
+      <tr><td><b>RHUB</b></td><td>Remote hub — switch-like aggregation for connecting multiple radios (pRRUs) over one link.</td></tr>
+      <tr><td><b>RRU / pRRU</b></td><td>Remote Radio Unit / pico-RRU (indoor) — the radio that drives the antenna.</td></tr>
+      <tr><td><b>AAU / BFANT</b></td><td>Active Antenna Unit (NR) / beamforming antenna for Massive MIMO.</td></tr>
+      <tr><td><b>Sector / SECTOREQM</b></td><td>Sector and sector-equipment objects mapping radios to antennas.</td></tr>
+      <tr><td><b>ETHPORT</b></td><td>Ethernet port config — MTU size, copper/fibre, 1G/1000M, duplex (forced where auto-neg fails).</td></tr>
+      <tr><td><b>RET / Mtilt</b></td><td>Remote Electrical Tilt / mechanical tilt for antenna optimization.</td></tr>
+    </table>
+    <h3>Cell objects, RF &amp; mobility parameters</h3>
+    <table class="cmp">
+      <tr><th>Parameter / object</th><th>Meaning</th></tr>
+      <tr><td><b>Cell / NRCell / NRDUCell / ExternalCell</b></td><td>LTE cell, NR logical cell, NR DU cell, and externally-defined neighbour cell objects.</td></tr>
+      <tr><td><b>HRRU / RFACELL (DCU/DAS)</b></td><td>High-power RRU and RF-aggregation cell objects for DAS / distributed indoor systems.</td></tr>
+      <tr><td><b>PCI / Root Sequence Index</b></td><td>Physical Cell ID and PRACH root sequence — planned to avoid collision/confusion and PRACH interference.</td></tr>
+      <tr><td><b>EARFCN / NRNFREQ / PCCFREQ / SCGFREQ</b></td><td>Carrier frequency (LTE), NR neighbour frequency, primary-carrier and secondary-cell-group frequency objects.</td></tr>
+      <tr><td><b>BW / Reference power / PA / PB</b></td><td>Channel bandwidth, reference signal power, and power-allocation ratios (PA/PB).</td></tr>
+      <tr><td><b>MIMO / CA / ENDC</b></td><td>Multi-antenna mode, Carrier Aggregation, and EN-DC (NSA dual connectivity).</td></tr>
+      <tr><td><b>TAC</b></td><td>Tracking Area Code — area/registration grouping for the cell.</td></tr>
+      <tr><td><b>Neighbour relation / UDTPARAGRP</b></td><td>Neighbour relations for Xn/NG handover and idle reselection; user-data-transport/QoS parameter groups.</td></tr>
+    </table>
+    <h3>Sync &amp; configuration workflow</h3>
+    <div class="panel"><ul class="clean">
+      <li><b>Timing &amp; sync:</b> GPS, PTP and NTP servers for frame/phase synchronization (with PTP↔GPS fallback validated on the lab side).</li>
+      <li><b>Per-site config blocks:</b> IP &amp; RF configuration, board configuration, and neighbour/core configuration specifically for <b>Xn HO and NG</b> activity.</li>
+      <li><b>Sharing:</b> MORAN (shared radio, separate carriers) and MOCN (shared carrier, multiple PLMNs/core networks).</li>
+      <li><b>Tech modes:</b> 5G SA / NSA, NR UL/DL decoupling, RedCap.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
