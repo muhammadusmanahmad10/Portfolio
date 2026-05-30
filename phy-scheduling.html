@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NR PHY & Scheduling | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; PHY &amp; Scheduling</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">PHY &middot; NR L1 &amp; MAC Scheduling</div>
+  <h1>5G NR PHY &amp; Scheduling</h1>
+  <p class="lede">
+    The 5G air interface is OFDM with <b>flexible numerology</b>, <b>beam-based access</b>, and a
+    scheduler that hands out resources slot-by-slot. This page covers the physical layer (frame structure,
+    channels, reference signals, beam management) and the MAC scheduling, HARQ and link-adaptation behaviour
+    that sit on top — the parameters that determine real throughput and reliability.
+  </p>
+  <div class="chips">
+    <span class="chip">OFDM · BWP · Numerology</span>
+    <span class="chip">SSB · PDCCH · PDSCH · PUCCH · PUSCH · PRACH</span>
+    <span class="chip">CSI-RS · DM-RS · SRS · PTRS</span>
+    <span class="chip">HARQ · MCS / CQI · Beam mgmt</span>
+  </div>
+
+  <section>
+    <h2>Frame structure &amp; numerology</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 860 170" role="img" aria-label="NR frame structure">
+        <g font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" text-anchor="middle">
+          <rect x="30" y="30" width="800" height="34" rx="6" fill="#e8eef9" stroke="#2563eb"/><text x="430" y="52" fill="#1e3a8a">Radio frame = 10 ms (10 subframes × 1 ms)</text>
+          <g>
+            <rect x="30" y="74" width="80" height="32" rx="5" fill="#eef2f8" stroke="#94a8d0"/><text x="70" y="94" fill="#1e293b">subframe</text>
+            <rect x="115" y="74" width="80" height="32" rx="5" fill="#eef2f8" stroke="#94a8d0"/><text x="155" y="94" fill="#1e293b">subframe</text>
+            <rect x="200" y="74" width="80" height="32" rx="5" fill="#eef2f8" stroke="#94a8d0"/><text x="240" y="94" fill="#1e293b">…</text>
+            <rect x="285" y="74" width="80" height="32" rx="5" fill="#eef2f8" stroke="#94a8d0"/><text x="325" y="94" fill="#1e293b">subframe</text>
+          </g>
+          <g>
+            <rect x="30" y="116" width="40" height="32" rx="5" fill="#e6f4ee" stroke="#0d9488"/><text x="50" y="136" fill="#0f766e">slot</text>
+            <rect x="75" y="116" width="40" height="32" rx="5" fill="#e6f4ee" stroke="#0d9488"/><text x="95" y="136" fill="#0f766e">slot</text>
+            <text x="135" y="136" fill="#64748b" font-family="Segoe UI,Arial" text-anchor="start" font-weight="400">14 OFDM symbols per slot &middot; 12 subcarriers per RB</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <table class="cmp">
+      <tr><th>SCS (μ)</th><th>Subcarrier spacing</th><th>Slots / subframe</th><th>Typical use</th></tr>
+      <tr><td>0</td><td>15 kHz</td><td>1</td><td>FR1 (sub-6) — LTE-compatible numerology</td></tr>
+      <tr><td>1</td><td>30 kHz</td><td>2</td><td>FR1 (n41/n77 etc.) — common in commercial 5G</td></tr>
+      <tr><td>2</td><td>60 kHz</td><td>4</td><td>FR1/FR2 — URLLC / FR2 control</td></tr>
+      <tr><td>3</td><td>120 kHz</td><td>8</td><td>FR2 (mmWave) — short slot for high BW</td></tr>
+    </table>
+    <p style="margin-top:8px"><b>Bandwidth Parts (BWP):</b> the cell's bandwidth is split into one or more BWPs; the UE operates on one active BWP per direction at a time. This is what the <a href="registration-pdu.html">BWPS attach issue</a> was about.</p>
+  </section>
+
+  <section>
+    <h2>Physical channels — what each carries</h2>
+    <table class="cmp">
+      <tr><th>Channel</th><th>Direction</th><th>Carries</th></tr>
+      <tr><td><b>SSB</b> (PSS / SSS / PBCH)</td><td>DL broadcast</td><td>Cell synchronization (PSS/SSS) and MIB (PBCH) — the first thing a UE finds.</td></tr>
+      <tr><td><b>PDCCH</b></td><td>DL</td><td>Downlink Control Information (DCI) — scheduling grants for PDSCH/PUSCH.</td></tr>
+      <tr><td><b>PDSCH</b></td><td>DL</td><td>The actual downlink user data (and some control).</td></tr>
+      <tr><td><b>PUCCH</b></td><td>UL</td><td>UL control (HARQ ACK/NACK, CSI reports, SR).</td></tr>
+      <tr><td><b>PUSCH</b></td><td>UL</td><td>UL user data (and UCI when piggy-backed).</td></tr>
+      <tr><td><b>PRACH</b></td><td>UL</td><td>Random access preambles — initial access, HO, beam-failure recovery, etc.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Reference signals — how the link is measured</h2>
+    <table class="cmp">
+      <tr><th>Signal</th><th>Purpose</th></tr>
+      <tr><td><b>DM-RS</b> (Demodulation RS)</td><td>Per-PDSCH/PDCCH/PUSCH/PUCCH channel estimation for demodulation.</td></tr>
+      <tr><td><b>CSI-RS</b></td><td>Periodic / aperiodic channel state info for link adaptation, beam management, MIMO.</td></tr>
+      <tr><td><b>SRS</b> (Sounding RS)</td><td>UL channel sounding for UL scheduling, beam management and reciprocity-based DL MIMO.</td></tr>
+      <tr><td><b>PT-RS</b></td><td>Phase-tracking RS — corrects phase noise at high frequencies (esp. FR2).</td></tr>
+      <tr><td><b>PRS</b></td><td>Positioning RS for downlink positioning (used by LMF; see <a href="e911-location.html">E911</a>).</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Beam management (FR2 &amp; FR1 Massive MIMO)</h2>
+    <div class="panel">
+      <p style="margin:0 0 8px">5G is beam-based: the gNB sweeps multiple <b>SSB beams</b> for cell access, then refines to user-specific beams via <b>CSI-RS</b> reports. The lifecycle is:</p>
+      <ol class="clean" style="margin-top:0">
+        <li><b>P1</b> — Initial beam acquisition over SSB sweep (UE measures SSB RSRP, picks best beam).</li>
+        <li><b>P2</b> — gNB-side beam refinement using CSI-RS sweep.</li>
+        <li><b>P3</b> — UE-side beam refinement.</li>
+        <li><b>Beam-failure detection &amp; recovery (BFD/BFR)</b> — UE declares beam failure on consecutive bad-quality measurements and recovers via a new beam through PRACH.</li>
+      </ol>
+      <p style="margin-top:10px">This connects directly to my <a href="massive-mimo.html">Massive MIMO</a> work — beamforming gains depend on CSI feedback quality and the right beam-management configuration.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>MAC scheduling, link adaptation &amp; HARQ</h2>
+    <table class="cmp">
+      <tr><th>Concept</th><th>What it does</th></tr>
+      <tr><td><b>Dynamic scheduling</b></td><td>The gNB scheduler hands out PDSCH/PUSCH resources slot-by-slot via PDCCH (DCI), based on buffer status, channel quality, QoS and fairness.</td></tr>
+      <tr><td><b>Semi-Persistent Scheduling (SPS) / Configured Grant</b></td><td>Pre-configured periodic DL/UL grants for predictable traffic (e.g. VoNR, URLLC) — reduces PDCCH overhead and latency.</td></tr>
+      <tr><td><b>BSR / SR</b></td><td>Buffer Status Report &amp; Scheduling Request — how the UE asks for UL resources.</td></tr>
+      <tr><td><b>Link adaptation (MCS, CQI, RI, PMI)</b></td><td>UE reports <b>CQI</b> (channel quality), <b>RI</b> (rank), <b>PMI</b> (precoder); the gNB picks an <b>MCS</b> (modulation + coding rate) targeting a BLER (typically ~10%).</td></tr>
+      <tr><td><b>HARQ</b></td><td>Stop-and-Wait per HARQ process; UE reports ACK/NACK on PUCCH/PUSCH; the gNB retransmits with incremental-redundancy and the UE <b>soft-combines</b> at PHY.</td></tr>
+      <tr><td><b>DRX</b></td><td>Discontinuous reception — UE sleeps for power saving; the scheduler honours active times.</td></tr>
+      <tr><td><b>Carrier Aggregation (CA)</b></td><td>Combines multiple component carriers (PCell + SCells) for higher peak throughput.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>How I use PHY/scheduling in validation</h2>
+    <div class="panel case good">
+      <p style="margin:0">When throughput, latency or coverage misbehave, the PHY/scheduling layer often holds the real story:</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Throughput plateau:</b> check reported CQI/MCS — a clamped MCS points to RF or scheduler config, not transport.</li>
+        <li><b>High latency under load:</b> check HARQ retx rate and DRX configuration; PDCCH congestion can starve users.</li>
+        <li><b>Coverage edge:</b> SSB RSRP &amp; beam-failure events; <a href="rf-optimization.html">RF optimization</a> (tilt/power) then closes the gap.</li>
+        <li><b>VoNR call quality:</b> SPS / configured-grant config and 5QI 1 mapping; <a href="volte-vonr.html">voice page</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.211</b> (PHY channels &amp; signals) · <b>TS 38.212</b> (multiplexing/channel coding) · <b>TS 38.213</b> (PHY procedures for control) · <b>TS 38.214</b> (PHY procedures for data, MIMO, CSI) · <b>TS 38.321</b> (MAC) · <b>TS 38.300</b> (overall &amp; scheduling).</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
