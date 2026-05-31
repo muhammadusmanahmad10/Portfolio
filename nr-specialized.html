@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5G NR Specialized Features | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Specialized Features</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Specialized NR Features &middot; URLLC, DSS, IAB, MBS, Sidelink</div>
+  <h1>5G NR Specialized Features</h1>
+  <div class="note" style="margin-top:0;margin-bottom:18px"><span>ℹ️</span><span><b>Knowledge page.</b> Specialized NR features standardised in Rel-16/17/18 that any senior RAN engineer should be able to discuss, even if not all are in their hands-on deployment scope.</span></div>
+  <p class="lede">
+    Beyond mainstream eMBB voice and data, 5G NR specifies several specialized features that broaden the technology
+    into <b>ultra-reliable low-latency</b> applications, <b>spectrum sharing</b> with LTE, <b>self-backhauled</b>
+    radio nodes, <b>broadcast/multicast</b>, and <b>direct device-to-device (sidelink)</b> communication. This page
+    is the quick-reference on each.
+  </p>
+  <div class="chips">
+    <span class="chip">URLLC</span><span class="chip">DSS</span>
+    <span class="chip">IAB</span><span class="chip">NR MBS</span>
+    <span class="chip">Sidelink / PC5 / V2X</span>
+    <span class="chip">mMTC concepts</span>
+  </div>
+
+  <section>
+    <h2>URLLC — Ultra-Reliable Low-Latency Communications</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>What it is:</b> the NR profile for use cases that need <b>1 ms user-plane latency</b> and <b>10<sup>-5</sup> packet error rate</b> — industrial automation, remote control, smart-grid protection.</p>
+      <p style="margin:0 0 10px"><b>How NR achieves it:</b></p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Mini-slot scheduling</b> — 2/4/7 OFDM symbols instead of a full 14-symbol slot, so a packet starts and finishes faster.</li>
+        <li><b>PDCP duplication</b> over multiple RLC entities / cells, then duplicate-discard at the receiver — diversity for reliability.</li>
+        <li><b>Configured Grant (CG) / Semi-Persistent Scheduling (SPS)</b> — pre-allocated resources, no Scheduling-Request round-trip.</li>
+        <li><b>HARQ-less or aggressive HARQ</b> with very low BLER target (~10<sup>-5</sup> at first transmission for the URLLC traffic class).</li>
+        <li><b>Pre-emption indication</b> — eMBB resources can be pre-empted by URLLC traffic mid-slot.</li>
+        <li><b>Compact DCI</b> (formats 0_2 / 1_2) for fast control decoding.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> introduced in Rel-15, enhanced in Rel-16 (IIoT) and Rel-17.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>DSS — Dynamic Spectrum Sharing</h2>
+    <div class="panel">
+      <p style="margin:0"><b>What it is:</b> LTE and NR share <b>the same carrier</b> dynamically, slot-by-slot, instead of statically partitioning the spectrum. The same MHz can carry LTE one millisecond and NR the next, with the scheduler deciding the split based on traffic. The NR side typically rate-matches its PDSCH around the LTE cell-specific reference signals (CRS) and uses <b>MBSFN-like subframes</b> on LTE to free symbols for NR. Critical for operators introducing 5G on low/mid bands while LTE traffic still dominates — no spectrum re-farming hit. 3GPP Release 15+ feature.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>IAB — Integrated Access &amp; Backhaul</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>What it is:</b> a gNB whose <b>backhaul is the NR air interface itself</b> instead of fibre/MW — particularly attractive in mmWave (FR2) where wired backhaul to every cell is impractical.</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>IAB-donor</b> — the gNB with wired backhaul to the 5GC.</li>
+        <li><b>IAB-node</b> — gNB-like node that backhauls itself over NR to the IAB-donor (or another IAB-node, multi-hop).</li>
+        <li><b>BH RLC channels</b> + <b>BAP (Backhaul Adaptation Protocol)</b> route traffic across IAB hops.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> Rel-16 (initial), Rel-17 (mobile IAB, enhancements).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>NR MBS — Multicast / Broadcast Services</h2>
+    <div class="panel">
+      <p style="margin:0"><b>What it is:</b> 5G NR's standardised <b>point-to-multipoint</b> delivery — one transmission serves many UEs in a cell. Replaces LTE's eMBMS. Two modes: <b>Multicast</b> (group of known UEs, with RRC context and feedback) and <b>Broadcast</b> (no UE-specific context, anyone in the cell can decode). Use cases include public-safety alerts, software updates pushed to many devices, live event streaming, V2X group safety messages. Specified in <b>Rel-17</b> (TS 23.247, 38.300).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sidelink (PC5) / NR V2X</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>What it is:</b> direct <b>UE-to-UE communication</b> over the <b>PC5</b> reference point, without traffic having to go through the gNB. The 5G evolution of LTE-V (Rel-14) into <b>NR V2X</b> for vehicle-to-everything (vehicle-to-vehicle, vehicle-to-infrastructure, vehicle-to-pedestrian).</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Mode 1</b> — gNB schedules sidelink resources for the UEs.</li>
+        <li><b>Mode 2</b> — UEs autonomously select resources (no network coverage required).</li>
+        <li><b>Unicast / groupcast / broadcast</b> over PC5; HARQ feedback supported on PC5.</li>
+        <li>Beyond V2X, sidelink is being extended for <b>commercial proximity services (ProSe)</b> and <b>public safety</b>.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> NR V2X in Rel-16; ProSe sidelink enhancements in Rel-17/18.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>mMTC concepts</h2>
+    <div class="panel">
+      <p style="margin:0">Massive-Machine-Type Communications — the ITU-R IMT-2020 use case for huge numbers of low-cost, low-power devices. In practice, this is covered today by <b>NB-IoT</b> and <b>LTE-M (CAT-M)</b> (both LTE-anchored, evolving alongside 5G); the NR-native equivalent is <b>RedCap</b> (Rel-17, reduced-capability NR for wearables / industrial sensors) and the lighter <b>eRedCap</b> in Rel-18. Trade-off across the family is the same: lower bandwidth, fewer Rx branches, longer battery life, simpler stack, narrower use-case.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why each matters in validation</h2>
+    <table class="cmp">
+      <tr><th>Feature</th><th>What a validation engineer checks</th></tr>
+      <tr><td><b>URLLC</b></td><td>End-to-end latency budgets, configured-grant timing, PDCP-duplication efficacy, pre-emption behaviour, BLER targets.</td></tr>
+      <tr><td><b>DSS</b></td><td>NR rate-matching around LTE CRS, MBSFN-subframe coordination, no LTE service degradation when NR traffic spikes.</td></tr>
+      <tr><td><b>IAB</b></td><td>Multi-hop latency, BAP routing, donor/node failover, mmWave fronthaul stability.</td></tr>
+      <tr><td><b>NR MBS</b></td><td>Group join/leave, multicast vs broadcast switching, delivery KPIs at cell edge.</td></tr>
+      <tr><td><b>Sidelink / V2X</b></td><td>Mode-1 vs Mode-2 behaviour, in-coverage / out-of-coverage transition, sidelink HARQ feedback.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.300</b> (NR overall, URLLC/mini-slot/preemption) · <b>TS 38.214</b> (URLLC scheduling) · <b>TS 38.401</b> (IAB architecture) · <b>TS 23.247</b> (NR MBS) · <b>TS 23.287 / 38.300</b> (V2X / PC5) · <b>TS 36.521-2</b> (DSS test methodology) · Rel-16 / Rel-17 / Rel-18 work-item descriptions.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

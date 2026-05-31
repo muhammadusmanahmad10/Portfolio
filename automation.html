@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python / tshark Automation Suite | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Tooling</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Engineering &middot; Test Automation</div>
+  <h1>Python / tshark Automation Suite</h1>
+  <p class="lede">
+    Manual packet inspection is slow, inconsistent, and hard to audit. I built a suite of <b>Python + tshark</b>
+    tools that read a capture, apply the <i>same display filters</i> an engineer would, correlate the expected
+    signalling sequence per UE, and emit a <b>CSV with frame numbers, IPs and copy-paste Wireshark filters</b> plus a
+    PASS/FAIL summary. The result: validation that's repeatable, standardised, and reviewable — not dependent on one
+    engineer's eyes.
+  </p>
+  <div class="chips">
+    <span class="chip">Python</span><span class="chip">tshark / Wireshark</span>
+    <span class="chip">PCAP / PCAPNG</span><span class="chip">CSV + GUI reporting</span>
+    <span class="chip s">Built for 5G SA lab validation</span>
+  </div>
+
+  <section>
+    <h2>How the tools work</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 150" role="img" aria-label="Automation pipeline">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="13" font-weight="700" text-anchor="middle">
+          <rect x="20"  y="50" width="140" height="50" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="90" y="74" fill="#1e293b">PCAP /</text><text x="90" y="91" fill="#64748b" font-size="11">PCAPNG capture</text>
+          <rect x="210" y="50" width="150" height="50" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="285" y="74" fill="#1e3a8a">tshark filter</text><text x="285" y="91" fill="#64748b" font-size="11">ngap / nas-5gs ...</text>
+          <rect x="410" y="50" width="170" height="50" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="495" y="74" fill="#1e3a8a">correlate per UE</text><text x="495" y="91" fill="#64748b" font-size="11">ordered sequence</text>
+          <rect x="630" y="20"  width="220" height="48" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="740" y="44" fill="#0f766e">CSV report</text><text x="740" y="60" fill="#0f766e" font-size="11">frames + filters + PASS/FAIL</text>
+          <rect x="630" y="84"  width="220" height="48" rx="10" fill="#efeafc" stroke="#8b6fd0"/><text x="740" y="108" fill="#6d28d9">GUI summary popup</text><text x="740" y="124" fill="#6d28d9" font-size="11">success vs failed counts</text>
+        </g>
+        <g stroke="#2563eb" marker-end="url(#a)" fill="none">
+          <line x1="160" y1="75" x2="208" y2="75"/><line x1="360" y1="75" x2="408" y2="75"/>
+          <line x1="580" y1="70" x2="628" y2="48"/><line x1="580" y1="80" x2="628" y2="104"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>The four validators</h2>
+    <div class="grid2">
+      <div class="panel"><h3 style="margin-top:0">1 · 5G SA Registration / PDU</h3>
+        <p style="margin:0">Filter <code>ngap &amp;&amp; nas-5gs</code>. Verifies the ordered sequence — <b>security complete → registration → PDU session establishment</b> — and extracts frame numbers for each NAS event. <a href="registration-pdu.html">See registration page →</a></p></div>
+      <div class="panel"><h3 style="margin-top:0">2 · NG Handover</h3>
+        <p style="margin:0">Detects and correlates the three-step NG fingerprint — <b>Handover Required (source) → Handover Notify (target) → UE Context Release (source)</b> — per UE, with src/dst IPs. <a href="ng-handover.html">See NG HO page →</a></p></div>
+      <div class="panel"><h3 style="margin-top:0">3 · Xn Handover (Path Switch)</h3>
+        <p style="margin:0">Correlates the two-step Xn fingerprint — <b>Path Switch Request → Path Switch Request Acknowledge</b> — and reports "Handover Successful over XN interface". <a href="xn-handover.html">See Xn HO page →</a></p></div>
+      <div class="panel"><h3 style="margin-top:0">4 · WPS-User Verifier</h3>
+        <p style="margin:0">Extracts <b>RRC establishment cause, 5QI/ARP, pre-emption flags, S-NSSAI/slice ID, DNN, IMEISV</b> and evaluates WPS criteria for voice/data per UE. <a href="wps-slicing.html">See WPS page →</a></p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Representative code (illustrative)</h2>
+    <pre><span class="k">import</span> subprocess, csv, collections
+
+<span class="k">def</span> <span class="s">extract</span>(capture, display_filter, fields):
+    cmd = [<span class="s">"tshark"</span>, <span class="s">"-r"</span>, capture, <span class="s">"-Y"</span>, display_filter, <span class="s">"-T"</span>, <span class="s">"fields"</span>]
+    <span class="k">for</span> f <span class="k">in</span> fields:
+        cmd += [<span class="s">"-e"</span>, f]
+    out = subprocess.run(cmd, capture_output=<span class="k">True</span>, text=<span class="k">True</span>).stdout
+    <span class="k">return</span> [line.split(<span class="s">"\t"</span>) <span class="k">for</span> line <span class="k">in</span> out.splitlines()]
+
+<span class="c"># NG handover: expected ordered sequence per UE</span>
+SEQ = [<span class="s">"HandoverRequired"</span>, <span class="s">"HandoverNotify"</span>, <span class="s">"UEContextReleaseCommand"</span>]
+rows = extract(cap, <span class="s">"ngap"</span>, [<span class="s">"frame.number"</span>,<span class="s">"ip.src"</span>,<span class="s">"ip.dst"</span>,<span class="s">"ngap.procedureCode"</span>,<span class="s">"ngap.RAN_UE_NGAP_ID"</span>])
+
+by_ue = collections.defaultdict(list)
+<span class="k">for</span> r <span class="k">in</span> rows:
+    by_ue[r[4]].append(r)            <span class="c"># group by RAN_UE_NGAP_ID</span>
+
+<span class="k">for</span> ue, ev <span class="k">in</span> by_ue.items():
+    ok = is_ordered_subsequence(ev, SEQ)
+    write_csv(ue, ev, status=<span class="s">"PASS"</span> <span class="k">if</span> ok <span class="k">else</span> <span class="s">"FAIL"</span>)   <span class="c"># + frames, IPs, filters</span></pre>
+    <div class="note"><span>📈</span><span>Each report includes the exact Wireshark display filter for every flagged frame, so a reviewer can jump straight to the packet — the automation accelerates analysis <i>and</i> leaves a clean audit trail.</span></div>
+  </section>
+
+  <section>
+    <h2>The NGAP / NAS reference guide</h2>
+    <div class="panel case good">
+      <p style="margin:0 0 10px">Alongside the tools I authored a consolidated <b>NGAP/NAS reference guide</b> covering the <b>full UE lifecycle</b> — attach, registration, security, context setup, PDU session establishment, QoS &amp; slice handling, paging &amp; idle mode, session release, deregistration, and handover. For each message it documents:</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Direction &amp; purpose</b>, and exactly <b>what you can see in the AMF logs</b> (key IEs, NAS-PDU details, SCTP info)</li>
+        <li><b>What it means</b> for RAN validation, plus a per-message <b>validation checklist</b></li>
+        <li>A <b>lookup index</b>: which message carries IMSI/SUPI, GUTI/TMSI, UE IDs, NAS security header/MAC/sequence, NR-CGI &amp; TAI, slice info, QoS flows, UPF IPs/TEIDs, ePCO (DNS, P-CSCF), paging identity, DRB mapping/PDCP status, release causes and timers</li>
+        <li><b>Source↔Target transparent-container decoding</b> for RRC continuity &amp; DRB mapping, PDCP SN size / UL-DL SN / HFN per DRB for data-integrity checks across handover</li>
+        <li><b>Optional/enrichment notes</b>: ePCO TLVs, DRB-to-QFI mapping, AUSF/AMF AKA correlation (XRES*/HRES*), NGAP procedure codes/criticality, NAS timers (T3512, T3502, T3560), reject causes, paging-response KPIs, SCTP stream usage</li>
+      </ul>
+      <p style="margin:12px 0 0">It also documents the less-common messages that show up in AMF logs (PDU session resource modify, UE context suspend/resume for RRC-inactive, AMF configuration update, NG Setup, error indication, reset/reset-ack, NAS service/registration reject, notification, policy update). Aligned to <b>TS 24.501, TS 38.413, TS 23.502</b>, it gives any validation engineer a single place to find which message holds the field they need, what it means, and how to validate it.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Operations automation &mdash; Excel / VBA macros</h2>
+    <p>Beyond the lab Python suite, I built a set of <b>Excel/VBA macros</b> that turned high-volume, repetitive integration tasks into one-click operations &mdash; saving hours per activity and eliminating manual-typing mistakes that were the actual cause of most rollback incidents.</p>
+    <div class="steps">
+      <div class="step"><div class="n">RET</div><div>
+        <span class="msg">RET Configuration macro</span>
+        <span class="desc">After powering on RET ports, the site engineer confirmed which jumper went to which layer. The macro <b>scanned the ALD output for RET serial numbers</b>, matched each serial to the layer the engineer confirmed, looked up the planned <b>tilt from the RF data sheet</b>, and emitted the full <code>ADD RET</code> command set for the site. One click instead of dozens of manual lookups; eliminated the wrong-tilt-on-wrong-sector class of error.</span></div></div>
+      <div class="step"><div class="n">Bulk CR</div><div>
+        <span class="msg">Bulk CR opening (30+ CRs &rarr; Outlook)</span>
+        <span class="desc">Before starting an integration window we had to open <b>30+ Change Requests</b> with NOC. The macro reads each CR row from Excel, opens an Outlook draft with the <b>CR info in the body</b>, sets <b>To/CC recipients</b>, sets the <b>email subject to the CR number</b>, and sends. All 30+ notification emails go out within a minute &mdash; manually this used to take 30+ minutes of error-prone copy-paste.</span></div></div>
+      <div class="step"><div class="n">Xn/X2</div><div>
+        <span class="msg">Xn / X2 interface creation macro</span>
+        <span class="desc">For peer-site interface setup, the macro generated the scripts to create the <b>SCTPPEER</b> for the peer gNB/eNB and add it to the correct <b>EPGROUP</b> for the Xn or X2 interface. Removes a frequent source of mis-typed peer IPs and port mappings that block interface bring-up.</span></div></div>
+      <div class="step"><div class="n">Health</div><div>
+        <span class="msg">Site health-check verification macro</span>
+        <span class="desc">After integration, the macro reads the site's running parameters and <b>cross-checks them against the MTAC reference health-check sheet</b> (which says, parameter by parameter, what value each should hold). Mismatches are flagged automatically &mdash; what used to be a multi-hour manual audit becomes seconds.</span></div></div>
+      <div class="step"><div class="n">Pre/Post</div><div>
+        <span class="msg">Pre/Post cell-status verification macro</span>
+        <span class="desc">Compares <b>pre-activity and post-activity cell-status reports</b> across the whole network; flags any cell whose state changed unexpectedly &mdash; e.g. a deactivated cell that's now active, or an active cell that's been deactivated by accident. Catches "wrong cell touched" errors <i>before</i> they hit a customer escalation.</span></div></div>
+    </div>
+    <div class="note"><span>💡</span><span><b>Common pattern:</b> each macro takes a repetitive, error-prone task humans were doing dozens of times per activity, and turns it into a one-click operation backed by the planning data we already had in Excel. The win isn't just time &mdash; it's the elimination of the manual-typing class of integration faults.</span></div>
+  </section>
+
+  <section>
+    <h2>Impact</h2>
+    <div class="panel">
+      <p style="margin:0">Together, the suite turns slow, manual, error-prone PCAP review into a <b>repeatable, standardized PASS/FAIL</b> with a built-in audit trail — and the reference guide makes the team's signalling knowledge reusable instead of locked in one person's head. Both reduce ramp-up time for new validation engineers and improve consistency across regression cycles.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Primary references</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 24.501</b> — 5G NAS. &nbsp;·&nbsp; <b>3GPP TS 38.413</b> — NGAP. &nbsp;·&nbsp; <b>3GPP TS 23.502</b> — procedures. &nbsp;·&nbsp; Wireshark / tshark display-filter reference.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Lab Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
