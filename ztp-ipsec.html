@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZTP & IPsec — 5G SA Femto | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Provisioning &amp; Security</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Provisioning &middot; ZTP, IPsec &amp; Certificates</div>
+  <h1>Zero-Touch Provisioning &amp; IPsec</h1>
+  <p class="lede">
+    A 5G SA femto is <b>plug-and-play</b>: plug it into any internet connection and it provisions itself —
+    builds secure tunnels, pulls its configuration, validates its physical location, and comes on air with
+    <b>no manual setup</b>. That is <b>Zero-Touch Provisioning (ZTP)</b>, and it rides on <b>IPsec</b> tunnels to
+    the operator. I validate the whole bring-up, the geo-security that locks it to an approved location, and the
+    certificate lifecycle.
+  </p>
+  <div class="chips">
+    <span class="chip">IKEv2 / IPsec</span><span class="chip">ZTP auto-provisioning</span>
+    <span class="chip">Cert enrollment &amp; renewal</span><span class="chip">20 m geo-lock</span>
+    <span class="chip s">Validated on a live 5G SA Femto deployment</span>
+  </div>
+
+  <section>
+    <h2>ZTP bring-up sequence</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 250" role="img" aria-label="ZTP and IPsec bring-up">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="12" font-weight="700" text-anchor="middle">
+          <rect x="20"  y="100" width="120" height="50" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="80" y="120" fill="#1e293b">Femto</text><text x="80" y="138" fill="#64748b" font-size="10">powers on</text>
+          <rect x="180" y="100" width="120" height="50" rx="10" fill="#efeafc" stroke="#8b6fd0"/><text x="240" y="120" fill="#6d28d9">SeGW</text><text x="240" y="138" fill="#6d28d9" font-size="10">+ temp tunnel</text>
+          <rect x="340" y="100" width="120" height="50" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="400" y="120" fill="#1e3a8a">NMS</text><text x="400" y="138" fill="#64748b" font-size="10">config / files</text>
+          <rect x="500" y="60"  width="160" height="50" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="580" y="80" fill="#0f766e">Location verify</text><text x="580" y="98" fill="#0f766e" font-size="10">BMC/LMF/GMLC, ≤20 m</text>
+          <rect x="500" y="140" width="160" height="50" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="580" y="160" fill="#0f766e">2 perm tunnels</text><text x="580" y="178" fill="#0f766e" font-size="10">NMS + 5G Core</text>
+          <rect x="700" y="100" width="150" height="50" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="775" y="120" fill="#1e3a8a">On air</text><text x="775" y="138" fill="#64748b" font-size="10">cells + neighbours</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a)" fill="none">
+          <line x1="140" y1="125" x2="178" y2="125"/>
+          <line x1="300" y1="125" x2="338" y2="125"/>
+          <line x1="460" y1="115" x2="498" y2="90"/>
+          <line x1="660" y1="85"  x2="690" y2="110"/>
+          <line x1="660" y1="165" x2="690" y2="140"/>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:12px">On power-up the femto opens <b>one temporary IPsec tunnel</b> to the security gateway. The <b>device certificate enrollment</b> (PKI per TS 33.310 — CMP/CMPv2) is completed first inside this temporary tunnel; only after the femto holds its issued operator certificate does the OAM exchange proceed, the femto registers with the NMS, and its location is verified. <b>Only after location is confirmed</b> are the <b>two permanent tunnels</b> built — one to the <b>NMS</b>, one to the <b>5G Core</b>. ZTP then auto-provisions cell parameters, neighbour relations, and the <b>BMC / LMF / GMLC</b> components; I verify the NMS correctly handles the ZTP file uploads and responds with the spectrum/BMC/LMF/GMLC pieces.</p>
+  </section>
+
+  <section>
+    <h2>Geo-security — the 20 m location lock</h2>
+    <div class="panel case good">
+      <p style="margin:0 0 10px">Because the femto is portable, it must not work outside its authorised spot. I validated that the femto checks its position and stays in service <b>only within a 20&nbsp;m radius</b> — move it beyond 20&nbsp;m and it is <b>automatically blocked</b> for security. The reboot/reset matrix confirms this is enforced consistently:</p>
+      <table class="cmp">
+        <tr><th>Action</th><th>Config retained?</th><th>ZTP triggered?</th><th>Location re-validated?</th></tr>
+        <tr><td>Soft reboot</td><td>Yes</td><td>No</td><td>Yes (≤20 m)</td></tr>
+        <tr><td>Hard reboot</td><td>Yes</td><td>No</td><td>Yes (≤20 m)</td></tr>
+        <tr><td>Factory reset</td><td>No (cleared)</td><td>Yes</td><td>Yes (≤20 m)</td></tr>
+      </table>
+      <p style="margin:12px 0 0">I also validated the <b>power-on/boot sequence</b> timing and <b>LED indications</b> against the design.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Certificate lifecycle</h2>
+    <div class="panel">
+      <p style="margin:0">IPsec to the operator is certificate-authenticated, so I validate the <b>device initial certificate enrollment</b> (the femto obtaining its identity certificate on first bring-up) and <b>certificate renewal</b> (rolling the cert before expiry without dropping service). A broken enrollment or a missed renewal means no tunnel — and therefore no service — so this is a core part of turn-up validation.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study — IPsec/transport faults that blocked bring-up</h2>
+    <div class="grid2">
+      <div class="panel case">
+        <h3 style="margin-top:0">Traffic-selector mismatch</h3>
+        <p style="margin:0">An interface wouldn't establish because the <b>traffic selector</b> defined at the security gateway was <code>10.0.0.0</code> while the peer site was <code>42.0.0.0</code> — packets were dropped after the SeGW. Aligning selectors fixed reachability.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">DPD timeout under load</h3>
+        <p style="margin:0">Under high load the <b>IPsec tunnel went down on a DPD timeout</b> and the femto stopped sending to the SeGW — surfacing as RRC establishment failures until the tunnel recovered.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why the plug-and-play model matters (deployment context)</h2>
+    <div class="panel">
+      <p style="margin:0">This internet-delivered femto is ideal where Wi-Fi exists but VoWiFi isn't viable — e.g. <b>enterprises</b> where guests can't access corporate Wi-Fi, employees prefer not to join it, or the company applies <b>DSCP marking</b> that permits browsing but not VoWiFi. The femto delivers licensed 5G SA voice/data without depending on the enterprise Wi-Fi policy. Understanding this context is what lets me prioritise the test cases that actually matter for the deployment.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Location gate is a hard dependency.</b> Permanent tunnels (and service) only come up after the ≤20 m check passes.</li>
+      <li><b>Factory reset ≠ reboot.</b> Only factory reset clears config and re-triggers ZTP — important when reproducing field issues.</li>
+      <li><b>Certificates are silent killers.</b> Enrollment/renewal failures look like generic "no service"; check the tunnel and cert state first.</li>
+      <li><b>Traffic selectors must match end-to-end</b> — a pingable path can still drop the tunnel's protected traffic.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Primary references</h2>
+    <div class="panel"><p class="ref"><b>RFC 7296</b> — IKEv2. &nbsp;·&nbsp; <b>3GPP TS 33.310</b> — network domain security / PKI (certificate enrollment, CMP). &nbsp;·&nbsp; <b>3GPP TS 33.501</b> — 5G security architecture. &nbsp;·&nbsp; <b>3GPP TS 28.xxx</b> — management &amp; provisioning (ZTP/NMS).</p></div>
+  </section>
+
+  <section>
+    <h2>IPsec / IKE building blocks I validate</h2>
+    <table class="cmp">
+      <tr><th>Element</th><th>What it is &amp; what I check</th></tr>
+      <tr><td><b>IKE SA (IKESA)</b></td><td>The <b>control-plane Security Association</b> negotiated by IKE_SA_INIT — it carries the keying material, DH group, encryption / integrity algorithms and a SPI pair used to protect all subsequent IKE messages. I check that IKE_SA_INIT completes (DH exchange + nonces + cookies if anti-DoS is on), that the negotiated proposals match the SeGW (encryption / PRF / integrity / DH group), and that <b>rekey</b> fires before the lifetime expires without dropping the IKE channel.</td></tr>
+      <tr><td><b>IKE_AUTH</b></td><td>The second exchange that authenticates the peers and creates the first Child SA. I verify the femto presents the correct <b>device certificate</b> (CN/SAN matches the SeGW expectation), the SeGW chain is validated against the trusted CA, and that the EAP / cert-only path matches the design.</td></tr>
+      <tr><td><b>Child SA (IPsec SA)</b></td><td>The actual <b>data-plane SA</b> created under the IKE SA — one pair per direction, with its own SPI, keys and selectors. I verify that one Child SA covers temp / NMS / 5GC traffic as designed and that <b>rekey</b> (time- or byte-based) works without packet loss.</td></tr>
+      <tr><td><b>Traffic Selectors (TSi / TSr)</b></td><td>The address / port ranges that say what traffic the Child SA protects. I match the femto's local selector to the SeGW's peer selector — the <code>10.0.0.0 vs 42.0.0.0</code> case was exactly a TS mismatch.</td></tr>
+      <tr><td><b>Encryption / Integrity proposal</b></td><td>e.g. AES-GCM-256 / AES-CBC-256 + SHA-256 / SHA-384. I verify proposal alignment between peers — one mismatched transform in the proposal kills IKE_SA_INIT.</td></tr>
+      <tr><td><b>DH group / PFS</b></td><td>DH group used for IKE SA and for Child SA rekey (PFS). I confirm the group is enabled on both sides (e.g. group 14 / 19 / 20) and that PFS-on-rekey behaves.</td></tr>
+      <tr><td><b>DPD (Dead Peer Detection)</b></td><td>Liveness probes over the IKE SA. I tune interval / retries and reproduce the load-induced <b>DPD timeout</b> case so the SA tears down cleanly and rebuilds rather than going zombie.</td></tr>
+      <tr><td><b>NAT-T (RFC 3947 / 3948)</b></td><td>UDP-encapsulated ESP on port 4500 when a NAT is in the path. I confirm NAT-D payload detection, the keepalive cadence, and that the femto behind enterprise NAT still rekeys cleanly.</td></tr>
+      <tr><td><b>Device certificate &amp; CA chain</b></td><td>Operator-issued cert (TS 33.310 / CMPv2). I check enrollment on first bring-up, the chain to the operator Root CA, expiry / renewal behaviour, and that revocation (CRL / OCSP) is honoured.</td></tr>
+      <tr><td><b>SeGW reachability &amp; FQDN / IP list</b></td><td>The SeGW set the femto tries (primary / backup), DNS resolution of the SeGW FQDN, and failover when the primary SeGW is unreachable.</td></tr>
+    </table>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
