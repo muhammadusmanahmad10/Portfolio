@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5G NR Specialized Features | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Specialized Features</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Specialized NR Features &middot; URLLC, DSS, IAB, MBS, Sidelink</div>
+  <h1>5G NR Specialized Features</h1>
+  <div class="note" style="margin-top:0;margin-bottom:18px"><span>ℹ️</span><span><b>Knowledge page.</b> Specialized NR features standardised in Rel-16/17/18 &mdash; included for completeness alongside the hands-on deployment work covered elsewhere in the portfolio.</span></div>
+  <p class="lede">
+    Most of 5G is about everyday phone traffic &mdash; voice, video, browsing &mdash; called <b>eMBB</b>. On top of that,
+    3GPP adds a handful of <b>specialized features</b> for use-cases where eMBB isn&rsquo;t the right fit: things that need
+    near-zero latency, sharing spectrum with LTE, gNBs that backhaul over the air, one-to-many broadcasts,
+    direct phone-to-phone radio, or huge fleets of low-power sensors. This page explains each one in plain language.
+  </p>
+  <div class="chips">
+    <span class="chip">URLLC</span><span class="chip">DSS</span>
+    <span class="chip">IAB</span><span class="chip">NR MBS</span>
+    <span class="chip">Sidelink / PC5 / V2X</span>
+    <span class="chip">mMTC concepts</span>
+  </div>
+
+  <section>
+    <h2>URLLC &mdash; Ultra-Reliable Low-Latency Communications</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>In one line:</b> the &ldquo;don&rsquo;t-drop-a-single-packet, deliver-it-now&rdquo; mode of 5G &mdash; used where a late or lost packet has real-world consequences (factory robot, surgical tool, smart-grid breaker). Target: about <b>1 ms latency</b> and <b>one error per 100,000 packets</b>.</p>
+      <p style="margin:0 0 10px"><b>How NR pulls it off &mdash; in plain words:</b></p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Mini-slot scheduling</b> &mdash; instead of waiting for a full slot, the scheduler can send a short 2/4/7-symbol mini-slot so a packet starts <i>and</i> finishes much faster.</li>
+        <li><b>PDCP duplication</b> &mdash; send the same packet twice over different paths (different cells or carriers); the receiver keeps the first copy that arrives correctly. Belt-and-braces reliability.</li>
+        <li><b>Configured Grant / SPS</b> &mdash; pre-book uplink resources for the UE so it can transmit immediately, without first asking and waiting.</li>
+        <li><b>Aggressive HARQ target</b> &mdash; aim for almost-zero errors on the first transmission, instead of the usual ~10% with retransmissions.</li>
+        <li><b>Pre-emption</b> &mdash; if URLLC traffic shows up mid-slot, it can steal resources from regular eMBB traffic.</li>
+        <li><b>Compact DCI</b> &mdash; smaller / faster scheduling messages so control decoding doesn&rsquo;t add latency.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> introduced in Rel-15, enhanced in Rel-16 (Industrial IoT) and Rel-17.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>DSS &mdash; Dynamic Spectrum Sharing</h2>
+    <div class="panel">
+      <p style="margin:0"><b>In one line:</b> let <b>LTE and 5G NR ride the same MHz of spectrum, alternating slot-by-slot</b>, instead of forcing the operator to clear a band before launching 5G. The scheduler decides on the fly: this millisecond is LTE, the next is NR. NR rate-matches its data around LTE&rsquo;s cell-specific reference signals (CRS), and LTE marks some sub-frames as MBSFN-like to free symbols for NR. <b>Why it matters:</b> an operator can light up 5G on a low / mid band while LTE still carries the bulk of the traffic &mdash; no painful refarming and no users left behind. 3GPP Rel-15+.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>IAB &mdash; Integrated Access &amp; Backhaul</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>In one line:</b> a gNB that uses <b>the NR air interface itself as its backhaul</b> &mdash; no fibre or microwave required. Especially useful at mmWave (FR2), where dropping fibre to every tiny cell on every street corner isn&rsquo;t practical.</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>IAB-donor</b> &mdash; the &ldquo;anchor&rdquo; gNB with real wired backhaul into the 5G core.</li>
+        <li><b>IAB-node</b> &mdash; gNB-like node that hops back to the donor over NR (can chain multiple hops).</li>
+        <li><b>BAP (Backhaul Adaptation Protocol)</b> + BH RLC channels route the traffic across those wireless hops.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> Rel-16 (initial), Rel-17 (mobile IAB and enhancements).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>NR MBS &mdash; Multicast / Broadcast Services</h2>
+    <div class="panel">
+      <p style="margin:0"><b>In one line:</b> <b>one transmission, many listeners</b>. Instead of sending the same packet separately to a thousand UEs, the cell sends it once and they all decode it. The 5G version of LTE&rsquo;s eMBMS, with two flavours: <b>Multicast</b> (a known group, with RRC context and feedback) and <b>Broadcast</b> (no UE-specific setup &mdash; anyone in the cell can pick it up). Useful for things like public-safety alerts, software updates to many devices at once, live event streaming, and V2X group safety messages. Specified in Rel-17 (TS 23.247, TS 38.300).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sidelink (PC5) / NR V2X</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px"><b>In one line:</b> <b>phones (or vehicles) talking directly to each other over the radio, without going through a gNB</b>. The link between two UEs is called <b>PC5</b>. Original use-case is vehicles &mdash; <b>V2X</b> (vehicle-to-vehicle, vehicle-to-infrastructure, vehicle-to-pedestrian) &mdash; but it&rsquo;s being extended to commercial proximity services and public safety.</p>
+      <ul class="clean" style="margin-top:0">
+        <li><b>Mode 1</b> &mdash; the gNB allocates the sidelink resources for the UEs (works in coverage).</li>
+        <li><b>Mode 2</b> &mdash; the UEs pick their own resources autonomously (works out of coverage, e.g. tunnels).</li>
+        <li><b>Unicast / groupcast / broadcast</b> are all supported over PC5; HARQ feedback works on PC5 too.</li>
+        <li>Beyond V2X, sidelink is being extended to <b>ProSe</b> (proximity services) and <b>public safety</b>.</li>
+      </ul>
+      <p style="margin:10px 0 0"><b>3GPP context:</b> NR V2X in Rel-16; ProSe / sidelink enhancements in Rel-17/18.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>mMTC &mdash; massive Machine-Type Communications</h2>
+    <div class="panel">
+      <p style="margin:0"><b>In one line:</b> the &ldquo;huge fleets of tiny, cheap, battery-powered things&rdquo; corner of the network &mdash; sensors, meters, trackers, wearables &mdash; that don&rsquo;t need fast data but do need <b>very low power, very low cost</b>, and the ability to run for years on a battery. Today this is mostly served by <b>NB-IoT</b> and <b>LTE-M / Cat-M</b> on the LTE side. The NR-native equivalents are <b>RedCap</b> (Reduced-Capability NR, Rel-17 &mdash; for wearables and industrial sensors) and the lighter <b>eRedCap</b> in Rel-18. Same trade-off across the family: lower bandwidth, fewer receive antennas, longer battery life, simpler stack.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why each matters in validation &mdash; in plain words</h2>
+    <table class="cmp">
+      <tr><th>Feature</th><th>What I would actually check</th></tr>
+      <tr><td><b>URLLC</b></td><td>Is the end-to-end latency really within the 1 ms budget? Are configured-grant resources arriving on time? Is PDCP duplication actually being deduplicated at the receiver? Is pre-emption firing when URLLC traffic shows up? Is first-transmission BLER as low as claimed?</td></tr>
+      <tr><td><b>DSS</b></td><td>Is the NR data correctly rate-matched around the LTE CRS (so nothing collides)? Are the LTE MBSFN sub-frames actually freeing the symbols NR expects? Does LTE service stay healthy when NR traffic ramps?</td></tr>
+      <tr><td><b>IAB</b></td><td>How much extra latency does each wireless hop add? Does BAP route traffic to the right path? Does the system fail over cleanly when a donor / node drops? Is the mmWave back-link stable enough to act as backhaul?</td></tr>
+      <tr><td><b>NR MBS</b></td><td>Can UEs join and leave a multicast group cleanly? Does it switch correctly between multicast and broadcast? Are all UEs &mdash; including those at the cell edge &mdash; actually receiving the content?</td></tr>
+      <tr><td><b>Sidelink / V2X</b></td><td>Does Mode-1 (network-scheduled) behave correctly in coverage, and Mode-2 (UE-autonomous) out of coverage? Does the link survive transitions between the two? Is sidelink HARQ feedback working between the UEs?</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.300</b> (NR overall, URLLC/mini-slot/preemption) · <b>TS 38.214</b> (URLLC scheduling) · <b>TS 38.401</b> (IAB architecture) · <b>TS 23.247</b> (NR MBS) · <b>TS 23.287 / 38.300</b> (V2X / PC5) · <b>TS 36.521-2</b> (DSS test methodology) · Rel-16 / Rel-17 / Rel-18 work-item descriptions.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
