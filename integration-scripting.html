@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-RAT Integration & Scripting | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; RAN Deployment</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Deployment &middot; Integration &amp; Scripting (2G–5G)</div>
+  <h1>Multi-RAT Integration &amp; Scripting</h1>
+  <p class="lede">
+    Across 1,000+ sites I integrated and commissioned RAN spanning <b>2G, 3G, 4G, 5G and NB-IoT</b> on a single
+    multi-mode platform. That means writing the site scripts, merging baseband, converting standalone radios to
+    <b>SRAN</b> (one cabinet serving multiple technologies), expanding sector-carriers, and bringing complex radio
+    topologies on air — through CME, local maintenance terminals, and direct CLI integration.
+  </p>
+  <div class="chips">
+    <span class="chip">SRAN</span><span class="chip">BBU merging</span>
+    <span class="chip">MORAN / MOCN</span><span class="chip">4T6S · Multi-RRU</span>
+    <span class="chip">CME · LMT · CLI</span>
+  </div>
+
+  <section>
+    <h2>Multi-mode site architecture</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 860 230" role="img" aria-label="SRAN multi-mode site">
+        <g font-family="Segoe UI,Arial" font-size="12" font-weight="700" text-anchor="middle">
+          <rect x="40" y="60" width="170" height="120" rx="12" fill="#eef2f8" stroke="#2563eb"/>
+          <text x="125" y="50" fill="#1e3a8a" font-size="13">BBU (multi-mode)</text>
+          <rect x="58" y="78"  width="134" height="26" rx="6" fill="#e8eef9"/><text x="125" y="96" fill="#334155" font-size="11">2G / 3G baseband</text>
+          <rect x="58" y="110" width="134" height="26" rx="6" fill="#e8eef9"/><text x="125" y="128" fill="#334155" font-size="11">4G baseband</text>
+          <rect x="58" y="142" width="134" height="26" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="125" y="160" fill="#0f766e" font-size="11">5G baseband</text>
+          <!-- CPRI -->
+          <rect x="330" y="70" width="150" height="44" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="405" y="90" fill="#1e293b" font-size="11">RRU / AAU</text><text x="405" y="105" fill="#64748b" font-size="10">low band (L700/L900)</text>
+          <rect x="330" y="130" width="150" height="44" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="405" y="150" fill="#1e293b" font-size="11">Massive MIMO AAU</text><text x="405" y="165" fill="#64748b" font-size="10">n41 / n77 (4T6S, 64T64R)</text>
+          <!-- core -->
+          <rect x="600" y="95" width="220" height="56" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="710" y="118" fill="#0f766e">Transport &rarr; Core</text><text x="710" y="136" fill="#0f766e" font-size="10">MORAN / MOCN sharing</text>
+        </g>
+        <g stroke="#1d4ed8" fill="none" stroke-width="1.4">
+          <line x1="210" y1="100" x2="328" y2="92"/><line x1="210" y1="140" x2="328" y2="152"/>
+          <line x1="210" y1="120" x2="598" y2="123"/>
+        </g>
+        <text x="270" y="200" font-family="Segoe UI,Arial" font-size="10.5" fill="#94a3b8">CPRI / eCPRI fronthaul</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Core configuration work — and what each actually means</h2>
+    <table class="cmp">
+      <tr><th>Operation</th><th>What it is &amp; why it's done</th></tr>
+      <tr><td><b>SRAN conversion</b></td><td>Consolidating separate single-RAT radios onto one multi-mode (Single RAN) platform so 2G/3G/4G/5G share baseband, transport and radios — cuts hardware, site visits and power.</td></tr>
+      <tr><td><b>BBU merging</b></td><td>Combining baseband units so multiple technologies/cells run from one BBU — frees slots and simplifies the site, but requires careful cell/clock/transport re-mapping in script.</td></tr>
+      <tr><td><b>Sector-carrier expansion</b></td><td>Adding carriers/sectors for capacity — the script must extend cell, carrier, and resource mapping without disrupting live cells.</td></tr>
+      <tr><td><b>4T6S / Multi-RRU</b></td><td>Advanced radio topologies (4 transmit / 6 sector, multiple RRUs per cell) for coverage/capacity — sensitive to CPRI mapping and working-mode config.</td></tr>
+      <tr><td><b>MORAN / MOCN</b></td><td>RAN sharing: MORAN = shared radio, separate carriers per operator; MOCN = shared carrier, multiple operators' core networks (multiple PLMNs broadcast).</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>How I worked</h2>
+    <div class="panel">
+      <p style="margin:0">I prepared complex site scripts in <b>CME</b> (configuration management) and applied them, with <b>on-site integration via local maintenance terminals (LMT) and direct CLI for minimal configuration and modification</b> &mdash; covering refarming, rehoming, IP migration, IP security, and software/licensing updates across <b>BTS, NodeB, eNodeB and gNodeB</b>. Because a single script touches cells, clocks, transport and radios at once, the discipline is in <b>validating the script against the existing config before commit</b> &mdash; most integration incidents (see the <a href="icase-library.html">case library</a>) trace back to a working-mode, topology, or peer-end mismatch that a careful pre-check catches.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Representative integrations I delivered</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Massive MIMO &amp; advanced configs</b> across large rollout programs — see <a href="massive-mimo.html">Massive MIMO &amp; advanced radio</a>.</li>
+      <li><b>5G SA/NSA hybrid sites, NR UL/DL decoupling, RedCap, BookBBU</b>, small cells, DAS and LampSite indoor systems.</li>
+      <li><b>NB-IoT</b> rollout for coverage/IoT capacity on 4G expansion programs.</li>
+      <li><b>Like-for-like multi-vendor swaps</b> (2G/4G/5G) with post-acceptance expansion.</li>
+      <li><b>L900Cr2 / refarming</b> scripting and integration at scale (thousands of sites).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Case study &mdash; one IPsec tunnel for two MMEs sharing a SeGW (ACL RULE + IPsec policy sequence)</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Starting point</dt><dd>The baseline configuration built <b>one IPsec tunnel per MME</b>, even when the two MMEs sat behind the <b>same Security Gateway (SeGW)</b>. The result was duplicate tunnels, duplicate ACL / IKEPEER / IPSECPOLICY objects, and extra control-plane load &mdash; with no real security or routing benefit because both MMEs were reachable through the same SeGW.</dd>
+        <dt>What I changed</dt><dd>Reworked the configuration so <b>one ACL RULE could be bound to two IKEPEERs</b> through the same Child SA. The <code>ACLRULE</code> destination IP / subnet was widened to cover the address ranges of both MMEs, and the <code>IPSECPOLICY</code> bound that single ACL rule to the shared SeGW peer &mdash; collapsing two tunnels into one.</dd>
+        <dt>The catch: IPsec policy sequence</dt><dd>The vendor&rsquo;s <code>IPSECPOLICY</code> entries are <b>matched in sequence (1, 2, 3, &hellip;)</b> &mdash; the first matching rule wins. The widened &ldquo;aggressive&rdquo; ACL covers a broad subnet, so if it is placed early in the sequence it will <b>also match traffic that should have used a more specific policy lower down the list</b> &mdash; that traffic ends up sent through the wrong IKEPEER. <b>Rule of thumb: aggressive / broad ACLs must sit at the bottom of the sequence; specific destinations go above them.</b> Same principle as a router ACL &mdash; specific rules first, broad rules last.</dd>
+        <dt>The wildcard-vs-subnet-mask trap</dt><dd>The <code>ACLRULE</code> uses a <b>wildcard mask</b> on the destination, not a subnet mask &mdash; conceptually <i>opposite</i> to a subnet mask (bits that are wildcarded = <code>1</code>, bits that must match = <code>0</code>). For a subnet <code>10.0.0.0 / 255.0.0.0</code> (subnet-mask form), the equivalent ACL line is destination <code>10.0.0.0</code> with wildcard <code>0.255.255.255</code>. If a subnet mask is mistakenly typed in the wildcard field (e.g. <code>255.0.0.0</code> instead of <code>0.255.255.255</code>), the match window flips: it matches everything <i>except</i> the intended subnet, sending the wrong flows through the tunnel &mdash; effectively creating a routing loop / black-hole at the IPsec layer.</dd>
+        <dt>Concept &amp; takeaway</dt><dd>For multiple peers sharing a SeGW, one tunnel + one ACL with the right wildcard + correct policy sequence is the cleaner design. <span class="tag-good">Takeaway:</span> the two things that bite you on this vendor&rsquo;s IPsec are <b>policy-match order</b> (broad last, specific first) and the <b>wildcard mask convention</b> (inverse of a subnet mask). Both are silent failures &mdash; nothing alarms, traffic just goes the wrong way.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study &mdash; small-cell 3G cells not coming up because <code>BASEBANDEQM</code> couldn&rsquo;t be bound from LMT</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>During a small-cell integration the <b>3G (UMTS) cells would not come up</b>. The cell objects existed and the rest of the site was healthy, but the cells sat in &ldquo;not configured&rdquo; / unavailable state.</dd>
+        <dt>Investigation</dt><dd>On the <b>LMT (Local Maintenance Terminal)</b> the configuration query that links the cell to its baseband equipment object showed <b>no BASEBANDEQM binding</b> for the affected cells, and the MML command needed to assign it <b>wasn&rsquo;t available</b> in that session. This pointed to a <b>limited MML package</b> on the LMT &mdash; the package loaded onto the LMT didn&rsquo;t expose the BASEBANDEQM-to-cell binding command for the small-cell board variant.</dd>
+        <dt>Fix</dt><dd>Brought the site under the central <b>CME (Configuration Management Engine)</b>, where the full set of MOs / commands is available regardless of board variant. From the CME the cell&rsquo;s <b>BASEBANDEQM ID was assigned</b>, the configuration was activated to the site, and the <b>3G cells came up</b> on the next setup attempt.</dd>
+        <dt>Concept &amp; takeaway</dt><dd><b>LMT and CME aren&rsquo;t equivalent.</b> LMT is the site-side maintenance tool and only exposes the MML commands present in the package it was loaded with &mdash; a slim package can hide objects/commands that the hardware actually supports. CME is the central, full-featured configuration tool. <span class="tag-good">Takeaway:</span> if a configuration command is &ldquo;missing&rdquo; on LMT and the cells won&rsquo;t come up, escalate to CME before assuming the hardware doesn&rsquo;t support it &mdash; nine times out of ten it&rsquo;s a package-level limitation.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Working-mode must match the peer end.</b> A mismatched RF-unit working mode between GU/inter-system ends is a classic conflict-alarm source.</li>
+      <li><b>Validate topology before commit.</b> RRU network-topology/type mismatches surface as setup failures after integration.</li>
+      <li><b>Frequency/MAGROUP overlaps block cell setup</b> — check band plans before adding U900/G900 carriers.</li>
+      <li><b>SRAN conversions touch everything at once</b> — clock, transport, cells — so stage and verify each layer.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Platform glossary &mdash; hardware &amp; parameters I configure</h2>
+    <p>The objects and parameters I work with day-to-day when scripting and integrating multi-mode sites:</p>
+    <h3>Baseband, boards &amp; connectivity</h3>
+    <table class="cmp">
+      <tr><th>Element</th><th>Role</th></tr>
+      <tr><td><b>BBU</b></td><td>Baseband Unit — the site's processing cabinet hosting the boards below.</td></tr>
+      <tr><td><b>MPT / BBP</b></td><td>Main Processing &amp; Transmission unit / Baseband Processing board — control, transmission and L1/L2 baseband.</td></tr>
+      <tr><td><b>UPEU / UEIU</b></td><td>Power &amp; environment unit / environment-interface unit (external alarms: door, temperature, water).</td></tr>
+      <tr><td><b>UCIU / UTRP</b></td><td>Inter-BBU control link unit / transmission processing unit (backhaul transport into the BBU).</td></tr>
+      <tr><td><b>RHUB</b></td><td>Remote hub — switch-like aggregation for connecting multiple radios (pRRUs) over one link.</td></tr>
+      <tr><td><b>RRU / pRRU</b></td><td>Remote Radio Unit / pico-RRU (indoor) — the radio that drives the antenna.</td></tr>
+      <tr><td><b>AAU / BFANT</b></td><td>Active Antenna Unit (NR) / beamforming antenna for Massive MIMO.</td></tr>
+      <tr><td><b>Sector / SECTOREQM</b></td><td>Sector and sector-equipment objects mapping radios to antennas.</td></tr>
+      <tr><td><b>ETHPORT</b></td><td>Ethernet port config — MTU size, copper/fibre, 1G/1000M, duplex (forced where auto-neg fails).</td></tr>
+      <tr><td><b>RET / Mtilt</b></td><td>Remote Electrical Tilt / mechanical tilt for antenna optimization.</td></tr>
+    </table>
+    <h3>Cell objects, RF &amp; mobility parameters</h3>
+    <table class="cmp">
+      <tr><th>Parameter / object</th><th>Meaning</th></tr>
+      <tr><td><b>Cell / NRCell / NRDUCell / ExternalCell</b></td><td>LTE cell, NR logical cell, NR DU cell, and externally-defined neighbour cell objects.</td></tr>
+      <tr><td><b>HRRU / RFACELL (DCU/DAS)</b></td><td>High-power RRU and RF-aggregation cell objects for DAS / distributed indoor systems.</td></tr>
+      <tr><td><b>PCI / Root Sequence Index</b></td><td>Physical Cell ID and PRACH root sequence — planned to avoid collision/confusion and PRACH interference.</td></tr>
+      <tr><td><b>EARFCN / NRNFREQ / PCCFREQ / SCGFREQ</b></td><td>Carrier frequency (LTE), NR neighbour frequency, primary-carrier and secondary-cell-group frequency objects.</td></tr>
+      <tr><td><b>BW / Reference power / PA / PB</b></td><td>Channel bandwidth, reference signal power, and power-allocation ratios (PA/PB).</td></tr>
+      <tr><td><b>MIMO / CA / ENDC</b></td><td>Multi-antenna mode, Carrier Aggregation, and EN-DC (NSA dual connectivity).</td></tr>
+      <tr><td><b>TAC</b></td><td>Tracking Area Code — area/registration grouping for the cell.</td></tr>
+      <tr><td><b>Neighbour relation / UDTPARAGRP</b></td><td>Neighbour relations for Xn/NG handover and idle reselection; user-data-transport/QoS parameter groups.</td></tr>
+    </table>
+    <h3>IP / transport &amp; interface MOs</h3>
+    <table class="cmp">
+      <tr><th>Object</th><th>What it configures</th></tr>
+      <tr><td><b>IPRT</b> (IP Route Table)</td><td>Destination-side routing entries on the site &mdash; the <b>destination address + mask + NEXTHOP</b> the BBU uses to reach a given remote subnet (core, NMS, SeGW, neighbour).</td></tr>
+      <tr><td><b>SRCIPRT</b> (Source IP Route)</td><td>Source-side routing entry &mdash; my <b>local IP</b> paired with the <b>NEXTHOP</b> only (no destination subnet); used to bind locally-sourced traffic to the right egress / gateway.</td></tr>
+      <tr><td><b>SCTPHOST / SCTPPEER</b></td><td>Local SCTP endpoint (host) and remote SCTP endpoint (peer) for control-plane signalling associations &mdash; S1-MME (LTE), NG-C (NG-AP, 5G SA), and Xn-C between gNBs.</td></tr>
+      <tr><td><b>USERPLANEHOST / USERPLANEPEER</b></td><td>Local / remote endpoints for the user-plane (GTP-U) &mdash; S1-U, NG-U / N3, Xn-U &mdash; carrying the bearer traffic for the same interfaces above.</td></tr>
+      <tr><td><b>EPGROUP</b> (End-Point Group)</td><td>Groups SCTP / user-plane endpoints into a logical set, so the interface objects can reference one group instead of individual endpoints &mdash; useful when an interface has multiple peer IPs for redundancy.</td></tr>
+      <tr><td><b>NG / Xn interface objects</b></td><td>The per-interface configuration (NG to AMF/UPF, Xn to peer gNB) that ties the SCTPHOST/SCTPPEER + USERPLANEHOST/PEER + IPRT together. <b>Slice configuration is bound to a specific NG interface object</b>, so the right S-NSSAI / slice maps to the right AMF set.</td></tr>
+      <tr><td><b>ACLRULE / IKEPEER / IPSECPOLICY</b></td><td>IPsec configuration objects &mdash; ACL rule (which traffic to protect, with a <b>wildcard mask</b> &mdash; inverse of a subnet mask), IKE peer (SeGW endpoint, proposals, auth), and IPsec policy (sequence-matched binding of ACL rule to peer; <b>broad ACLs must sit at the bottom of the sequence</b>).</td></tr>
+    </table>
+
+    <h3>Sync &amp; configuration workflow</h3>
+    <div class="panel"><ul class="clean">
+      <li><b>Timing &amp; sync:</b> GPS, PTP and NTP servers for frame/phase synchronization (with PTP&harr;GPS fallback validated on the lab side).
+        <ul class="clean" style="margin:6px 0 0">
+          <li><b>GPS</b> &mdash; satellite-derived time + position reference. A GPS receiver at the site, with an antenna that has sky view, locks to satellites and provides <b>sub-microsecond accurate phase + frequency + time-of-day</b>. No network dependency, but needs a healthy antenna and sky view. Typically the <b>primary</b> timing source at the site, especially for TDD where cell-to-cell phase alignment matters.</li>
+          <li><b>PTP (Precision Time Protocol, IEEE 1588 v2)</b> &mdash; packet-based timing carried over the IP / Ethernet transport from a central <b>Grandmaster clock</b> down to the site. With proper network support (Boundary Clocks on every hop, per the <b>G.8275.1 telecom profile</b>) it also delivers <b>sub-microsecond phase + frequency</b> &mdash; accurate enough for 5G NR TDD. Used either as the primary timing source when GPS isn&rsquo;t available or as a network-fed backup so the site can fall back from GPS to PTP (or the other way around) without losing sync.</li>
+          <li><b>NTP (Network Time Protocol)</b> &mdash; used to synchronize the system clock of network elements for logs, alarms, and OAM functions. Its accuracy is typically in the <b>millisecond</b> range, which is sufficient for management purposes. However, LTE and 5G radio synchronization require much higher precision, so GPS or PTP are used for air-interface timing while NTP handles management-plane time-of-day synchronization.</li>
+        </ul>
+      </li>
+      <li><b>Per-site config blocks:</b> IP &amp; RF configuration, board configuration, and neighbour/core configuration specifically for <b>Xn HO and NG</b> activity.</li>
+      <li><b>Sharing:</b> MORAN (shared radio, separate carriers) and MOCN (shared carrier, multiple PLMNs/core networks).</li>
+      <li><b>Tech modes:</b> 5G SA / NSA, NR UL/DL decoupling, RedCap.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; platform context</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 23.251</b> &mdash; network sharing (MORAN/MOCN). &nbsp;&middot;&nbsp; <b>3GPP TS 38.401 / 38.300</b> &mdash; NG-RAN architecture. &nbsp;&middot;&nbsp; <b>CPRI / eCPRI</b> fronthaul specifications. &nbsp;&middot;&nbsp; Vendor multi-mode (SRAN) configuration practice.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
