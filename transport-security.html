@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transport, Backhaul & IP Security | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Transport &amp; IP</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Transport &middot; Backhaul, IP &amp; Security</div>
+  <h1>Transport, Backhaul &amp; IP Security</h1>
+  <p class="lede">
+    The radio is useless without a healthy transport path to the core. I troubleshoot the layers beneath the air
+    interface &mdash; <b>IP routing, SCTP associations, IPsec tunnels and backhaul</b> &mdash; that carry NG and Xn
+    signalling. Most "interface down" tickets live here, and separating <b>IP reachability</b> from
+    <b>protocol behaviour</b> is the core skill.
+  </p>
+  <div class="chips">
+    <span class="chip">IPsec / IKEv2</span><span class="chip">SCTP</span>
+    <span class="chip">NG / Xn / S1 transport</span><span class="chip">Backhaul migration</span>
+    <span class="chip">IP migration · PKI</span>
+  </div>
+
+  <section>
+    <h2>The transport stack I troubleshoot</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 820 210" role="img" aria-label="Transport protocol stack">
+        <g font-family="Segoe UI,Arial" font-size="12.5" font-weight="700" text-anchor="middle">
+          <rect x="260" y="20"  width="300" height="34" rx="8" fill="#e6f4ee" stroke="#0d9488"/><text x="410" y="42" fill="#0f766e">NGAP / XnAP (signalling)</text>
+          <rect x="260" y="62"  width="300" height="34" rx="8" fill="#e8eef9" stroke="#2563eb"/><text x="410" y="84" fill="#1e3a8a">SCTP (reliable transport)</text>
+          <rect x="260" y="104" width="300" height="34" rx="8" fill="#efeafc" stroke="#8b6fd0"/><text x="410" y="126" fill="#6d28d9">IPsec / IKEv2 (security)</text>
+          <rect x="260" y="146" width="300" height="34" rx="8" fill="#eef2f8" stroke="#94a8d0"/><text x="410" y="168" fill="#1e293b">IP / backhaul (routing &amp; reachability)</text>
+        </g>
+        <text x="120" y="130" font-family="Segoe UI,Arial" font-size="11" fill="#64748b" text-anchor="middle">a fault at any</text>
+        <text x="120" y="148" font-family="Segoe UI,Arial" font-size="11" fill="#64748b" text-anchor="middle">layer breaks the</text>
+        <text x="120" y="166" font-family="Segoe UI,Arial" font-size="11" fill="#64748b" text-anchor="middle">interface above</text>
+      </svg>
+    </div>
+    <div class="note"><span>💡</span><span><b>Golden rule:</b> a pingable link only proves the IP layer. SCTP source-port behaviour, IPsec context and traffic selectors all sit <i>above</i> ICMP — and any of them can silently drop the signalling while ping still succeeds. See the full <a href="xn-handover.html">SCTP source-port case study</a>.</span></div>
+  </section>
+
+  <section>
+    <h2>Representative cases I resolved</h2>
+    <div class="grid2">
+      <div class="panel case">
+        <h3 style="margin-top:0">SCTP source-port / interop (modern 5G)</h3>
+        <p style="margin:0">Xn wouldn't establish though IP was pingable: the femto used dynamic SCTP source ports while the peer only accepted port <b>38422</b>. Fixed by pinning the femto's SCTP source port — interface came up.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">Traffic-selector mismatch</h3>
+        <p style="margin:0">IPsec-protected traffic dropped past the security gateway because selectors differed (<code>10.0.0.0</code> vs <code>42.0.0.0</code>). Aligning the traffic selectors restored end-to-end reachability.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">DHCP / OAM tunnel instability</h3>
+        <p style="margin:0">Intermittent DHCP IP allocation broke OAM-tunnel setup; the DHCP server wasn't processing requests correctly. Cleared leases and enforced assigning only fully-reachable IPs.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">PKI migration breaking S1 (legacy)</h3>
+        <p style="margin:0">Migrating to a third-party PKI server raised an S1 interface alarm (broken certificate/IPsec trust). Re-established the security/cert config so S1 recovered.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Backhaul work</h2>
+    <div class="panel">
+      <p style="margin:0 0 8px">I supported <b>5G backhaul migration</b> across hundreds of sites — ensuring robust connectivity, low latency and higher throughput — and handled <b>IP migration</b> and <b>IP security</b> reconfiguration as part of site lifecycle. On the validation side I exercised the femto under a deliberately throttled backhaul: forcing <b>100 Mbps / full-duplex</b> when auto-negotiation stopped the femto coming up, and using an <a href="load-stress.html">IXIA policer</a> to cap throughput while protecting the physical 1&nbsp;Gbps link.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Ping proves IP, nothing more.</b> SCTP, IPsec and selectors live above it.</li>
+      <li><b>Pin SCTP source ports for strict peers.</b> Dynamic ports cause silent association failures in some stacks.</li>
+      <li><b>Traffic selectors must match end-to-end</b>, or protected traffic is dropped after the gateway.</li>
+      <li><b>Force speed/duplex on throttled links</b> — auto-negotiation can prevent bring-up.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Backhaul &amp; IP transport I configure</h2>
+    <table class="cmp">
+      <tr><th>Element</th><th>Role</th></tr>
+      <tr><td><b>MW / GPON backhaul</b></td><td>Microwave and GPON transport feeding the site &mdash; I confirm readiness and capacity before integration and during BH migration.</td></tr>
+      <tr><td><b>VLAN mapping</b></td><td>Mapping control/user/management traffic to the correct VLANs across the transport path.</td></tr>
+      <tr><td><b>IPRT (IP route)</b></td><td>IP routing objects/next-hops on the node ensuring NG/Xn/OAM reach their destinations.</td></tr>
+      <tr><td><b>IP &amp; subnetting</b></td><td>Address planning for the node's interfaces (OAM, S1/NG, Xn) and the correct subnet/mask so reachability and traffic selectors line up.</td></tr>
+      <tr><td><b>ETHPORT (speed/duplex/MTU)</b></td><td>Physical port settings &mdash; forced speed/duplex when auto-negotiation blocks bring-up; MTU sized to avoid fragmentation of tunnelled traffic.</td></tr>
+    </table>
+    <div class="note"><span>💡</span><span>The recurring theme across these layers: a fault at IP/VLAN/route level looks identical to a higher-layer fault from the top. I work bottom-up &mdash; confirm L2/L3 (VLAN, route, subnet, MTU) before blaming SCTP, IPsec or the application.</span></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; references</h2>
+    <div class="panel"><p class="ref"><b>RFC 4960</b> &mdash; SCTP. &nbsp;&middot;&nbsp; <b>RFC 7296</b> &mdash; IKEv2. &nbsp;&middot;&nbsp; <b>3GPP TS 33.310 / 33.501</b> &mdash; network domain security &amp; PKI. &nbsp;&middot;&nbsp; <b>3GPP TS 38.414 / 38.474</b> &mdash; NG-RAN data transport.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

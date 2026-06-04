@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZTP & IPsec — 5G SA Femto | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Provisioning &amp; Security</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Provisioning &middot; ZTP, IPsec &amp; Certificates</div>
+  <h1>Zero-Touch Provisioning &amp; IPsec</h1>
+  <p class="lede">
+    A 5G SA femto is <b>plug-and-play</b>: plug it into any internet connection and it provisions itself —
+    builds secure tunnels, pulls its configuration, validates its physical location, and comes on air with
+    <b>no manual setup</b>. That is <b>Zero-Touch Provisioning (ZTP)</b>, and it rides on <b>IPsec</b> tunnels to
+    the operator. I validate the whole bring-up, the geo-security that locks it to an approved location, and the
+    certificate lifecycle.
+  </p>
+  <div class="chips">
+    <span class="chip">IKEv2 / IPsec</span><span class="chip">ZTP auto-provisioning</span>
+    <span class="chip">Cert enrollment</span><span class="chip">20 m geo-lock</span>
+    <span class="chip s">Validated on a live 5G SA Femto deployment</span>
+  </div>
+
+  <section>
+    <h2>ZTP bring-up sequence</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 1110 170" role="img" aria-label="ZTP and IPsec bring-up">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="11" font-weight="700" text-anchor="middle">
+          <rect x="10"   y="55" width="85"  height="55" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="52"   y="78" fill="#1e293b">Femto</text><text x="52"   y="94" fill="#64748b" font-size="10">powers on</text>
+          <rect x="105"  y="55" width="120" height="55" rx="10" fill="#efeafc" stroke="#8b6fd0"/><text x="165"  y="78" fill="#6d28d9">Cert enrollment</text><text x="165"  y="94" fill="#6d28d9" font-size="10">CMP / CMPv2</text>
+          <rect x="235"  y="55" width="120" height="55" rx="10" fill="#efeafc" stroke="#8b6fd0"/><text x="295"  y="78" fill="#6d28d9">SeGW</text><text x="295"  y="94" fill="#6d28d9" font-size="10">+ temp tunnel</text>
+          <rect x="365"  y="55" width="190" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="460"  y="78" fill="#1e3a8a">Operator provisioning platform</text><text x="460"  y="94" fill="#64748b" font-size="10">location + RF + IP cfg</text>
+          <rect x="565"  y="55" width="120" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="625"  y="78" fill="#0f766e">Location verify</text><text x="625"  y="94" fill="#0f766e" font-size="10">&le;20 m gate</text>
+          <rect x="695"  y="55" width="115" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="752"  y="78" fill="#0f766e">2 perm tunnels</text><text x="752"  y="94" fill="#0f766e" font-size="10">NMS + 5G Core</text>
+          <rect x="820"  y="55" width="155" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="897"  y="78" fill="#0f766e">BMC / LMF / GMLC</text><text x="897"  y="94" fill="#0f766e" font-size="10">provisioning via NMS</text>
+          <rect x="985"  y="55" width="115" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="1042" y="78" fill="#1e3a8a">On air</text><text x="1042" y="94" fill="#64748b" font-size="10">RF/IP cfg + neighbours</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a)" fill="none">
+          <line x1="95"  y1="82" x2="103" y2="82"/>
+          <line x1="225" y1="82" x2="233" y2="82"/>
+          <line x1="355" y1="82" x2="363" y2="82"/>
+          <line x1="555" y1="82" x2="563" y2="82"/>
+          <line x1="685" y1="82" x2="693" y2="82"/>
+          <line x1="810" y1="82" x2="818" y2="82"/>
+          <line x1="975" y1="82" x2="983" y2="82"/>
+        </g>
+        <g font-family="Segoe UI,Arial" font-size="9.5" fill="#94a3b8" font-style="italic" text-anchor="middle">
+          <text x="752" y="130">temp tunnel torn down once perm tunnels are up</text>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:12px">On power-up the femto first performs <b>device certificate enrollment</b> with the operator&rsquo;s Registration Authority over CMP / CMPv2 (per TS 33.310) to obtain its <b>operator-issued certificate</b>. Using that operator cert, the femto then opens <b>one temporary IPsec tunnel</b> to the security gateway. Through the temp tunnel it reaches the <b>operator&rsquo;s provisioning platform group</b> &mdash; the central system that holds the <b>authorised location</b> for this cell and pushes back the cell&rsquo;s <b>RF data</b> (PCI, TAC, NR-ARFCN, power, neighbour relations) and <b>IP data</b> (NMS IPs, 5GC IPs, SeGW endpoints / FQDN). The femto then reports its actual GPS location and that&rsquo;s compared against the authorised location in the operator platform &mdash; if it&rsquo;s outside the <b>&le;20 m</b> window the <b>femto is blocked</b> at this gate. Once location passes, the femto builds its <b>two permanent tunnels</b> &mdash; one to the <b>NMS</b> (for ongoing OAM) and one to the <b>5G Core</b> &mdash; both authenticated with the enrolled operator cert; the <b>temporary tunnel is then torn down</b> as it&rsquo;s no longer needed. Over the NMS permanent tunnel, the <b>NMS</b> then provisions the femto&rsquo;s <b>BMC / LMF / GMLC</b> bindings (broadcast / positioning / gateway-mobile-location mapping) &mdash; the operator-provisioning platform group has no role at this stage; BMC/LMF/GMLC delivery is the NMS&rsquo;s job. The femto then activates the cells with the provisioned RF + IP configuration and neighbour relations; I verify the NMS correctly delivers the spectrum / BMC / LMF / GMLC pieces and that the femto comes up as expected.</p>
+  </section>
+
+  <section>
+    <h2>Geo-security — the 20 m location lock</h2>
+    <div class="panel case good">
+      <p style="margin:0 0 10px">Because the femto is portable, it must not work outside its authorised spot. I validated that the femto checks its position and stays in service <b>only within a 20&nbsp;m radius</b> — move it beyond 20&nbsp;m and it is <b>automatically blocked</b> for security. The reboot/reset matrix confirms this is enforced consistently:</p>
+      <table class="cmp">
+        <tr><th>Action</th><th>Config retained?</th><th>ZTP triggered?</th><th>Location re-validated?</th></tr>
+        <tr><td>Soft reboot</td><td>Yes</td><td>No</td><td>Yes (≤20 m)</td></tr>
+        <tr><td>Hard reboot</td><td>Yes</td><td>No</td><td>Yes (≤20 m)</td></tr>
+        <tr><td>Factory reset</td><td>No (cleared)</td><td>Yes</td><td>Yes (≤20 m)</td></tr>
+      </table>
+      <p style="margin:12px 0 0">I also validated the <b>power-on/boot sequence</b> timing and <b>LED indications</b> against the design.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Certificate lifecycle</h2>
+    <div class="panel">
+      <p style="margin:0">IPsec to the operator is certificate-authenticated, so I validate the <b>device initial certificate enrollment</b> &mdash; the femto obtaining its operator-issued identity certificate on first bring-up. A broken enrollment means no tunnel and therefore no service, so this is a core part of turn-up validation.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Common IPsec / transport faults I worked through</h2>
+    <div class="grid2">
+      <div class="panel case">
+        <h3 style="margin-top:0">Traffic-selector mismatch (one neighbour unreachable over 5GC tunnel)</h3>
+        <p style="margin:0">This <b>didn&rsquo;t block bring-up</b> &mdash; the femto came up cleanly. The symptom was that <b>one specific neighbour site was unreachable over the 5G Core IPsec tunnel</b>: that neighbour&rsquo;s IP was in <code>42.0.0.0/8</code>, but the femto&rsquo;s 5GC <b>traffic selector</b> was configured as <code>10.0.0.0/8</code>. Because the neighbour&rsquo;s destination didn&rsquo;t match the SA&rsquo;s selector, the femto never sent that traffic into the tunnel &mdash; so packets to that one neighbour were silently dropped while everything else worked fine. Aligning the traffic selector to cover the neighbour&rsquo;s subnet restored reachability.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">DPD timeout under load</h3>
+        <p style="margin:0">Under high load the <b>IPsec tunnel went down on a DPD timeout</b>. <b>DPD (Dead Peer Detection)</b> runs on a timer &mdash; the femto periodically sends a small IKE liveness probe to the SeGW and expects a response back within a configured retry window. Root cause was a <b>DSCP marking gap</b>: the DPD probes were leaving the femto with a lower priority class than network-control traffic, so under congestion the transport queue dropped them first. With no response coming back in time, the <b>femto itself</b> declared the SeGW unreachable and <b>tore the IKE / Child SAs down from its side</b> &mdash; even though the SeGW was healthy and the IPsec data path would otherwise have been fine. With the tunnel gone, the femto cells went out of service; the femto then re-initiated IKE_SA_INIT, rebuilt the tunnel, and service came back. Fixed by tagging the IKE / DPD traffic with the correct high-priority DSCP (network-control class). Detailed write-up in the case section below.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study &mdash; UDP checksum altered in transit (NAT-T behaviour)</h2>
+    <div class="panel case">
+      <p style="margin:0 0 10px"><b>Quick context &mdash; what NAT, NAT-T and ESP are:</b></p>
+      <ul class="clean" style="margin:0 0 12px">
+        <li><b>NAT (Network Address Translation)</b> &mdash; a device in the middle (router / firewall) that rewrites the IP addresses (and sometimes ports) of packets as they cross it &mdash; e.g. translating a private <code>10.x</code> IP into a public one. Any time a NAT sits between two peers, the IP/port the receiver sees is not what the sender sent.<br/><b>Why this translation is needed:</b> public IPv4 addresses are limited and expensive, so devices on home / enterprise / mobile networks are given <b>private IPs (RFC 1918: <code>10.x.x.x</code>, <code>172.16&ndash;31.x</code>, <code>192.168.x</code>)</b> that are not routable on the public Internet. NAT lets many such private devices share <b>one public IP</b> by translating their addresses on the way out and tracking the mapping for return traffic &mdash; saving address space and, as a side benefit, hiding the internal network from the outside.</li>
+        <li><b>ESP (Encapsulating Security Payload)</b> &mdash; the IPsec packet format that actually <b>carries the encrypted and integrity-protected payload</b>. ESP runs over its own IP protocol number (50), not over TCP or UDP &mdash; which is exactly the problem when there&rsquo;s a NAT in the path, because most NATs only know how to translate TCP / UDP.</li>
+        <li><b>NAT-T (NAT Traversal, RFC 3947 / 3948)</b> &mdash; the fix: when the two IPsec peers detect a NAT between them, they <b>wrap each ESP packet inside a UDP packet on port 4500</b>, so the NAT sees a normal UDP flow and can translate it. The ESP is exactly the same inside; it&rsquo;s just inside a UDP envelope.</li>
+        <li><b>IKE proposals</b> &mdash; the <b>security parameters the two peers exchange during IKE negotiation</b> that decide how the tunnel will be protected. A proposal lists the candidate <b>encryption algorithm</b> (e.g. AES-CBC-256, AES-GCM-256), <b>integrity algorithm</b> (e.g. SHA-256, SHA-384), <b>Diffie-Hellman group</b> (e.g. group 14 / 19 / 20) and <b>authentication method</b> (certificate, PSK).</li>
+      </ul>
+      <dl class="kv">
+        <dt>Symptom</dt><dd>At one site the femto&rsquo;s IPsec association to the SeGW would not establish even though the IKE proposals matched, IP was reachable, and the same femto build worked in other locations.</dd>
+        <dt>Investigation</dt><dd>While capturing traffic between the femto and the SeGW, I found that IPsec was using <b>NAT-T (UDP port 4500)</b> because a NAT device was in the path. According to the NAT-T standard, <b>UDP-encapsulated ESP packets should have a UDP checksum of 0</b>. However, in the packet capture, the UDP checksum was <b>non-zero</b>. The receiving side treated these packets as invalid and dropped them because they did not match the expected NAT-T packet format. As a result, the IPsec tunnel could not be established properly. Specifically, the <b>SeGW was sending packets to the femto</b>, and the <b>femto was discarding them</b> because the UDP checksum field wasn&rsquo;t the expected zero.</dd>
+        <dt>Why the UDP checksum is <i>recommended</i> to be zero (and why non-zero is also normal)</dt><dd>For UDP-encapsulated ESP, RFC 3948 <b>recommends</b> the sender set the UDP checksum field to <code>0x0000</code>. The reason is that <b>ESP already provides its own integrity check</b> over the inner payload &mdash; computing a second UDP checksum on top is redundant, and it would also be wrong after any NAT, because NAT changes the addresses / ports that the UDP checksum is computed over. So &ldquo;UDP checksum = 0&rdquo; doesn&rsquo;t mean &ldquo;no integrity&rdquo;; it means &ldquo;don&rsquo;t use this field, trust ESP&rsquo;s own integrity instead.&rdquo;
+          <br/><b>But a non-zero UDP checksum is also perfectly normal:</b> although RFC 3948 allows UDP-encapsulated IPsec packets to use a UDP checksum of 0, <b>many modern devices automatically calculate and add a normal (non-zero) UDP checksum to all UDP packets</b>. This is standard behaviour and does not indicate a problem. The RFC also states that the <b>receiving device should accept the packet whether the UDP checksum is zero or non-zero</b>. Therefore, a sender using a non-zero checksum is behaving normally. If the receiver rejects those packets because the checksum is non-zero, then the issue is with the <b>receiver being too strict</b> &mdash; not with the sender.</dd>
+        <dt>Root cause</dt><dd>The <b>SeGW was emitting UDP-encap ESP with a non-zero UDP checksum</b> (normal modern UDP behaviour), but the <b>femto&rsquo;s IPsec stack was being strict</b> and only accepting UDP-encap ESP packets where the UDP checksum was exactly <code>0x0000</code>. So every packet the SeGW sent arrived at the femto with what looked to it like an &ldquo;unexpected&rdquo; checksum field, and the femto dropped them before the IKE / ESP layer could process anything &mdash; which is why no IKE error showed up in the logs.</dd>
+        <dt>Fix &amp; takeaway</dt><dd>The fix was made on the <b>femto side</b>: its IPsec stack was updated to <b>accept UDP-encap ESP regardless of the UDP checksum value</b> (zero or non-zero), aligning it with the RFC 3948 receiver guidance instead of strictly enforcing checksum = 0. Once that change was in, the tunnel came up on the next attempt with the SeGW&rsquo;s own packets unchanged. <span class="tag-good">Concept:</span> for NAT-T, the UDP checksum field is a transport-level annotation, not a security check &mdash; ESP carries the integrity. A non-zero checksum on UDP-encap ESP is allowed by the standard; a receiver that rejects those packets is over-strict and silently breaks IPsec without any IKE error in the logs.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study &mdash; OAM tunnel hijacked by the core tunnel&rsquo;s traffic selector</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>At one location the femto <b>came up cleanly</b> &mdash; OAM tunnel established first, then the core (5GC) tunnel came up &mdash; and both tunnels worked. The problem appeared <b>later</b>: any time the <b>OAM tunnel went down (e.g. brief drop, expiry of its lifetime, IKE rekey window)</b>, it <b>could not re-establish</b> as long as the core tunnel was still up. The femto would lose NMS connectivity until the core tunnel was also bounced.</dd>
+        <dt>Investigation</dt><dd>The femto holds <b>two permanent IPsec tunnels</b> after bring-up: one to the <b>NMS / OAM</b> and one to the <b>5G Core</b>. Each tunnel has its own <b>traffic selector</b> describing which destination prefixes belong to it. To re-establish the OAM tunnel, the femto first has to resolve the <b>OAM-side SeGW FQDN</b> via a <b>private DNS server</b>. In the offending location, that private DNS server&rsquo;s IP <b>fell inside the core tunnel&rsquo;s traffic-selector prefix</b> &mdash; the core TS had been provisioned aggressively as <code>10.0.0.0/8</code>. So while only the OAM tunnel was up (initial bring-up), DNS worked fine and the OAM tunnel came up without issue. Once the core tunnel was <b>also</b> up, the IPsec <b>SAD (Security Association Database)</b> selector match on the femto picked the core tunnel&rsquo;s SA for any packet destined to <code>10.0.0.x</code> &mdash; including the DNS query for the OAM SeGW. The DNS query went out over the wrong SA, no response came back on the OAM path, FQDN resolution failed, and the <b>OAM tunnel could not re-establish for as long as the core tunnel held that aggressive selector</b>.</dd>
+        <dt>Root cause</dt><dd>A <b>traffic-selector overlap</b> between two SAs on the same femto: the core tunnel&rsquo;s broad <code>10.0.0.0/8</code> swallowed the IP of the OAM-side DNS server. This is a classic "too-broad selector" problem &mdash; the SA chosen for a packet is whichever selector matches first, regardless of which tunnel it logically belongs to.</dd>
+        <dt>Fix &amp; takeaway</dt><dd>Tightened the core tunnel&rsquo;s traffic selector to exclude the OAM DNS subnet (or moved the DNS server outside <code>10.0.0.0/8</code>), so DNS queries for the OAM SeGW were no longer captured by the core SA. The OAM tunnel could then re-resolve and re-establish cleanly even while the core tunnel stayed up. <span class="tag-good">Concept:</span> when a femto has more than one IPsec SA, the <b>traffic selectors must be disjoint</b>. The broadest selector wins by SAD lookup order &mdash; an aggressive <code>/8</code> on one tunnel will silently steal traffic that belonged to another, and the symptom often only shows up on the <b>second tunnel&rsquo;s rekey / re-establishment</b>, not at initial bring-up.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study &mdash; DPD timeout because liveness packets weren&rsquo;t high-priority enough</h2>
+    <div class="panel case">
+      <p style="margin:0 0 10px"><b>Quick context &mdash; IKE SA vs Child SA:</b> an <b>IKE SA</b> is the <b>control-plane security association</b> used for authentication, key exchange, and management of the IPsec connection. A <b>Child SA</b> is the <b>data-plane security association</b> that carries encrypted traffic using ESP. The IKE SA negotiates and manages one or more Child SAs, while the Child SAs are responsible for protecting the actual user, OAM, or core-network traffic.</p>
+      <dl class="kv">
+        <dt>Symptom</dt><dd>Under sustained high load / congestion the <b>IPsec tunnel went down on a DPD timeout</b>. Once the femto tore the SA down on its side, the AMF was no longer reachable and the <b>cells went down</b>; the femto then re-initiated IKE_SA_INIT, rebuilt the tunnel, and service came back &mdash; only to repeat the pattern the next time the cell was driven into congestion.</dd>
+        <dt>How DPD actually behaves</dt><dd><b>DPD (Dead Peer Detection)</b> is a timer-based liveness check that runs over the existing IKE SA. The concept was originally specified for IKEv1 in <b>RFC 3706</b>; in <b>IKEv2 (RFC 7296 &sect;2.4)</b> the equivalent mechanism is the <b>empty INFORMATIONAL exchange</b>, which is what this femto uses. Before its inactivity timer expires, the femto sends a short IKE liveness probe (an empty INFORMATIONAL request) to the SeGW and expects an INFORMATIONAL response back within a configured retry window. <b>If the femto doesn&rsquo;t see a response after the retry count, the femto itself declares the peer dead</b> and tears the IKE SA (and its Child SAs) down from its side. Liveness is bidirectional in principle, but in this deployment the femto&rsquo;s timer was tighter, so the femto was the side that gave up first.</dd>
+        <dt>Investigation</dt><dd>Looked at the IP header of the femto&rsquo;s DPD packets in Wireshark &mdash; specifically the <b>DSCP / DiffServ Code Point field (shown as IP &rarr; Differentiated Services Field)</b>. The DPD probes were leaving the femto with a <b>lower priority class than network-control traffic</b> (best-effort rather than CS6). Under congestion the transport queue dropped these DPD probes first, so the SeGW never saw them &mdash; and no INFORMATIONAL response was ever generated. From the <b>femto&rsquo;s</b> point of view this looked like the SeGW had gone silent, so it concluded the peer was dead and tore down its SA. The SeGW was actually healthy and the IPsec data path would have stayed up if the probes had survived the queue.</dd>
+        <dt>Root cause</dt><dd>A <b>DSCP marking gap</b> on the femto&rsquo;s outgoing IKE / DPD traffic: liveness probes were not classified as <b>network-control</b> priority, so they had the same drop probability as user traffic during congestion. Wireshark&rsquo;s "Differentiated Services Field" inside the IPv4 header is the field that shows the DSCP value of those packets.</dd>
+        <dt>Fix &amp; takeaway</dt><dd>Tagged the femto&rsquo;s IKE / DPD outgoing traffic with the appropriate high-priority DSCP class (typically <b>CS6 / network-control</b>) and ensured the transport path honoured that marking. DPD probes survived the congestion window, the femto kept seeing INFORMATIONAL responses in time, no false &ldquo;peer dead&rdquo; was declared, and the cells stopped flapping during load tests. <span class="tag-good">Concept:</span> IPsec liveness is fragile under congestion when its packets compete with user data for queue space &mdash; if the probes get dropped, the side running the DPD timer reaches its retry limit and brings its own SA down, even though the peer was never actually dead. The right DSCP class for keepalives / DPD is network-control, not best-effort.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why the plug-and-play model matters (deployment context)</h2>
+    <div class="panel">
+      <p style="margin:0">This internet-delivered femto is ideal where Wi-Fi exists but VoWiFi isn't viable — e.g. <b>enterprises</b> where guests can't access corporate Wi-Fi, employees prefer not to join it, or the company applies <b>DSCP marking</b> that permits browsing but not VoWiFi. The femto delivers licensed 5G SA voice/data without depending on the enterprise Wi-Fi policy. Understanding this context is what lets me prioritise the test cases that actually matter for the deployment.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>IPsec / IKE building blocks I validate</h2>
+    <table class="cmp">
+      <tr><th>Element</th><th>What it is &amp; what I check</th></tr>
+      <tr><td><b>IKE SA (IKESA)</b></td><td>The <b>control-plane Security Association</b> negotiated by IKE_SA_INIT &mdash; it carries the keying material, DH group, encryption / integrity algorithms and a <b>SPI pair</b> (SPI = Security Parameter Index, a unique identifier the peers exchange &mdash; one per direction &mdash; so each side knows which SA to apply to incoming packets; the IKE SPI is 8 bytes in IKEv2, the ESP/Child-SA SPI is 4 bytes) used to protect all subsequent IKE messages. I check that IKE_SA_INIT completes, the negotiated proposals match the SeGW, and that <b>rekey</b> fires before the lifetime expires without dropping the IKE channel.</td></tr>
+      <tr><td><b>IKE_AUTH</b></td><td>The second exchange that authenticates the peers and creates the first Child SA. I verify the femto presents the correct <b>device certificate</b>, and that the SeGW chain is validated against the trusted CA.</td></tr>
+      <tr><td><b>Child SA (IPsec SA)</b></td><td>The actual <b>data-plane SA</b> created under the IKE SA. A Child SA negotiation produces <b>two unidirectional SAs</b> (one for each direction), each with its own SPI, keys and selectors. I verify that the right Child SA covers temp / NMS / 5GC traffic as designed and that <b>rekey</b> (time- or byte-based) works without packet loss.</td></tr>
+      <tr><td><b>Traffic Selectors (TSi / TSr)</b></td><td>The address ranges that say what traffic the Child SA protects. I match the femto's local selector to the peer subnets &mdash; the <code>10.0.0.0 vs 42.0.0.0</code> case was exactly a TS mismatch.</td></tr>
+      <tr><td><b>Encryption / Integrity proposal</b></td><td>e.g. AES-GCM-256 / AES-CBC-256 + SHA-256 / SHA-384. I verify proposal alignment between peers &mdash; one mismatched transform in the proposal kills IKE_SA_INIT.</td></tr>
+      <tr><td><b>DH group / PFS</b></td><td>DH group used for IKE SA and for Child SA rekey (<b>PFS = Perfect Forward Secrecy</b> &mdash; an IPsec feature that uses a fresh Diffie-Hellman exchange during Child SA creation or rekeying to generate new encryption keys independently of previous keys, so that if one session key is compromised, past and future sessions remain secure). I confirm the group is enabled on both sides (e.g. group 14 / 19 / 20) and that PFS-on-rekey behaves.</td></tr>
+      <tr><td><b>DPD (Dead Peer Detection)</b></td><td>Liveness probes over the IKE SA. I tune interval / retries and reproduce the load-induced <b>DPD timeout</b> case so the SA tears down cleanly and rebuilds rather than going zombie.</td></tr>
+      <tr><td><b>NAT-T (RFC 3947 / 3948)</b></td><td>UDP-encapsulated ESP on port 4500 when a NAT is in the path. I confirm NAT-D payload detection, the keepalive cadence, and that the femto behind enterprise NAT still rekeys cleanly.</td></tr>
+      <tr><td><b>Device certificate &amp; CA chain</b></td><td>Operator-issued cert (CMPv2). I check enrollment on first bring-up, the chain to the operator Root CA, and that revocation (CRL) is honoured.</td></tr>
+      <tr><td><b>SeGW reachability &amp; FQDN / IP list</b></td><td>The SeGW set the femto tries (primary / backup), DNS resolution of the SeGW FQDN, and failover when the primary SeGW is unreachable.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Location gate is a hard dependency.</b> Permanent tunnels (and service) only come up after the &le;20 m check passes.</li>
+      <li><b>Factory reset &ne; reboot.</b> Only factory reset clears config and re-triggers ZTP &mdash; important when reproducing field issues.</li>
+      <li><b>Certificates are silent killers.</b> Enrollment failures look like generic "no service"; check the tunnel and cert state first.</li>
+      <li><b>Traffic selectors must match end-to-end</b> &mdash; a pingable path can still drop the tunnel's protected traffic.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Primary references</h2>
+    <div class="panel"><p class="ref"><b>RFC 7296</b> &mdash; IKEv2. &nbsp;&middot;&nbsp; <b>3GPP TS 33.310</b> &mdash; network domain security / PKI (certificate enrollment, CMP). &nbsp;&middot;&nbsp; <b>3GPP TS 33.501</b> &mdash; 5G security architecture. &nbsp;&middot;&nbsp; <b>3GPP TS 28.xxx</b> &mdash; management &amp; provisioning (ZTP/NMS).</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
