@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Usman Ahmad — RAN Engineer · Technical Portfolio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero-index">
+    <h1>Muhammad Usman Ahmad</h1>
+    <div class="role">5G SA RAN Engineer</div>
+    <p class="sub">
+      A working technical portfolio. Each page below explains a topic I own — with the standards behind it, a
+      signalling/architecture diagram, and the real lab and integration issues I diagnosed and resolved. It exists so the
+      claims on my resume can be verified, not just read.
+    </p>
+    <div class="contact">
+      <a href="mailto:muhammadusmanahmad10@gmail.com">muhammadusmanahmad10@gmail.com</a>
+      <span>·</span>
+      <a href="https://www.linkedin.com/in/muhammad-usman-ahmad-0b1355166" target="_blank">LinkedIn</a>
+      <span>·</span>
+      <span>Sammamish, WA, USA</span>
+    </div>
+  </div>
+
+  <div class="group-title">Architecture, Foundations &amp; Standards</div>
+  <div class="cards">
+    <a class="card" href="5g-architecture.html"><div class="ct">5G System Architecture &amp; Interfaces</div><div class="cd">All NFs (AMF/SMF/UPF/AUSF/UDM/PCF/NRF/NSSF/NEF/CHF/NWDAF) and the N1–N6 + SBA reference points.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="protocol-stack.html"><div class="ct">Protocol Stack (Radio + TCP/IP)</div><div class="cd">SDAP/PDCP/RLC/MAC/PHY explained, TCP/IP model, HARQ vs ARQ.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="phy-scheduling.html"><div class="ct">NR PHY &amp; Scheduling</div><div class="cd">Numerology, BWP, channels, reference signals, beam mgmt, MAC scheduling, HARQ.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="3gpp-standards.html"><div class="ct">3GPP Standards &amp; Releases 15–19</div><div class="cd">TS 23/24/38 series, RAN2/3/4 literacy, spec-driven dispute resolution.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ran-fundamentals.html"><div class="ct">5G RAN Fundamentals (Reference)</div><div class="cd">RSRP/RSRQ/SINR · MCS/QAM/BLER · CQI/RI/PMI · A1–A5 events &amp; TTT · IMCR · redirect-with-release · MIB/SIBs/SRBs/DRBs.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="nr-specialized.html"><div class="ct">5G NR Specialized Features</div><div class="cd">URLLC · DSS · IAB · NR MBS · mMTC concepts. <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="security.html"><div class="ct">5G / Telecom Security</div><div class="cd">IPsec/IKEv2, PKI &amp; certs, TS 33.501 architecture, SUPI/SUCI, NAS/AS security.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="volte-vonr.html"><div class="ct">VoNR / VoLTE, EPS Fallback &amp; SRVCC</div><div class="cd">5G voice and its fallbacks to LTE VoLTE and 3G/2G CS; voice continuity.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="policy-qos.html"><div class="ct">Policy &amp; QoS Control (PCF/PCRF)</div><div class="cd">How the core decides 5QI/ARP/slice QoS and pushes it to the RAN. <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="open-ran.html"><div class="ct">Open RAN (O-RAN)</div><div class="cd">Disaggregation (O-RU/O-DU/O-CU), Near-RT/Non-RT RIC, open interfaces, fronthaul 7.2x.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ai-ml-ran.html"><div class="ct">AI / ML for RAN</div><div class="cd">3GPP Rel-18/19 air-interface AI/ML, O-RAN xApps/rApps, NWDAF analytics. <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="ntn.html"><div class="ct">Non-Terrestrial Networks (NTN)</div><div class="cd">Satellite backhaul, PFD limits, coexistence; Rel-17 NTN concepts.</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="group-title">5G SA Lab Validation</div>
+  <div class="cards">
+    <a class="card" href="kpis-messages.html"><div class="ct">KPIs &amp; Signalling Messages</div><div class="cd">The KPI + message fingerprint of every feature; OAM counters correlated with trace.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="lab-methodology.html"><div class="ct">Lab Validation Methodology</div><div class="cd">Conformance vs operator acceptance, UE-category selection, simulator/traffic toolchain, soak.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="tm500-xcal5.html"><div class="ct">TM500 &amp; XCAL5 &mdash; Lab Tools User Guide</div><div class="cd">UE network tester + signalling analyzer: setup, basic workflow, common scenarios, how I use them together.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ztp-ipsec.html"><div class="ct">ZTP &amp; IPsec</div><div class="cd">Auto-provisioning, temp→permanent tunnels, cert enrollment, 20 m geo-lock.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="registration-pdu.html"><div class="ct">Registration &amp; PDU Session</div><div class="cd">Attach/NAS/security flow; BWPS device-attach &amp; C-RNTI failures.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="e911-location.html"><div class="ct">E911 Location &amp; CMAS/WEA</div><div class="cd">NR-ECID vs CID, Z-axis, multi-LMF; CMAS core-dump fix.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="xn-handover.html"><div class="ct">Xn Handover</div><div class="cd">Intra-NR direct gNB-to-gNB handover; Path Switch; SCTP &amp; SRB interop case studies.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ng-handover.html"><div class="ct">NG (N2) Handover &amp; AMF Selection</div><div class="cd">Core-coordinated handover; AMF relative-capacity attach failure in an AMF pool.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="wps-slicing.html"><div class="ct">WPS &amp; Network Slicing</div><div class="cd">5QI/ARP, pre-emption, slice isolation; the PCI/PVI fix that stopped 911 calls dropping.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="load-stress.html"><div class="ct">Load, Stress &amp; Throughput</div><div class="cd">TM500, IXIA policer, iPerf vs Ookla; VPP/HW-accel fix; RRC/PRB/CPU KPI analysis.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ldr-regression.html"><div class="ct">Legacy Device Regression (LDR)</div><div class="cd">Multi-vendor handset regression sweep — iPhone, Samsung, Google Pixel, Motorola; real device-fault root causes.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="automation.html"><div class="ct">Python / tshark &amp; Excel Automation Suite</div><div class="cd">Four signalling validators + the full NGAP/NAS reference guide.</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="group-title">RAN Deployment, Optimization &amp; Project Management</div>
+  <div class="cards">
+    <a class="card" href="project-lifecycle.html"><div class="ct">Project Delivery Lifecycle</div><div class="cd">LLD→BOQ→integration→acceptance→as-built; GAP1/2/3 financials; 5G Femto to GA.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="transport-security.html"><div class="ct">Transport, Backhaul &amp; IP Security</div><div class="cd">SCTP, IPsec, traffic selectors, VLAN/route/subnet, backhaul migration.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="integration-scripting.html"><div class="ct">Multi-RAT Integration &amp; Scripting</div><div class="cd">2G–5G SRAN, BBU merging, MORAN/MOCN, sector-carrier expansion via CME/LMT/CLI.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="rf-optimization.html"><div class="ct">RF Optimization &amp; KPIs</div><div class="cd">Coverage/capacity/mobility tuning; tilt/azimuth/power; audit-driven corrections.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="spectrum-refarming.html"><div class="ct">Spectrum Refarming &amp; Coexistence</div><div class="cd">L700→N77 refarming, guard bands, link-budget validation in dense clusters.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="massive-mimo.html"><div class="ct">Massive MIMO &amp; Advanced Radio</div><div class="cd">Beamforming, MU-MIMO, CA, RedCap, UL/DL decoupling, DAS/LampSite (incl. rural relay).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="icase-library.html"><div class="ct">Troubleshooting Case Library</div><div class="cd">45+ real field faults I diagnosed &amp; published on the OEM case portal.</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; 5G SA RAN Validation Engineer</span>
+    <span>Technical portfolio &middot; verifiable proof of work</span>
+  </div>
+
+</div>
+</body>
+</html>
