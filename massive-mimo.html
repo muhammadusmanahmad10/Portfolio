@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Massive MIMO & Advanced Radio | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Radio Technology</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Radio &middot; Massive MIMO &amp; Advanced Features</div>
+  <h1>Massive MIMO &amp; Advanced Radio</h1>
+  <p class="lede">
+    Modern 5G capacity comes from the radio: <b>Massive MIMO</b> and beamforming focus energy at each user,
+    <b>Carrier Aggregation</b> stacks bandwidth, <b>UL/DL decoupling</b> rebalances uplink and downlink across bands,
+    and <b>RedCap</b> trims the stack for IoT devices. I integrated these features across macro and
+    indoor (DAS / LampSite / small-cell) deployments.
+  </p>
+  <div class="chips">
+    <span class="chip">Massive MIMO · Beamforming</span>
+    <span class="chip">4T6S · MU-MIMO</span>
+    <span class="chip">Carrier Aggregation</span>
+    <span class="chip">RedCap · NR UL/DL decoupling</span>
+    <span class="chip">DAS · LampSite · Small cells</span>
+  </div>
+
+  <section>
+    <h2>Why Massive MIMO matters</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 820 220" role="img" aria-label="Massive MIMO beamforming">
+        <!-- base station -->
+        <rect x="40" y="90" width="40" height="60" rx="6" fill="#e8eef9" stroke="#2563eb"/>
+        <text x="60" y="172" font-family="Segoe UI,Arial" font-size="11" fill="#1e3a8a" text-anchor="middle">AAU (64T64R)</text>
+        <!-- beams -->
+        <g stroke-width="10" stroke-linecap="round" opacity=".85">
+          <line x1="84" y1="120" x2="320" y2="40"  stroke="#0d9488"/>
+          <line x1="84" y1="120" x2="340" y2="100" stroke="#2563eb"/>
+          <line x1="84" y1="120" x2="320" y2="170" stroke="#d99a16"/>
+        </g>
+        <!-- users -->
+        <g font-family="Segoe UI,Arial" font-size="11" font-weight="700" text-anchor="middle">
+          <circle cx="340" cy="38" r="14" fill="#e6f4ee" stroke="#0d9488"/><text x="340" y="42" fill="#0f766e">UE</text>
+          <circle cx="360" cy="100" r="14" fill="#eef2f8" stroke="#2563eb"/><text x="360" y="104" fill="#0f766e">UE</text>
+          <circle cx="340" cy="172" r="14" fill="#fbf2dd" stroke="#d99a16"/><text x="340" y="176" fill="#b45309">UE</text>
+        </g>
+        <text x="500" y="80" font-family="Segoe UI,Arial" font-size="13" fill="#334155" font-weight="700">Separate steered beams per user</text>
+        <text x="500" y="104" font-family="Segoe UI,Arial" font-size="12" fill="#64748b">→ higher SINR, spatial reuse (MU-MIMO),</text>
+        <text x="500" y="124" font-family="Segoe UI,Arial" font-size="12" fill="#64748b">   more capacity from the same spectrum</text>
+      </svg>
+    </div>
+    <p style="margin-top:8px">A Massive-MIMO AAU (e.g. 64T64R) forms many narrow beams and serves multiple users on the same time-frequency resource (<b>MU-MIMO</b>) by separating them spatially — directly boosting capacity and cell-edge SINR.</p>
+  </section>
+
+  <section>
+    <h2>Advanced features I integrated</h2>
+    <table class="cmp">
+      <tr><th>Feature</th><th>What it does</th></tr>
+      <tr><td><b>Massive MIMO / 4T6S</b></td><td>Multi-antenna beamforming &amp; advanced sectorization (4 transmit / 6 sector) for coverage + capacity.</td></tr>
+      <tr><td><b>MU-MIMO</b></td><td>Serves multiple users on the same resource via spatial separation — multiplies spectral efficiency.</td></tr>
+      <tr><td><b>Carrier Aggregation</b></td><td>Combines multiple carriers/bands for higher per-user throughput (and a capacity lever in optimization).</td></tr>
+      <tr><td><b>NR UL/DL decoupling</b></td><td>Uses a low band for uplink while keeping a mid band for downlink — extends uplink coverage where mid-band UL is weak.</td></tr>
+      <tr><td><b>RedCap</b></td><td>Reduced-capability NR for IoT/wearables &mdash; lower bandwidth on NR.</td></tr>
+      <tr><td><b>Dual connectivity (NSA)</b></td><td>UE anchored on LTE with NR added for throughput — validated NSA anchoring behaviour.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Indoor &amp; dense deployments</h2>
+    <div class="panel">
+      <p style="margin:0">Beyond macro sites I implemented multi-cell, multi-RAT <b>indoor systems</b> &mdash; <b>DAS</b> (distributed antenna systems with RAN sharing), <b>LampSite</b> indoor small-cell platforms, and dedicated small cells / IBS for urban centres. These deployments involved <b>integration and on-air commissioning of DAS, LampSite, and IBS solutions</b>, including cell activation, neighbour configuration, transport and synchronization validation, shared-RAN (<a href="integration-scripting.html">MORAN/MOCN</a>) integration, and verification of mobility and service performance across indoor and macro networks.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Indoor, shared &amp; specialized deployments I delivered</h2>
+    <table class="cmp">
+      <tr><th>Solution</th><th>How it's built &amp; what I configured</th></tr>
+      <tr><td><b>LampSite / LampSite Pro</b></td><td>An <b>RHUB</b> aggregates multiple <b>pRRUs</b> (each pRRU is its own radio + antenna) placed per floor for in-building coverage; the RHUB connects back to the BBP in the BBU. I configured the pRRU/RHUB chain, cells and neighbour relations for in-building clusters.</td></tr>
+      <tr><td><b>LampSite sharing</b></td><td>The same LampSite infrastructure configured for <b>multiple operators</b> (RAN sharing &mdash; MOCN/MORAN), with per-operator PLMN/cell configuration.</td></tr>
+      <tr><td><b>Movable LampSite</b></td><td>A self-contained box with BBU, power and cooling, connected to transmission and to a single RHUB&rarr;pRRU &mdash; a portable in-building solution I configured and integrated.</td></tr>
+      <tr><td><b>DAS / DAS Pro (DCU/HRRU)</b></td><td>RRUs from the BBU connect to a <b>DCU</b>, which feeds <b>HRRUs</b> distributing signal to floors; supports DAS sharing across operators. I handled the DCU/HRRU mapping and cell config.</td></tr>
+      <tr><td><b>Rural RRU-relay + Yagi backhaul</b></td><td>One site's <b>RRU configured as a relay</b>; a distant site takes its <b>backhaul over the radio relay</b> (via a Yagi antenna) from the main site, both running the same radio configuration &mdash; extending coverage where wired/MW backhaul wasn't available.</td></tr>
+    </table>
+    <div class="note"><span>💡</span><span>These specialized topologies are where integration judgment matters most &mdash; the radio, transport and clock all have to be planned together (e.g. a relay site inherits timing and backhaul from its parent). See <a href="integration-scripting.html">integration &amp; scripting</a> and <a href="transport-security.html">transport</a>.</span></div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Beamforming gains depend on channel feedback.</b> Poor CSI / mobility can erode MU-MIMO gains.</li>
+      <li><b>UL/DL decoupling is a coverage tool, not magic.</b> It helps where mid-band uplink is the limiter &mdash; confirm the uplink band actually improves the budget.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; references</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.214</b> &mdash; MIMO, CSI, beam management. &nbsp;&middot;&nbsp; <b>3GPP TS 38.300</b> &mdash; CA, dual connectivity, RedCap overview. &nbsp;&middot;&nbsp; <b>3GPP Rel-17</b> &mdash; RedCap. &nbsp;&middot;&nbsp; <b>3GPP TS 37.340</b> &mdash; NSA / multi-connectivity.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
