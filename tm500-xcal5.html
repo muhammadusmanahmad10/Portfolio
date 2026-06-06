@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM500 &amp; XCAL5 — Lab Tools User Guide | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Tools</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Tools &middot; Lab Tooling User Guide</div>
+  <h1>TM500 &amp; XCAL5 &mdash; Lab Tools User Guide</h1>
+  <p class="lede">
+    <b>TM500</b> and <b>XCAL5</b> are the two RAN-lab tools I drive most. <b>TM500</b> is a hardware
+    <b>UE network tester</b> &mdash; it simulates many UEs at once to load and stress-test the gNB / eNB.
+    <b>XCAL5</b> is a software <b>signalling analyzer</b> &mdash; it captures L1/L2/L3 messages from a
+    real UE so I can decode RRC, NAS, MAC/PHY and SIP behaviour in detail. This page is a short user guide on what
+    each tool is, how I set it up, and how I use them together in a typical 5G SA validation session.
+  </p>
+  <div class="chips">
+    <span class="chip">TM500 &middot; multi-UE simulation</span>
+    <span class="chip">XCAL5 &middot; L1/L2/L3 signalling capture</span>
+    <span class="chip">Load &amp; stress, mobility, throughput</span>
+    <span class="chip">VoNR / SIP / NAS / RRC / SIB decoding</span>
+  </div>
+
+  <section>
+    <h2>What each tool is &mdash; in one line</h2>
+    <table class="cmp">
+      <tr><th>Tool</th><th>What it is</th><th>What I use it for</th></tr>
+      <tr><td><b>TM500</b></td><td>A hardware <b>UE / mobile-network tester</b> that emulates many UEs at once against a real gNB / eNB. Sits in a rack, has RF ports, and is driven from a Windows-based GUI / test environment on a control PC.</td><td>Multi-UE attach / registration capacity, PDU-session throughput, mobility (handover) stress, RRC / PRB / CPU KPI generation, soak runs.</td></tr>
+      <tr><td><b>XCAL5</b></td><td>A Windows-based <b>UE-side signalling analyzer</b>. Connects to a real UE over USB (chipset diag mode) and decodes L1/L2/L3 in real time &mdash; RRC, NAS, MAC, PHY, SIP, IMS &mdash; with a built-in log player and call-flow view.</td><td>Decoding the air-interface and IMS / SIP, root-causing a single UE&rsquo;s attach / call / data behaviour, walking SIB content, checking RRC events, capturing VoNR / RTT call flow.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>TM500 &mdash; basic workflow</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 170" role="img" aria-label="TM500 basic workflow">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="11" font-weight="700" text-anchor="middle">
+          <rect x="10"   y="60" width="130" height="55" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="75"   y="82" fill="#1e293b">1. Plan</text><text x="75"   y="98" fill="#64748b" font-size="10">UEs, services, time</text>
+          <rect x="150"  y="60" width="140" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="220"  y="82" fill="#1e3a8a">2. Configure</text><text x="220"  y="98" fill="#64748b" font-size="10">network + UE profile</text>
+          <rect x="300"  y="60" width="140" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="370"  y="82" fill="#1e3a8a">3. Build script</text><text x="370"  y="98" fill="#64748b" font-size="10">attach &rarr; PDU &rarr; traffic</text>
+          <rect x="450"  y="60" width="140" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="520"  y="82" fill="#0f766e">4. Connect RF</text><text x="520"  y="98" fill="#0f766e" font-size="10">via attenuator to gNB</text>
+          <rect x="600"  y="60" width="140" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="670"  y="82" fill="#0f766e">5. Run &amp; monitor</text><text x="670"  y="98" fill="#0f766e" font-size="10">KPIs in real time</text>
+          <rect x="750"  y="60" width="120" height="55" rx="10" fill="#fbf2dd" stroke="#d99a16"/><text x="810"  y="82" fill="#b45309">6. Export</text><text x="810"  y="98" fill="#b45309" font-size="10">KPI / logs</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a)" fill="none">
+          <line x1="140" y1="88" x2="148" y2="88"/>
+          <line x1="290" y1="88" x2="298" y2="88"/>
+          <line x1="440" y1="88" x2="448" y2="88"/>
+          <line x1="590" y1="88" x2="598" y2="88"/>
+          <line x1="740" y1="88" x2="748" y2="88"/>
+        </g>
+      </svg>
+    </div>
+    <ol class="clean" style="margin-top:8px">
+      <li><b>Plan the test.</b> Decide how many UEs, which services (attach only, attach + PDU session, attach + VoNR + data, mobility), the band / carrier under test, and how long the run is.</li>
+      <li><b>Configure the network parameters</b> on TM500: <b>PLMN</b>, <b>tracking-area code</b>, <b>NR band / ARFCN / bandwidth</b>, <b>SSB</b> config and SCS. These have to match the gNB&rsquo;s broadcast or no UE will attach.</li>
+      <li><b>Configure the UE profile</b>: <b>IMSI / SUPI</b> range so the AMF / UDM recognises them, <b>UE category / capability</b>, and how many simulated UEs to bring up. Match the SIM provisioning at the core.</li>
+      <li><b>Build the test script</b> &mdash; the ordered sequence each simulated UE will run: power-on &rarr; attach / 5G NAS Registration &rarr; PDU Session Establishment &rarr; offered traffic profile (DL/UL TCP/UDP, configurable bitrate) &rarr; optional handover &rarr; deregister. TM500 has GUI building blocks for each step; complex scripts are saved and reused per campaign.</li>
+      <li><b>Connect RF</b> from the TM500 RF ports through an <b>attenuator network</b> to the gNB&rsquo;s RF chain. The attenuator lets me simulate cell-centre / mid / edge without moving anything physically &mdash; just sweep the attenuation.</li>
+      <li><b>Run &amp; monitor.</b> Start the test and watch the live counters: <b>UE-attached count, RRC success ratio, PDU-session success ratio, throughput per UE, BLER, MCS, CQI</b>, and the gNB-side KPIs from the OAM (PRB, CPU, scheduler fairness).</li>
+      <li><b>Export</b> the run report &mdash; CSV / Excel of all KPIs over time, plus the captured logs &mdash; for the regression record.</li>
+    </ol>
+    <div class="note"><span>💡</span><span><b>Typical campaigns I run on TM500:</b> RRC / context / QoS-flow success ratios at scale, PRB / CPU utilization under offered load, throughput fairness across N UEs, mobility stress (handover success ratio at N HO/s), and soak runs (8-hour VoNR, 24-hour data).</span></div>
+  </section>
+
+  <section>
+    <h2>XCAL5 &mdash; basic workflow</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 170" role="img" aria-label="XCAL5 basic workflow">
+        <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <g font-family="Segoe UI,Arial" font-size="11" font-weight="700" text-anchor="middle">
+          <rect x="10"   y="60" width="130" height="55" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="75"   y="82" fill="#1e293b">1. Connect UE</text><text x="75"   y="98" fill="#64748b" font-size="10">USB &middot; diag mode</text>
+          <rect x="150"  y="60" width="140" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="220"  y="82" fill="#1e3a8a">2. Select UE</text><text x="220"  y="98" fill="#64748b" font-size="10">chipset auto-detect</text>
+          <rect x="300"  y="60" width="140" height="55" rx="10" fill="#e8eef9" stroke="#2563eb"/><text x="370"  y="82" fill="#1e3a8a">3. Pick layers</text><text x="370"  y="98" fill="#64748b" font-size="10">RRC / NAS / MAC / SIP</text>
+          <rect x="450"  y="60" width="140" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="520"  y="82" fill="#0f766e">4. Start logging</text><text x="520"  y="98" fill="#0f766e" font-size="10">begin capture</text>
+          <rect x="600"  y="60" width="140" height="55" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="670"  y="82" fill="#0f766e">5. Run scenario</text><text x="670"  y="98" fill="#0f766e" font-size="10">attach / call / data</text>
+          <rect x="750"  y="60" width="120" height="55" rx="10" fill="#fbf2dd" stroke="#d99a16"/><text x="810"  y="82" fill="#b45309">6. Analyze</text><text x="810"  y="98" fill="#b45309" font-size="10">decode / filter</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a2)" fill="none">
+          <line x1="140" y1="88" x2="148" y2="88"/>
+          <line x1="290" y1="88" x2="298" y2="88"/>
+          <line x1="440" y1="88" x2="448" y2="88"/>
+          <line x1="590" y1="88" x2="598" y2="88"/>
+          <line x1="740" y1="88" x2="748" y2="88"/>
+        </g>
+      </svg>
+    </div>
+    <ol class="clean" style="margin-top:8px">
+      <li><b>Connect the UE</b> to the PC over <b>USB</b>. The UE has to be in <b>diag mode</b> (Qualcomm / Samsung chipsets, depending on the model) so XCAL5 can pull layer-by-layer logs from it.</li>
+      <li><b>Open XCAL5 and select the UE.</b> XCAL5 auto-detects the chipset and shows the connected device in its UE list. If multiple UEs are connected, each gets its own pane.</li>
+      <li><b>Pick which layers to log.</b> A typical 5G validation run captures <b>RRC, NAS-5GS, MAC, PHY, IP, SIP / IMS</b>. For VoNR I always include <b>SIP</b>.</li>
+      <li><b>Start logging.</b> XCAL5 begins writing the capture file &mdash; both the raw chipset log and the decoded messages stream in live.</li>
+      <li><b>Run the scenario.</b> On the UE: power-on / attach, make a VoNR call, push data, trigger a handover &mdash; whatever the test case is. XCAL5 records everything timestamped to the test session.</li>
+      <li><b>Analyze.</b> Stop the capture and walk through the call flow:
+        <ul class="clean" style="margin:4px 0 0">
+          <li><b>RRC Setup &rarr; NAS Registration Request</b> &rarr; <b>Authentication</b> &rarr; <b>Security Mode</b> &rarr; <b>Registration Accept</b> &rarr; <b>PDU Session Establishment</b>.</li>
+          <li>Use the <b>filter bar</b> to isolate one message type (e.g. only <code>RRCReconfiguration</code> or only SIP).</li>
+          <li>For VoNR, jump into the <b>SIP call-flow view</b>: INVITE &rarr; 100 Trying &rarr; 183 Session Progress &rarr; 180 Ringing &rarr; 200 OK &rarr; ACK.</li>
+          <li>Export filtered events to CSV / TXT for the report and attach the raw XCAL5 capture to the test case.</li>
+        </ul>
+      </li>
+    </ol>
+    <div class="note"><span>🔎</span><span><b>What I look at first when an attach fails on XCAL5:</b> SIB1 read (cell access / barred?), then RRC Setup Request cause, then NAS Registration Request &rarr; Reject (and the 5GMM cause), and finally the <b>Security Mode Command/Complete</b> exchange. Most "won&rsquo;t attach" cases are clear within the first few messages once the log is in front of you.</span></div>
+  </section>
+
+  <section>
+    <h2>How I use them together in a single test session</h2>
+    <div class="panel">
+      <p style="margin:0 0 10px">For a real 5G SA Femto validation campaign the three tools work in parallel:</p>
+      <table class="cmp">
+        <tr><th>Tool</th><th>Role in the session</th></tr>
+        <tr><td><b>TM500</b></td><td>Generates the offered load &mdash; many simulated UEs attaching, holding PDU sessions, sending data, handing over &mdash; so the gNB and core are exercised at scale. Runs the campaign script and produces the KPI report.</td></tr>
+        <tr><td><b>XCAL5</b></td><td>Captures the detailed UE-side signalling on a <b>"golden" real UE</b> (a known device on the same cell). When TM500 surfaces a counter regression, XCAL5 tells me what the UE actually saw on the air interface.</td></tr>
+        <tr><td><b>Wireshark / tshark</b></td><td>Captures the <b>core-facing</b> signalling at the AMF / UPF / SeGW &mdash; NGAP / NAS / SCTP / IPsec &mdash; via my <a href="automation.html">Python+tshark validators</a>. Closes the loop: UE side from XCAL5, core side from Wireshark, system-level KPIs from TM500.</td></tr>
+      </table>
+      <p style="margin:10px 0 0">If TM500 reports an RRC-setup-failure spike, I pull XCAL5 logs from the golden UE for the same window and the tshark capture from the AMF. Between the three I can pin the failure to a layer (radio, RRC, NAS, NGAP, IPsec) and a node (UE, gNB, AMF, SeGW) very quickly.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Practical setup checklist</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>SIM / SUPI alignment:</b> the UE&rsquo;s SUPI must match what the AMF / UDM has provisioned &mdash; for TM500 simulated UEs and for the real UE driven by XCAL5.</li>
+      <li><b>Attenuator network:</b> a controlled attenuator between TM500 / UE RF and the gNB lets me sweep cell-centre &rarr; cell-edge without moving anything. Plan the path loss range up front.</li>
+      <li><b>Band-lock the UE</b> on the band under test, so the UE doesn&rsquo;t silently camp on LTE while I&rsquo;m trying to test NR.</li>
+      <li><b>Log everything during the run.</b> Re-decoding a saved log is much faster than re-running a multi-hour soak.</li>
+      <li><b>Time-sync the PCs.</b> TM500, XCAL5 and Wireshark hosts should share NTP so the timestamps line up across the three tools.</li>
+      <li><b>Naming convention</b> for captures: <code>&lt;testcase&gt;_&lt;date&gt;_&lt;UE-ID&gt;_&lt;run&gt;.&lt;ext&gt;</code>. Without it the regression archive is unsearchable in a week.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Field notes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>TM500 is a system test, not a UE test.</b> It tells me whether the gNB handles the load and signalling at scale &mdash; not whether one specific handset model works (that&rsquo;s XCAL5 territory).</li>
+      <li><b>XCAL5 is only as good as the UE diag access.</b> If the device-mode (diag port) isn&rsquo;t open, no logs.</li>
+      <li><b>The two tools are complementary, not interchangeable.</b> Use TM500 for KPI and capacity; use XCAL5 for "what did the UE actually see" on a single device.</li>
+      <li><b>For VoNR-specific work:</b> XCAL5 SIP + RTP stats catch garbled-audio / jitter / setup-time issues that TM500 alone can&rsquo;t see (see <a href="volte-vonr.html">VoNR page</a>).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>TM500</b> Network Tester product documentation &middot; <b>XCAL5</b> 5G &amp; LTE analyzer documentation &middot; <b>3GPP TS 38.508</b> (UE conformance test methodology) &middot; <b>3GPP TS 24.501 / 38.331</b> &mdash; NAS / RRC message decoders used in the analyzer.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocol Stack (Radio + TCP/IP) | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Protocols</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+  </div>
+
+  <div class="eyebrow">Protocols &middot; Radio Stack &amp; TCP/IP Model</div>
+  <h1>Protocol Stack: Radio Layers + TCP/IP</h1>
+  <p class="lede">
+    Every byte a UE sends crosses two stacks: the <b>radio stack</b> (SDAP / PDCP / RLC / MAC / PHY) that handles
+    the air interface, and the <b>TCP/IP model</b> (Link / Internet / Transport / Application) that delivers it
+    end-to-end. Understanding what each layer is responsible for is how I localize a fault — is it RF? MAC
+    scheduling? RLC retransmission? IP routing? TCP backoff? The layer points to the team.
+  </p>
+  <div class="chips">
+    <span class="chip">SDAP · PDCP · RLC · MAC · PHY</span>
+    <span class="chip">TCP/IP 4-layer model</span>
+    <span class="chip">HARQ · ARQ</span>
+  </div>
+
+  <section>
+    <h2>The NR radio stack — control plane &amp; user plane</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 320" role="img" aria-label="NR radio protocol stack">
+        <g font-family="Segoe UI,Arial" font-size="12.5" font-weight="700" text-anchor="middle">
+          <!-- CP -->
+          <text x="220" y="22" fill="#1e3a8a">Control plane (RRC + NAS)</text>
+          <rect x="60" y="32" width="320" height="38" rx="6" fill="#e8eef9" stroke="#2563eb"/><text x="220" y="56" fill="#1e3a8a">NAS (UE ↔ AMF, over N1)</text>
+          <rect x="60" y="76" width="320" height="38" rx="6" fill="#e8eef9" stroke="#2563eb"/><text x="220" y="100" fill="#1e3a8a">RRC (UE ↔ gNB)</text>
+          <rect x="60" y="120" width="320" height="34" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="220" y="142" fill="#1e293b">PDCP (SRBs)</text>
+          <rect x="60" y="160" width="320" height="34" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="220" y="182" fill="#1e293b">RLC (AM / UM / TM)</text>
+          <rect x="60" y="200" width="320" height="34" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="220" y="222" fill="#1e293b">MAC (scheduling, HARQ)</text>
+          <rect x="60" y="240" width="320" height="38" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="220" y="264" fill="#0f766e">PHY (L1 — OFDM, beams)</text>
+
+          <!-- UP -->
+          <text x="660" y="22" fill="#1e3a8a">User plane (data)</text>
+          <rect x="500" y="32" width="320" height="38" rx="6" fill="#e8eef9" stroke="#2563eb"/><text x="660" y="56" fill="#1e3a8a">Application (HTTP, RTP, SIP, …)</text>
+          <rect x="500" y="76" width="320" height="38" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="660" y="100" fill="#1e293b">IP</text>
+          <rect x="500" y="120" width="320" height="34" rx="6" fill="#fbf2dd" stroke="#d99a16"/><text x="660" y="142" fill="#b45309">SDAP (QoS flow ↔ DRB mapping)</text>
+          <rect x="500" y="160" width="320" height="34" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="660" y="182" fill="#1e293b">PDCP (DRBs · ciphering/integrity)</text>
+          <rect x="500" y="200" width="320" height="34" rx="6" fill="#eef2f8" stroke="#94a8d0"/><text x="660" y="222" fill="#1e293b">RLC · MAC · PHY (shared with CP)</text>
+          <rect x="500" y="240" width="320" height="38" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="660" y="264" fill="#0f766e">PHY (L1) on the air</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>What each radio layer actually does</h2>
+    <table class="cmp">
+      <tr><th>Layer (full form)</th><th>Purpose</th><th>Key behaviour</th></tr>
+      <tr><td><b>NAS</b> &mdash; Non-Access Stratum</td><td>The <b>UE&rsquo;s conversation with the core (AMF)</b>, riding through the gNB as a passenger. Used for registration, authentication, security and asking for a data session.</td><td>Registration, security, PDU-session control. <a href="registration-pdu.html">Attach flow &rarr;</a></td></tr>
+      <tr><td><b>RRC</b> &mdash; Radio Resource Control</td><td>The <b>UE&rsquo;s conversation with the gNB about radio resources</b> &mdash; "which cell to camp on, which beam to use, when to hand over, which bearers to set up".</td><td>Cell selection, measurements, handover commands (<code>RRCReconfiguration</code>), SRB/DRB setup, security mode.</td></tr>
+      <tr><td><b>SDAP</b> &mdash; Service Data Adaptation Protocol (NR-only, user plane)</td><td>The <b>QoS sorter</b>: takes each user packet and puts it on the right Data Radio Bearer based on its 5QI. The 5G replacement for LTE&rsquo;s static bearer model.</td><td>Marks &amp; routes packets to the right DRB based on 5QI.</td></tr>
+      <tr><td><b>PDCP</b> &mdash; Packet Data Convergence Protocol</td><td>The <b>per-bearer security + housekeeping</b> layer: encrypts, integrity-protects, compresses headers using <b>ROHC (Robust Header Compression)</b>, numbers and re-orders packets so they arrive once and in order.</td><td>Header compression, <b>ciphering &amp; integrity</b> (with K<sub>gNB</sub>-derived keys), sequence numbering, in-order delivery, ARQ-status assistance on handover.</td></tr>
+      <tr><td><b>RLC</b> &mdash; Radio Link Control</td><td>The <b>reliability layer</b>: cuts big packets into the size the air can carry, reassembles them on the other side, and retransmits anything that gets lost (in AM mode).</td><td>Three modes:
+        <ul class="clean" style="margin:4px 0 0">
+          <li><b>TM (Transparent Mode)</b> &mdash; no header, no segmentation, no retransmission. Used for very small, control-only flows where RLC just passes the packet straight through (e.g. paging, BCCH).</li>
+          <li><b>UM (Unacknowledged Mode)</b> &mdash; segments/reassembles and reorders, <b>but no retransmission</b>. Good for delay-sensitive traffic like VoNR where a late packet is worse than a lost one.</li>
+          <li><b>AM (Acknowledged Mode, with ARQ)</b> &mdash; segments/reassembles, reorders, <b>and retransmits anything lost</b> based on STATUS reports from the peer. Used for reliability-sensitive traffic (TCP data, signalling SRBs).</li>
+        </ul>
+      </td></tr>
+      <tr><td><b>MAC</b> &mdash; Medium Access Control</td><td>The <b>scheduler and traffic cop</b>: decides which UE gets which time/frequency resources on each slot, runs fast retransmissions (HARQ), and multiplexes logical channels onto the shared transport.</td><td>Logical-to-transport channel mapping, <b>dynamic scheduling</b>, <b>HARQ</b> (Stop-and-Wait per process, ACK/NACK feedback), DRX / CQI handling.</td></tr>
+      <tr><td><b>PHY</b> &mdash; Physical Layer (L1)</td><td>The <b>radio itself</b>: takes the coded, modulated bits and actually transmits / receives them as OFDM symbols over the air.</td><td>SSB, PDCCH, PDSCH/PUSCH, PUCCH, PRACH; reference signals; beam management. <a href="phy-scheduling.html">PHY page &rarr;</a></td></tr>
+    </table>
+    <div class="note"><span>💡</span><span><b>HARQ vs ARQ — the difference I always check.</b> <b>HARQ</b> at MAC is fast, per-process, with soft combining at PHY — the first line of retransmission. <b>ARQ</b> at RLC-AM is slower and reliability-oriented — the second line for what HARQ couldn't recover. A "throughput drop" with high HARQ retransmissions usually means RF/MCS; rising RLC retransmissions usually mean something more persistent in the link or scheduler.</span></div>
+
+    <h3 style="margin-top:18px">AS vs NAS &mdash; and what 5GMM / 5GSM are</h3>
+    <div class="panel">
+      <p style="margin:0 0 8px">The signalling between a UE and the network splits cleanly into <b>two halves</b>, based on <i>who the UE is actually talking to</i>:</p>
+      <ul class="clean" style="margin:0 0 10px">
+        <li><b>AS &mdash; Access Stratum.</b> The <b>UE&rsquo;s conversation with the gNB about the radio</b>: cell selection, beams, bearers, security on the air. In NR this is <b>RRC + PDCP + RLC + MAC + PHY</b>. Everything in the "radio stack" diagram above is the AS.</li>
+        <li><b>NAS &mdash; Non-Access Stratum.</b> The <b>UE&rsquo;s conversation with the core (AMF / SMF)</b>, going <i>through</i> the gNB as a passenger inside RRC. The gNB doesn&rsquo;t read it &mdash; it just forwards it. NAS itself splits further into two sub-protocols:
+          <ul class="clean" style="margin:6px 0 0">
+            <li><b>5GMM &mdash; 5G Mobility Management</b> (UE &harr; AMF). Handles <b>registration, authentication, security mode, identity, paging, deregistration, mobility/tracking-area updates</b>. Messages like <code>Registration Request / Accept</code>, <code>Authentication Request</code>, <code>Security Mode Command</code>, <code>Service Request</code>.</li>
+            <li><b>5GSM &mdash; 5G Session Management</b> (UE &harr; SMF, via the AMF). Handles <b>PDU sessions</b>: bringing them up, modifying QoS, tearing them down, IP-address assignment. Messages like <code>PDU Session Establishment Request / Accept</code>, <code>PDU Session Modification</code>, <code>PDU Session Release</code>.</li>
+          </ul>
+        </li>
+      </ul>
+      <p style="margin:0"><b>In one line:</b> <b>AS</b> is everything about the radio between UE and gNB; <b>NAS</b> is everything between the UE and the core, and inside NAS, <b>5GMM</b> is "am I registered and mobile?" while <b>5GSM</b> is "do I have a data session?". The two NAS halves are defined in <b>TS 24.501</b>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The TCP/IP model — the other stack</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3 style="margin-top:0">Four layers</h3>
+        <table class="cmp">
+          <tr><th>Layer</th><th>What it does</th></tr>
+          <tr><td><b>Application</b></td><td>HTTP, SIP, DNS, FTP, RTP — the actual user-visible protocols.</td></tr>
+          <tr><td><b>Transport</b></td><td>TCP (reliable, ordered, congestion control), UDP (unordered, lightweight), SCTP (used by NGAP, XnAP).</td></tr>
+          <tr><td><b>Internet (Network)</b></td><td>IP routing &amp; addressing (IPv4/IPv6), ICMP, IPsec.</td></tr>
+          <tr><td><b>Link</b></td><td>Ethernet, VLAN, ARP — physical link &amp; framing.</td></tr>
+        </table>
+      </div>
+      <div class="panel">
+        <h3 style="margin-top:0">How it crosses 5G</h3>
+        <ul class="clean" style="margin-top:0">
+          <li>On the air, the user's <b>IP packet</b> sits on top of <b>SDAP → PDCP → RLC → MAC → PHY</b>.</li>
+          <li>From the gNB to UPF over N3 the IP packet is tunnelled in <b>GTP-U over UDP/IP</b>.</li>
+          <li>NGAP (N2) and XnAP run on <b>SCTP/IP</b>; PFCP (N4) on <b>UDP/IP</b>; SBA on <b>HTTP/2 (TCP)</b>.</li>
+          <li><b>MTU</b> matters: tunnel overhead (GTP-U + UDP/IP) can fragment user packets — I check MTU on backhaul whenever throughput collapses without obvious RF cause.</li>
+          <li><b>TCP behaviour</b> on the radio: a single packet loss triggers TCP fastRetransmit and reduces cwnd — which is why <b>L4S/ECN</b> matter for low-latency, low-loss scalable throughput (see <a href="load-stress.html">load &amp; stress</a>).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>OSI cross-reference (so the layers always line up)</h2>
+    <table class="cmp">
+      <tr><th>OSI</th><th>TCP/IP</th><th>Where in 5G</th></tr>
+      <tr><td>7 Application / 6 Presentation / 5 Session</td><td>Application</td><td>HTTP, SIP/RTP, DNS</td></tr>
+      <tr><td>4 Transport</td><td>Transport</td><td>TCP / UDP / SCTP</td></tr>
+      <tr><td>3 Network</td><td>Internet</td><td>IP / IPsec / ICMP / GTP-U</td></tr>
+      <tr><td>2 Data Link</td><td>Link</td><td>Ethernet/VLAN on backhaul; <b>SDAP/PDCP/RLC/MAC</b> on the air</td></tr>
+      <tr><td>1 Physical</td><td>Link (PHY)</td><td>OFDM, beams, channel coding (NR <b>PHY</b>)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>How I use it in troubleshooting</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Symptom: high latency on data.</b> Check RLC-AM retransmissions and MAC HARQ. If clean, suspect TCP behaviour (cwnd collapse) or backhaul.</li>
+      <li><b>Symptom: voice clips, data OK.</b> RTP/SIP issue at Application; or 5QI/QoS-flow mapping wrong at SDAP. <a href="wps-slicing.html">QoS →</a></li>
+      <li><b>Symptom: NGAP/XnAP not coming up.</b> SCTP association layer — not IP, not application. <a href="transport-security.html">Transport →</a></li>
+      <li><b>Symptom: throughput tanks under tunnel.</b> Check MTU vs tunnel overhead; fragmentation kills TCP.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.300</b> (NR stack overview) · <b>TS 37.324 / 38.323 / 38.322 / 38.321 / 38.201</b> (SDAP / PDCP / RLC / MAC / PHY) · <b>TS 38.331</b> (RRC) · <b>RFC 791/8200</b> (IPv4/IPv6) · <b>RFC 9293</b> (TCP) · <b>RFC 4960</b> (SCTP).</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Validation Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
