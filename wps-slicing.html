@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WPS & Network Slicing — 5G SA Validation | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; QoS &amp; Priority</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">QoS &middot; WPS, Slicing &amp; Pre-emption</div>
+  <h1>WPS &amp; Network Slicing</h1>
+  <p class="lede">
+    <b>WPS</b> (Wireless Priority Service) and <b>network slicing</b> let a 5G SA network guarantee that
+    priority traffic — emergency responders, government users — keeps working when the cell is congested.
+    The behaviour is governed by per-flow QoS parameters (<b>5QI, ARP, GBR/MBR</b>) and by <b>pre-emption</b>:
+    a priority UE can take resources from a normal UE, but never the reverse. I validate that this holds under
+    load, and that slices stay isolated.
+  </p>
+  <div class="chips">
+    <span class="chip">3GPP TS 23.501 (QoS model)</span>
+    <span class="chip">3GPP TS 23.502 (procedures)</span>
+    <span class="chip">5QI / ARP / GBR / MBR</span>
+    <span class="chip">Slices 7000 / 7001 / default</span>
+    <span class="chip s">Validated on a live 5G SA Femto deployment</span>
+  </div>
+
+  <section>
+    <h2>The QoS parameters that drive everything</h2>
+    <table class="cmp">
+      <tr><th>Parameter</th><th>What it is</th><th>Why it matters in validation</th></tr>
+      <tr><td><b>5QI</b></td><td>5G QoS Identifier &mdash; maps a flow to a standardized treatment (priority, delay budget, loss rate). e.g. 5QI&nbsp;1 voice, 5QI&nbsp;6 data, <b>5QI&nbsp;128</b> WPS. (<i>Delay Budget</i> defines the maximum acceptable packet delay for a QoS flow; <i>Packet Loss Rate</i> defines how much packet loss the service can tolerate.)</td><td>Confirms the flow got the intended treatment class.</td></tr>
+      <tr><td><b>ARP</b></td><td>Allocation &amp; Retention Priority &mdash; a priority level plus two flags: <b>PCI</b> (pre-emption capability) and <b>PVI</b> (pre-emption vulnerability).</td><td>Decides who can take resources and who can lose them under congestion.</td></tr>
+      <tr><td><b>GBR / MBR</b></td><td>Guaranteed / Maximum Bit Rate for the flow.</td><td>I verify MBR is enforced (capped) and GBR is honoured even under poor RSRP.</td></tr>
+      <tr><td><b>PCI / PVI</b></td><td>PCI=true &rArr; this bearer <i>can</i> pre-empt others. PVI=true &rArr; this bearer <i>can be</i> pre-empted.</td><td>The exact pair that caused &mdash; and then fixed &mdash; the 911 drop (see the <a href="e911-location.html">E911 page</a> for the wider emergency-services context).</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Pre-emption under congestion — how it should behave</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 300" role="img" aria-label="Pre-emption under congestion">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#d99a16"/></marker></defs>
+        <!-- cell capacity bar -->
+        <text x="40" y="40" font-family="Segoe UI,Arial" font-size="13" font-weight="700" fill="#64748b">Cell resources (full)</text>
+        <rect x="40" y="52" width="800" height="46" rx="8" fill="#eef2f8" stroke="#d8e0ea"/>
+        <rect x="44" y="56" width="520" height="38" rx="6" fill="#dbe4f3"/><text x="304" y="80" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#334155" font-weight="700">Normal UEs (PVI=true, can be pre-empted)</text>
+        <rect x="568" y="56" width="268" height="38" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="702" y="80" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#0f766e" font-weight="700">WPS / HPA (PVI=false)</text>
+        <!-- incoming WPS -->
+        <text x="40" y="150" font-family="Segoe UI,Arial" font-size="13" font-weight="700" fill="#d99a16">Incoming WPS UE needs resources &rarr;</text>
+        <line x1="350" y1="145" x2="350" y2="170" stroke="#d99a16" marker-end="url(#a)"/>
+        <!-- after preemption -->
+        <text x="40" y="205" font-family="Segoe UI,Arial" font-size="13" font-weight="700" fill="#64748b">After pre-emption</text>
+        <rect x="40" y="217" width="800" height="46" rx="8" fill="#eef2f8" stroke="#d8e0ea"/>
+        <rect x="44" y="221" width="400" height="38" rx="6" fill="#dbe4f3"/><text x="244" y="245" text-anchor="middle" font-family="Segoe UI,Arial" font-size="12.5" fill="#334155" font-weight="700">Normal UEs (some dropped/barred)</text>
+        <rect x="448" y="221" width="388" height="38" rx="6" fill="#e6f4ee" stroke="#0d9488"/><text x="642" y="245" text-anchor="middle" font-family="Segoe UI,Arial" font-size="12.5" fill="#0f766e" font-weight="700">WPS / HPA admitted &amp; protected</text>
+      </svg>
+    </div>
+    <div class="note"><span>💡</span><span>I verified each rule by trace: WPS UEs are <b>not pre-emptable</b>; normal UEs are pre-empted <b>by ARP</b> to admit incoming WPS UEs; under max load normal UEs get rejected via <b>cell temporary barring</b> + <b>access class barring on SIB1</b>, and re-attach when resources free up. During handover with no free resource, the normal UE fails while the WPS UE succeeds.</span></div>
+  </section>
+
+  <section>
+    <h2>Case study — the PCI/PVI gap that dropped live 911 calls</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>Ongoing emergency (911) calls were being <b>dropped</b> during congestion — exactly the calls that must never drop.</dd>
+        <dt>Root cause</dt><dd>Pre-emption was configured <b>ARP-priority-only</b>. The emergency bearer had a high ARP priority value but its <b>PCI/PVI flags were not set correctly</b> (effectively pre-emptable), so the scheduler could victimise it when admitting other traffic.</dd>
+        <dt>Fix</dt><dd>Switched pre-emption to evaluate <b>ARP + PCI + PVI together</b>. With PCI=true / PVI=false applied to the priority bearer, an in-progress 911 call became <span class="tag-good">non-pre-emptable</span> and no longer dropped under congestion.</dd>
+      </dl>
+      <p style="margin:14px 0 0"><span class="tag-good">Why it matters:</span> ARP priority alone is not enough — the pre-emption <i>flags</i> are what actually protect a bearer. This is a life-safety-critical distinction, and catching it in the lab is the entire point of pre-launch validation.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study — WPS dynamic ARP uplift (the <code>*272</code> behaviour)</h2>
+    <div class="panel case good">
+      <p style="margin:0 0 10px">WPS users invoke priority by dialling <code>*272</code> + the destination number. I validated a subtle, correct behaviour: when a WPS user calls a <b>regular</b> user (whose IMS voice flow runs on <b>5QI 1</b>), the network <b>dynamically raises the regular user's ARP</b> on that voice flow for the duration of that call — so the whole priority conversation is protected, not just the WPS leg. I confirmed by trace that the regular UE's ARP rose while on a call with the WPS UE, and returned afterward. I separately validated <b>HPA</b> (High Priority Access): with the SIM provisioned <code>ACC = 11</code> and MPS off, the UE signals <b>High Priority Access</b> as its RRC establishment cause, mapping to ARP 4 / 5QI 128 / PCI=true / PVI=false.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case study — WPS + Slicing bring-up failures</h2>
+    <div class="grid2">
+      <div class="panel case">
+        <h3 style="margin-top:0">SIM can't see 5QI 128</h3>
+        <p style="margin:0">WPS+Slicing configured but the SIM never saw 5QI 128. Root cause was twofold: <b>SOC codes not correctly provisioned at the SIM</b> <i>and</i> <b>slicing not configured at the femto</b>. Fixed both ends ⇒ 5QI 128 appeared.</p>
+      </div>
+      <div class="panel case">
+        <h3 style="margin-top:0">Voice stalled on slice (default slice missing)</h3>
+        <p style="margin:0">In this WPS + Slicing scenario, <b>voice stalled while data kept working</b>. The reason was in how the SIM provisioning routed the two services: per the SIM&rsquo;s S-NSSAI mapping, <b>voice was supposed to ride on the <i>default</i> slice</b> while <b>data rode on the configured priority slice (e.g. 7000 / 7001)</b>. The priority slice <i>was</i> configured on the femto, so the data PDU session came up normally. But the <b>default slice was not configured on the femto</b> &mdash; so when the UE tried to set up the voice PDU session against the default S-NSSAI, the femto had no slice context to admit it, and the voice path stalled. Adding the default slice on the femto restored voice; data was unaffected throughout.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Slice isolation &amp; resource reservation</h2>
+    <div class="panel">
+      <p>I validated three slices (<b>default</b>, <b>7000</b>, <b>7001</b>) for correct isolation and admission, and confirmed the three reservation modes behave per design:</p>
+      <table class="cmp">
+        <tr><th>Reservation mode</th><th>Expected behaviour I verified</th></tr>
+        <tr><td><b>Exclusive</b></td><td>Resources reserved for one slice <i>cannot</i> be used by another, even when idle.</td></tr>
+        <tr><td><b>Priority</b></td><td>Higher-priority slice gets preference when resources are shared.</td></tr>
+        <tr><td><b>Shared</b></td><td>Remaining resources can be shared among slices.</td></tr>
+      </table>
+      <p style="margin-top:14px">Throughput prioritization held the intended order under congestion: <b>Regular &lt; WPS &lt; Slice UE</b>, with PRB assignment and admission control respecting WPS/HPA priority, and multi-slice support keeping ≥2 slices isolated simultaneously.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>How I confirm WPS status from the trace</h2>
+    <pre><span class="c"># WPS-user verifier (tshark) — illustrative</span>
+<span class="c"># From each PDU Session Establishment, extract:</span>
+<span class="c">#   - RRC establishment cause (mps-PriorityAccess / highPriorityAccess)</span>
+<span class="c">#   - 5QI, ARP (priority, PCI, PVI), GBR/MBR</span>
+<span class="c">#   - S-NSSAI / slice ID (SST+SD), DNN mapping, IMEISV</span>
+<span class="c"># Evaluate WPS criteria for voice &amp; data -> CSV + GUI PASS/FAIL summary</span></pre>
+    <div class="note"><span>🔎</span><span>Slice and QoS info is read straight from the <code>PDU Session Establishment</code> message; establishment cause (MO-signalling / high-priority / MPS) is read from the RRC setup. The script maps slice ID and flags WPS pass/fail per UE.</span></div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>ARP priority ≠ protection.</b> PCI/PVI flags decide pre-emption; a high-priority bearer with PVI=true can still be dropped.</li>
+      <li><b>WPS protection is dynamic.</b> A regular user on a call with a WPS user inherits raised ARP for that call.</li>
+      <li><b>Default slice must be configured for whichever service the SIM maps to it.</b> If the SIM provisions voice on the default slice and data on a priority slice (e.g. 7000/7001), then configuring only the priority slice on the femto lets data come up but stalls voice &mdash; because there&rsquo;s no femto-side slice context for the default S-NSSAI the UE is asking for.</li>
+      <li><b>Provisioning is two-sided.</b> WPS/5QI 128 needs both SIM (SOC/ACC) and femto (slicing) config — one side alone fails silently.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Primary references</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 23.501</b> §5.7 — 5G QoS model (5QI, ARP, GBR/MBR), §5.15 — network slicing. &nbsp;·&nbsp; <b>3GPP TS 23.502</b> — PDU session &amp; QoS flow procedures. &nbsp;·&nbsp; <b>3GPP TS 23.503</b> — policy &amp; pre-emption control. &nbsp;·&nbsp; WPS / MPS priority &amp; access-class concepts.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
