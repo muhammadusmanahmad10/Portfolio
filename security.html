@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5G / Telecom Security | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Security</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Security &middot; 5G &amp; Transport</div>
+  <h1>5G / Telecom Security</h1>
+  <p class="lede">
+    Security in a mobile network runs from the SIM to the core. I work hands-on with the <b>transport-security</b>
+    layer every day (IPsec/IKEv2 tunnels, certificate-based authentication, traffic selectors), and I understand
+    the wider <b>5G security architecture</b> — mutual authentication, key hierarchy, subscriber-identity
+    protection and integrity/ciphering — that protects the air interface and the signalling behind it.
+  </p>
+  <div class="chips">
+    <span class="chip">IPsec / IKEv2</span><span class="chip">PKI &amp; certificate enrollment</span>
+    <span class="chip">5G-AKA · SUPI/SUCI</span><span class="chip">NAS / AS security</span>
+    <span class="chip">TS 33.501 · 33.310</span>
+  </div>
+
+  <section>
+    <h2>Where security sits in the 5G stack</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 840 220" role="img" aria-label="5G security layers">
+        <g font-family="Segoe UI,Arial" font-size="12" font-weight="700" text-anchor="middle">
+          <rect x="40" y="20" width="760" height="34" rx="8" fill="#e6f4ee" stroke="#0d9488"/><text x="420" y="42" fill="#0f766e">Subscriber identity protection &mdash; SUPI concealed as SUCI</text>
+          <rect x="40" y="64" width="760" height="34" rx="8" fill="#e8eef9" stroke="#2563eb"/><text x="420" y="86" fill="#1e3a8a">Mutual authentication — 5G-AKA (UE ↔ AUSF/UDM), key hierarchy K → K_AMF → K_gNB</text>
+          <rect x="40" y="108" width="760" height="34" rx="8" fill="#eef2f8" stroke="#94a8d0"/><text x="420" y="130" fill="#1e293b">NAS &amp; AS security — ciphering + integrity (Security Mode Command/Complete)</text>
+          <rect x="40" y="152" width="760" height="34" rx="8" fill="#efeafc" stroke="#8b6fd0"/><text x="420" y="174" fill="#6d28d9">Transport security — IPsec/IKEv2 on N2/Xn/backhaul; PKI certificates; SeGW</text>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:8px">Each layer protects a different thing: <b>SUCI</b> hides the permanent identity over the air; <b>5G-AKA</b> proves UE and network to each other and derives keys; <b>NAS/AS security</b> ciphers and integrity-protects signalling and data; and <b>IPsec</b> protects the backhaul/interface transport to the core.</p>
+  </section>
+
+  <section>
+    <h2>Hands-on: the transport-security layer</h2>
+    <div class="panel case good">
+      <p style="margin:0">This is my day-to-day. On the 5G SA Femto I validate the full <b>IPsec/IKEv2</b> bring-up &mdash; <b>IKE SA &rarr; IPsec (child) SA &rarr; protected traffic</b> &mdash; over <b>certificate-based authentication</b>, including device <b>initial certificate enrollment</b> (PKI per TS 33.310), the temporary-then-permanent tunnel model to the <b>SeGW</b>, rekey behaviour, ACL/traffic-selector rules, and DPD. I've root-caused real faults here: a traffic-selector mismatch (10.0.0.0 vs 42.0.0.0), an SCTP-over-IPsec source-port issue, and a DPD timeout under load. <a href="ztp-ipsec.html">ZTP &amp; IPsec page &rarr;</a> &nbsp;&middot;&nbsp; <a href="transport-security.html">Transport &amp; IP security &rarr;</a></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The wider 5G security architecture (TS 33.501)</h2>
+    <table class="cmp">
+      <tr><th>Mechanism</th><th>What it protects / how</th></tr>
+      <tr><td><b>SUPI / SUCI</b></td><td>The permanent subscriber identity (SUPI) is never sent in clear over the air &mdash; it's encrypted into a <b>SUCI</b> using the home network public key, defeating IMSI-catchers.</td></tr>
+      <tr><td><b>5G-AKA / EAP-AKA'</b></td><td>Mutual authentication between UE and network via AUSF/UDM; produces the anchor key and the key hierarchy (K → K_AUSF → K_SEAF → K_AMF → K_gNB).</td></tr>
+      <tr><td><b>NAS security</b></td><td>Ciphering + integrity protection of NAS signalling between UE and AMF (activated at Security Mode Command).</td></tr>
+      <tr><td><b>AS security</b></td><td>Ciphering + integrity of RRC signalling and user-plane between UE and gNB (keys derived from K_gNB; horizontal/vertical key derivation on handover).</td></tr>
+      <tr><td><b>Algorithms</b></td><td>NEA/NIA (encryption/integrity) — e.g. AES, SNOW 3G, ZUC based.</td></tr>
+      <tr><td><b>Network domain security</b></td><td>IPsec/IKEv2 + PKI between network nodes (TS 33.310) — the layer I operate hands-on.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Security mindset &amp; credential</h2>
+    <div class="panel">
+      <p style="margin:0">My troubleshooting discipline &mdash; isolate, prove root cause with evidence, resolve, document &mdash; is the same discipline security work rewards. I've reinforced the fundamentals through the <b>Google Cybersecurity Certificate</b> (security frameworks &amp; controls, threats/vulnerabilities, network security, SIEM concepts), complementing the network-domain security I already practise. For a RAN role this shows I treat the IPsec/PKI/authentication layer as first-class, not an afterthought.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Identity is protected before authentication.</b> SUCI conceals SUPI on the very first message.</li>
+      <li><b>Keys are derived, not shared.</b> The hierarchy means a compromised gNB key doesn't expose the anchor key.</li>
+      <li><b>Transport security is its own failure domain.</b> A cert/IKE/ACL fault stops service even when the radio is perfect.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 33.501</b> — 5G security architecture &amp; procedures. &nbsp;·&nbsp; <b>TS 33.310</b> — network domain security / PKI (certificate enrollment, CMPv2). &nbsp;·&nbsp; <b>RFC 7296</b> — IKEv2. &nbsp;·&nbsp; <b>TS 33.401</b> — EPS (LTE) security.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

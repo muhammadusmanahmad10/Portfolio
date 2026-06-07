@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Non-Terrestrial Networks (NTN) | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Emerging Tech</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Emerging &middot; Non-Terrestrial Networks</div>
+  <h1>Non-Terrestrial Networks (NTN)</h1>
+  <p class="lede">
+    NTN extends 5G beyond cell towers &mdash; using <b>satellites</b> to deliver coverage
+    where terrestrial sites can't reach. Standardised from <b>3GPP Release 17</b>, it's one of the fastest-growing
+    frontiers in RAN. I've worked on mixed terrestrial/satellite-linked sites and the coexistence questions NTN
+    raises &mdash; a differentiator few RAN engineers have hands-on exposure to.
+  </p>
+  <div class="chips">
+    <span class="chip">3GPP Rel-17 NTN</span><span class="chip">Satellite backhaul</span>
+    <span class="chip">PFD limits · coexistence</span><span class="chip">LEO / GEO</span>
+  </div>
+
+  <section>
+    <h2>Where NTN fits</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 820 230" role="img" aria-label="NTN architecture">
+        <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1d4ed8"/></marker></defs>
+        <!-- satellite -->
+        <rect x="360" y="14" width="100" height="40" rx="10" fill="#efeafc" stroke="#8b6fd0"/><text x="410" y="39" font-family="Segoe UI,Arial" font-size="12" font-weight="700" fill="#6d28d9" text-anchor="middle">Satellite</text>
+        <!-- ground -->
+        <g font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" text-anchor="middle">
+          <circle cx="120" cy="180" r="20" fill="#e6f4ee" stroke="#0d9488"/><text x="120" y="184" fill="#0f766e">UE</text>
+          <rect x="320" y="160" width="180" height="42" rx="10" fill="#eef2f8" stroke="#94a8d0"/><text x="410" y="186" fill="#1e293b">Gateway / NTN payload</text>
+          <rect x="640" y="160" width="140" height="42" rx="10" fill="#e6f4ee" stroke="#0d9488"/><text x="710" y="186" fill="#0f766e">5G Core</text>
+        </g>
+        <g stroke="#1d4ed8" marker-end="url(#a)" fill="none">
+          <line x1="138" y1="168" x2="370" y2="58"/>
+          <line x1="450" y1="58" x2="430" y2="158"/>
+          <line x1="500" y1="181" x2="638" y2="181"/>
+        </g>
+        <text x="250" y="110" font-family="Segoe UI,Arial" font-size="10.5" fill="#64748b">service link</text>
+        <text x="470" y="120" font-family="Segoe UI,Arial" font-size="10.5" fill="#64748b">feeder link</text>
+      </svg>
+    </div>
+    <p style="margin-top:8px">NTN inserts a satellite into the path between the UE and the 5G core via service and feeder links. The satellite can carry one of two payload types: <b>transparent</b> (the satellite acts as a simple bent-pipe relay &mdash; it just forwards the signal between UE and ground gateway without processing) or <b>regenerative</b> (the satellite carries the gNB or part of the gNB on board, so it decodes / re-encodes the signal in space). NTN extends coverage to remote, maritime and disaster-recovery scenarios where building towers isn't feasible.</p>
+  </section>
+
+  <section>
+    <h2>My exposure</h2>
+    <div class="panel">
+      <p style="margin:0 0 8px">On a large smart-city telecom infrastructure program I integrated 5G and RAN-sharing (MORAN) solutions across <b>sites whose backhaul transport was carried over satellite</b> (i.e. terrestrial 5G RAN with satellite-based backhaul, not 3GPP NTN air-interface).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What makes NTN hard (and where validation focuses)</h2>
+    <table class="cmp">
+      <tr><th>Challenge</th><th>Why it matters</th></tr>
+      <tr><td><b>Long propagation delay</b></td><td>Satellite distance adds large round-trip delay — timers, HARQ, and RACH must be adapted (Rel-17 NTN timing enhancements).</td></tr>
+      <tr><td><b>Doppler shift</b></td><td>Fast-moving LEO satellites shift frequency — needs pre-compensation.</td></tr>
+      <tr><td><b>PFD limits &amp; coexistence</b></td><td>Satellite emissions must stay within power-flux-density limits to coexist with terrestrial networks in shared bands.</td></tr>
+      <tr><td><b>Mobility &amp; cell movement</b></td><td>For LEO, the "cell" moves over the ground — fundamentally different mobility model from fixed towers.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Field notes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>NTN reuses the 5G NR stack</b> with timing/Doppler adaptations — not a separate radio technology.</li>
+      <li><b>Coexistence is the gating issue</b> in shared spectrum; PFD limits are the terrestrial network's protection.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; references</h2>
+    <div class="panel"><p class="ref"><b>3GPP TR 38.811</b> — NTN study. &nbsp;·&nbsp; <b>3GPP TS 38.821</b> — NTN solutions. &nbsp;·&nbsp; <b>Release 17/18</b> NTN work items. &nbsp;·&nbsp; ITU-R PFD limits &amp; satellite/terrestrial coexistence.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

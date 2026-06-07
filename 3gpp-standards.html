@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3GPP Standards & Releases 15–19 | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Standards</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Standards &middot; 3GPP Releases &amp; RAN Working Groups</div>
+  <h1>3GPP Standards &amp; Releases 15–19</h1>
+  <p class="lede">
+    Everything I validate traces back to a 3GPP specification. I don't just follow test scripts — I read the
+    underlying TS documents, map a procedure to its clause, and use that to settle vendor disputes and design
+    test cases. This page shows the standards I work from, the RAN working groups they come from, and how I apply
+    them in the lab.
+  </p>
+  <div class="chips">
+    <span class="chip">Releases 15–19</span><span class="chip">RAN1 · RAN2 · RAN3 · RAN4</span>
+    <span class="chip">TS 23 / 24 / 38 series</span>
+  </div>
+
+  <section>
+    <h2>The specs I work from daily</h2>
+    <table class="cmp">
+      <tr><th>Spec</th><th>Covers</th><th>Where I apply it</th></tr>
+      <tr><td><b>TS 23.501 / 23.502</b></td><td>5G system architecture &amp; procedures</td><td>QoS (5QI/ARP), slicing, PDU sessions, handover procedures</td></tr>
+      <tr><td><b>TS 24.501</b></td><td>5G NAS</td><td>Registration, security, PDU session signalling</td></tr>
+      <tr><td><b>TS 38.300</b></td><td>NR overall architecture</td><td>Mobility, scheduling, dual connectivity, RedCap</td></tr>
+      <tr><td><b>TS 38.331</b></td><td>NR RRC</td><td>RRCReconfiguration, SRB/DRB, measurements — the SRB <code>criticalExtension</code> dispute</td></tr>
+      <tr><td><b>TS 38.413 (NGAP)</b></td><td>NG application protocol</td><td>Path Switch, Handover, Initial Context, PDU resource setup</td></tr>
+      <tr><td><b>TS 38.423 (XnAP)</b></td><td>Xn application protocol</td><td>Xn handover request/ack, UE context release</td></tr>
+      <tr><td><b>TS 38.305 / 23.273</b></td><td>Positioning &amp; location services</td><td>NR-ECID, LMF/GMLC, E911 location</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Release evolution — what each brought</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 840 130" role="img" aria-label="3GPP release timeline">
+        <line x1="40" y1="70" x2="800" y2="70" stroke="#d8e0ea" stroke-width="2"/>
+        <g font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" text-anchor="middle">
+          <circle cx="100" cy="70" r="7" fill="#0d9488"/><text x="100" y="48" fill="#0f766e">Rel-15</text><text x="100" y="98" fill="#64748b" font-size="10">5G NSA/SA base</text>
+          <circle cx="260" cy="70" r="7" fill="#2563eb"/><text x="260" y="48" fill="#1e3a8a">Rel-16</text><text x="260" y="98" fill="#64748b" font-size="10">URLLC, NR-U, pos.</text>
+          <circle cx="420" cy="70" r="7" fill="#2563eb"/><text x="420" y="48" fill="#1e3a8a">Rel-17</text><text x="420" y="98" fill="#64748b" font-size="10">RedCap, NTN, slicing</text>
+          <circle cx="580" cy="70" r="7" fill="#d99a16"/><text x="580" y="48" fill="#b45309">Rel-18</text><text x="580" y="98" fill="#64748b" font-size="10">5G-Advanced</text>
+          <circle cx="740" cy="70" r="7" fill="#d6629e"/><text x="740" y="48" fill="#be185d">Rel-19</text><text x="740" y="98" fill="#64748b" font-size="10">AI/ML, NTN evol.</text>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:8px"><b>RAN1</b> (PHY layer &mdash; channel structure, waveforms, MIMO, channel coding, beam management), <b>RAN2</b> (radio protocols &mdash; RRC, MAC, RLC, PDCP, SDAP), <b>RAN3</b> (interfaces &amp; architecture &mdash; Xn/NG/F1/E1, mobility, RAN sharing) and <b>RAN4</b> (RF &amp; performance requirements, coexistence). My work maps directly: <a href="phy-scheduling.html">PHY/scheduling</a> to RAN1, mobility/SRB/measurement events to RAN2, Xn/NG and AMF behaviour to RAN3, and multi-band integration, refarming and coexistence work (assuring that newly activated NR/LTE carriers don&rsquo;t degrade neighbouring bands) to RAN4.</p>
+  </section>
+
+  <section>
+    <h2>Standards literacy in action</h2>
+    <div class="panel case good">
+      <p style="margin:0 0 10px">The clearest proof that reading the spec matters: in the <a href="xn-handover.html">SRB <code>criticalExtension</code> dispute</a>, a vendor claimed a peer was non-compliant. By citing <b>TS 38.331</b> (RRCReconfiguration is UE-facing; <code>srb-ToAddModList</code> optional when unchanged) and <b>TS 38.423</b> (XnAP treats the RRC container as transparent), I demonstrated the peer was <b>fully compliant</b> and reframed the issue as a vendor interop alignment — closing a dispute that could otherwise have escalated for weeks.</p>
+      <p style="margin:0">I'm also comfortable drafting technical inputs, analysing contributions, and summarising meeting outcomes for stakeholders — translating raw spec text into decisions the team can act on.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field notes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>"Optional" is a precise word in 3GPP.</b> Optional-when-unchanged IEs are a frequent source of false non-compliance claims.</li>
+      <li><b>Transparent containers mean the carrier doesn't parse them.</b> XnAP/NGAP relay RRC without deriving its state.</li>
+      <li><b>Map the working group to the problem.</b> RAN1 vs RAN2 vs RAN3 vs RAN4 framing speeds up who owns a fix.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>References</h2>
+    <div class="panel"><p class="ref">3GPP specification portal (TS/TR series) · Release 15–19 feature descriptions · RAN2/RAN3/RAN4 Study &amp; Work Item documentation.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
