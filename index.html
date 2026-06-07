@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Usman Ahmad — RAN Engineer · Technical Portfolio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero-index">
+    <h1>Muhammad Usman Ahmad</h1>
+    <div class="role">RAN Engineer</div>
+    <p class="sub">
+      A working technical portfolio. Each page below explains a topic I own — with the standards behind it, a
+      signalling/architecture diagram, the real lab &amp; integration issues I diagnosed and resolved. It exists so the
+      claims on my resume can be verified, not just read.
+    </p>
+    <div class="contact">
+      <a href="mailto:muhammadusmanahmad10@gmail.com">muhammadusmanahmad10@gmail.com</a>
+      <span>·</span>
+      <a href="https://www.linkedin.com/in/muhammad-usman-ahmad-0b1355166" target="_blank">LinkedIn</a>
+      <span>·</span>
+      <span>Sammamish, WA, USA</span>
+    </div>
+  </div>
+
+  <div class="group-title">Architecture, Foundations &amp; Standards</div>
+  <div class="cards">
+    <a class="card" href="5g-architecture.html"><div class="ct">5G System Architecture &amp; Interfaces</div><div class="cd">All 5GC NFs (AMF/SMF/UPF/AUSF/UDM/UDR/PCF/NRF/NSSF/NEF/CHF/NWDAF/SMSF/BSF/LMF), N1–N15 reference points, Service-Based Architecture (HTTP/2 + JSON, NRF registry), PFCP PDR/FAR/QER on N4.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="protocol-stack.html"><div class="ct">Protocol Stack (Radio + TCP/IP)</div><div class="cd">SDAP/PDCP/RLC (TM/UM/AM)/MAC/PHY, HARQ vs ARQ, AS vs NAS, 5GMM vs 5GSM, TCP/IP 4-layer model, GTP-U/SCTP/PFCP, OSI cross-reference, MTU/tunnel-overhead.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="phy-scheduling.html"><div class="ct">NR PHY &amp; Scheduling</div><div class="cd">Numerology μ=0–4, BWP, SSB/PSS/SSS, PCI = 3·N_ID^(1) + N_ID^(2) = 1008, bits→symbols→RB hierarchy, throughput formula, 4-step/2-step RACH, RNTIs, DM-RS/CSI-RS/SRS/PT-RS/PRS, beam mgmt P-1/P-2/P-3 + BFR, MCS/CQI/HARQ, FR2 (24.25–71 GHz).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="3gpp-standards.html"><div class="ct">3GPP Standards &amp; Releases 15–19</div><div class="cd">TS 23.501/502, TS 24.501, TS 38.300/331/413/423/305, RAN1/RAN2/RAN3/RAN4 mapping, spec-driven dispute resolution (SRB <code>criticalExtension</code> case).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ran-fundamentals.html"><div class="ct">5G RAN Fundamentals (Reference)</div><div class="cd">RSRP/RSRQ/SINR/RSSI · MCS/QAM/BLER · CQI/RI/PMI · A1–A5 / B1–B2 events &amp; TTT · IMCR · redirect-with-release · HARQ &amp; ARQ · MIB/SIBs/SRBs/DRBs · MORAN/MOCN · EN-DC · RedCap · UL/DL decoupling.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="nr-specialized.html"><div class="ct">5G NR Specialized Features</div><div class="cd">URLLC (mini-slot, PDCP duplication, SPS) · DSS (NR rate-match around LTE CRS) · IAB (donor/node, BAP) · NR MBS (multicast/broadcast, TS 23.247) · mMTC (NB-IoT, RedCap, eRedCap). <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="security.html"><div class="ct">5G / Telecom Security</div><div class="cd">IPsec/IKEv2 + PKI/certs (hands-on), TS 33.501 architecture, SUPI/SUCI, 5G-AKA &amp; EAP-AKA', key hierarchy K → K_AUSF → K_SEAF → K_AMF → K_gNB, NAS/AS security, network domain security (TS 33.310).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="volte-vonr.html"><div class="ct">VoNR / VoLTE, EPS Fallback &amp; SRVCC</div><div class="cd">5G voice + LTE/3G/2G fallbacks; VoNR/ViNR/RTT/SMS-over-IMS, supplementary &amp; multi-party services; non-VoNR device blocking; garbled-voice case (TEID / QFI&rarr;DRB SDAP binding); SMS iFC routing fix; VoNR setup-time sweep; hotspot coexistence.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="policy-qos.html"><div class="ct">Policy &amp; QoS Control (PCF/PCRF)</div><div class="cd">PCF/PCRF chain → SMF/UPF; 5QI/QCI, ARP, GBR/MBR; N7 (PCF↔SMF), N5 (AF↔PCF), Rx/Gx; DPI-assisted policy; slice policy per S-NSSAI. <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="open-ran.html"><div class="ct">Open RAN (O-RAN)</div><div class="cd">O-RU/O-DU/O-CU disaggregation, Near-RT &amp; Non-RT RIC (xApps/rApps), open interfaces (A1/E2/O1/O2, F1/E1), Open Fronthaul 7.2x with PTP/SyncE/GPS S-plane timing, ±1.5 µs TDD phase budget.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ai-ml-ran.html"><div class="ct">AI / ML for RAN</div><div class="cd">3GPP Rel-18 TS 38.843 (CSI feedback, beam mgmt, positioning), Rel-19 model life-cycle, O-RAN xApps/rApps on Near-RT RIC, rApps on Non-RT RIC, NWDAF analytics. <em>(knowledge)</em></div><span class="arrow">Open →</span></a>
+    <a class="card" href="ntn.html"><div class="ct">Non-Terrestrial Networks (NTN)</div><div class="cd">Transparent vs regenerative payload, satellite backhaul, PFD limits, LEO/GEO, Rel-17 NTN timing/Doppler, TR 38.811 / TS 38.821.</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="group-title">5G SA Lab Validation</div>
+  <div class="cards">
+    <a class="card" href="kpis-messages.html"><div class="ct">KPIs &amp; Signalling Messages</div><div class="cd">KPI + signalling fingerprint per feature: accessibility (RRC/registration/PDU success), data (throughput/latency), voice/IMS (CSSR/RTP), mobility (HO success, drops), retainability (PRB/CPU). OAM counters correlated with Wireshark/XCAL5 trace.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="lab-methodology.html"><div class="ct">Lab Validation Methodology</div><div class="cd">3GPP conformance + operator acceptance (both), UE-category selection (CA/EN-DC/VoNR), TM500/IXIA/XCAL5 toolchain, test-case execution discipline (what to check / method / pass-fail), Basic Sanity Test Guide, 8/24/72-hr soak; femto SA→NSA macro HO via existing LTE anchor.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="tm500-xcal5.html"><div class="ct">TM500 &amp; XCAL5 &mdash; Lab Tools User Guide</div><div class="cd">TM500 UE-emulator 6-step workflow (plan → config → script → RF → run → export); XCAL5 signalling analyzer 6-step workflow (connect → select → layers → log → run → analyze); golden-UE + Wireshark three-tool session; attenuator network.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ztp-ipsec.html"><div class="ct">ZTP &amp; IPsec</div><div class="cd">ZTP bring-up (cert enrollment → SeGW temp tunnel → location ≤20 m → 2 perm tunnels → BMC/LMF/GMLC → on air); IKE SA/Child SA, SPI 8-byte vs 4-byte, NAT-T UDP-checksum case, OAM-tunnel TS overlap, DPD/DSCP under load; PTP/GPS sync incl. site-to-site PTP→PTP and PTP→GPS handover.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="registration-pdu.html"><div class="ct">Registration &amp; PDU Session</div><div class="cd">Reg → Auth → SMC → Reg Accept → PDU Session flow; BWPS iPhone iOS 18.7 attach fix; duplicate C-RNTI; IPsec DPD timeout under load; non-VoNR rejection at AMF; RRC_INACTIVE/RNA/RNAU; RF-chamber MIB-OK-no-register (2T2R with one RRU port piped); tshark registration / PDU validator.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="e911-location.html"><div class="ct">E911 Location &amp; CMAS/WEA</div><div class="cd">NR-ECID vs CID uncertainty (15 m policy case), Z-axis FCC rule, multi-LMF redundancy fix, NRCI+TAC+PLMN whitelisting, MTLR; CMAS core-dump SIB-scheduling fix; LMF/GMLC/PSAP/EGIS/MSAG/BMC component map.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="xn-handover.html"><div class="ct">Xn Handover</div><div class="cd">Intra-NR gNB↔gNB via Xn; Xn-C SCTP/IP + Xn-U GTP-U; NGAP Path Switch; SCTP source-port mismatch (38422) firewall case; SRB <code>criticalExtension</code> TS 38.331/38.423 dispute resolution; hand-in RRCReconfiguration failure (target-side C-RNTI collision); femto→macro PLMN-extract patch; Xn tshark validator (Path Switch Req/Ack).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ng-handover.html"><div class="ct">NG (N2) Handover &amp; AMF Selection</div><div class="cd">Core-coordinated HO via AMF (NGAP); AMF relative-capacity (ARC) weighted selection; attach-failure case in an AMF pool (ARC=0 boundary behaviour); inter-AMF relocation.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="wps-slicing.html"><div class="ct">WPS &amp; Network Slicing</div><div class="cd">5QI/ARP/GBR/MBR; PCI/PVI pre-emption (the fix that stopped 911 drops); *272 WPS dynamic ARP uplift; HPA ACC=11 → ARP 4 / 5QI 128; slices 7000/7001 + default; exclusive/priority/shared reservation; voice-stalled-on-default-slice case.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="load-stress.html"><div class="ct">Load, Stress &amp; Throughput</div><div class="cd">TM500 + IXIA 100 Mbps policer/shaper; iPerf vs Ookla fairness; VPP/HW-accel UE-fairness fix; UDP 3 Gbps overshoot; UL P_0 open-loop power case; RPS/L4S/ECN/AQM; full KPI-report analysis (RRC, UE-context, QoS-flow, CPU/PRB).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="ldr-regression.html"><div class="ct">Legacy Device Regression (LDR)</div><div class="cd">Multi-vendor handset matrix — iPhone (14/15/16/17), Samsung Galaxy S/A/Note, Google Pixel 6–9, Motorola; BWPS iOS 18.7 attach; iPhone 14 non-VoNR rejection; iPhone 16 Pro / 17 UL-MIMO behaviour; GCF/PTCRB framework.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="automation.html"><div class="ct">Python / tshark &amp; Excel Automation Suite</div><div class="cd">Four signalling validators (Reg/PDU, NG HO, Xn HO, WPS-user); full NGAP/NAS lifecycle reference guide; Excel/VBA macros (RET configuration, bulk CR Outlook drafts, Xn/X2 SCTPPEER scripts, health-check audits, pre/post cell-status compare).</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="group-title">RAN Deployment, Optimization &amp; Project Management</div>
+  <div class="cards">
+    <a class="card" href="project-lifecycle.html"><div class="ct">Project Delivery Lifecycle</div><div class="cd">LLD → BOQ/SOW → material listing → civil/backhaul → installation → integration → drive test → PAT/MTAC/MNOC/OPT acceptance → as-built; GAP1/2/3 financial dashboards; 5G SA Femto kickoff → GA.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="transport-security.html"><div class="ct">Transport, Backhaul &amp; IP Security</div><div class="cd">SCTP source-port case, IPsec traffic selectors (10.0.0.0 vs 42.0.0.0), DHCP/OAM tunnel, PKI migration breaking S1; MW/GPON backhaul, VLAN mapping, IPRT, ETHPORT speed/duplex/MTU.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="integration-scripting.html"><div class="ct">Multi-RAT Integration &amp; Scripting</div><div class="cd">2G–5G SRAN, BBU merging, MORAN/MOCN, sector-carrier expansion, 4T6S/Multi-RRU via CME/LMT/CLI; one-tunnel-for-two-MMEs ACL RULE + IPSECPOLICY sequence case; small-cell BASEBANDEQM/CME case; GPS/PTP/NTP, IPRT/SRCIPRT/SCTPHOST/EPGROUP.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="rf-optimization.html"><div class="ct">RF Optimization &amp; KPIs</div><div class="cd">Coverage/capacity/mobility tuning (tilt/azimuth/power, A1–A5/TTT); online vs offline FFT for RTWP unbalance &amp; external PIM; neighbour-relation table-overflow reboot case; audit-driven corrections.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="spectrum-refarming.html"><div class="ct">Spectrum Refarming &amp; Coexistence</div><div class="cd">2G/3G/4G refarming (L900, L900Cr2), L700/L900/N28/N41/N77 coverage-vs-capacity trade-off, adjacent-channel/guard-band/inter-band coexistence after on-air activation.</div><span class="arrow">Open →</span></a>
+    <a class="card" href="massive-mimo.html"><div class="ct">Massive MIMO &amp; Advanced Radio</div><div class="cd">LampSite / LampSite Pro / movable LampSite, DAS / DAS Pro (DCU/HRRU), rural RRU-relay + Yagi backhaul, AAU 64T64R beamforming, MU-MIMO, 4T6S, CA, RedCap, NR UL/DL decoupling, dual connectivity (NSA).</div><span class="arrow">Open →</span></a>
+    <a class="card" href="icase-library.html"><div class="ct">Troubleshooting Case Library</div><div class="cd">45+ real field faults published on the OEM engineering case portal — integration &amp; config (mediation), RF/cell-setup (U900/G900, NSA EN-DC anchor via ExternalCell, 5CC SCCFreq, NB-IoT MME, TAC change, weak-coverage power), transport &amp; security (TNL VLAN, PKI, IKE proposal), software/upgrade.</div><span class="arrow">Open →</span></a>
+  </div>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span>Technical portfolio &middot; verifiable proof of work</span>
+  </div>
+
+</div>
+</body>
+</html>
