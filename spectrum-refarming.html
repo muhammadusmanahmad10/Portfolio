@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spectrum Refarming & Coexistence | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; Spectrum</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Spectrum &middot; Refarming &amp; Coexistence</div>
+  <h1>Spectrum Refarming &amp; Coexistence</h1>
+  <p class="lede">
+    Spectrum is finite, so operators <b>refarm</b> it &mdash; re-purposing bands from older technologies (2G/3G/4G) to
+    5G as demand shifts. Done wrong, refarming creates cross-band interference and coverage holes. I integrated
+    refarming and <b>coexistence</b> across the full low-to-mid band range (<b>G900 &rarr; N77</b>), allowing minimal
+    interference and healthy link budgets in dense clusters.
+  </p>
+  <div class="chips">
+    <span class="chip">Refarming 2G/3G/4G → 5G</span>
+    <span class="chip">Coexistence &amp; guard bands</span>
+    <span class="chip">Link-budget analysis</span>
+    <span class="chip">G900 · L700 · L900 · L1800 · N28 · N41 · N77</span>
+  </div>
+
+  <section>
+    <h2>Bands I worked across</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 840 150" role="img" aria-label="Spectrum band map">
+        <line x1="40" y1="100" x2="800" y2="100" stroke="#d8e0ea" stroke-width="2"/>
+        <g font-family="Segoe UI,Arial" font-size="11" font-weight="700" text-anchor="middle">
+          <g><rect x="50"  y="70" width="60" height="28" rx="5" fill="#fde8d9" stroke="#c2410c"/><text x="80" y="89" fill="#9a3412">G900</text><text x="80" y="120" fill="#64748b" font-size="9.5">GSM 900</text></g>
+          <g><rect x="135" y="70" width="60" height="28" rx="5" fill="#e6f4ee" stroke="#0d9488"/><text x="165" y="89" fill="#0f766e">L700</text><text x="165" y="120" fill="#64748b" font-size="9.5">700 MHz</text></g>
+          <g><rect x="220" y="70" width="60" height="28" rx="5" fill="#e6f4ee" stroke="#0d9488"/><text x="250" y="89" fill="#0f766e">L900</text><text x="250" y="120" fill="#64748b" font-size="9.5">900 MHz</text></g>
+          <g><rect x="305" y="70" width="60" height="28" rx="5" fill="#e8eef9" stroke="#2563eb"/><text x="335" y="89" fill="#1e3a8a">L1800</text><text x="335" y="120" fill="#64748b" font-size="9.5">1.8 GHz</text></g>
+          <g><rect x="390" y="70" width="60" height="28" rx="5" fill="#e8eef9" stroke="#2563eb"/><text x="420" y="89" fill="#1e3a8a">L2100</text><text x="420" y="120" fill="#64748b" font-size="9.5">2.1 GHz</text></g>
+          <g><rect x="475" y="70" width="60" height="28" rx="5" fill="#e8eef9" stroke="#2563eb"/><text x="505" y="89" fill="#1e3a8a">N28</text><text x="505" y="120" fill="#64748b" font-size="9.5">700 (NR)</text></g>
+          <g><rect x="560" y="70" width="60" height="28" rx="5" fill="#fbf2dd" stroke="#d99a16"/><text x="590" y="89" fill="#b45309">N41</text><text x="590" y="120" fill="#64748b" font-size="9.5">2.5 GHz</text></g>
+          <g><rect x="700" y="70" width="80" height="28" rx="5" fill="#fbe9f1" stroke="#d6629e"/><text x="740" y="89" fill="#be185d">N77</text><text x="740" y="120" fill="#64748b" font-size="9.5">3.3&ndash;4.2 GHz</text></g>
+        </g>
+        <text x="170" y="45" font-family="Segoe UI,Arial" font-size="11" fill="#0f766e" text-anchor="middle">low band — coverage</text>
+        <text x="710" y="45" font-family="Segoe UI,Arial" font-size="11" fill="#be185d" text-anchor="middle">mid band — capacity</text>
+      </svg>
+    </div>
+    <p style="margin-top:8px">Low bands (G900/L700/L900, N28) carry coverage; mid bands (N41, N77) carry capacity. Refarming and coexistence decisions trade these off against each other.</p>
+  </section>
+
+  <section>
+    <h2>What refarming actually involves</h2>
+    <div class="panel">
+      <p style="margin:0">Refarming reassigns part (or all) of a band from an old RAT to a new one &mdash; e.g. narrowing a 2G/3G carrier to free spectrum for LTE or NR. The risks are <b>coverage loss</b> on the shrunk technology and <b>interference</b> between the old and new carriers at the boundary. I integrated refarming activities including <b>G900 (GSM 900) refarming</b> &mdash; narrowing the legacy GSM 900 carrier to free spectrum for LTE on the same band &mdash; as well as <b>L700</b>, <b>L900</b>, <b>L900Cr2</b>, <b>N28</b> and combined <b>2G + 4G</b> refarming, allowing the legacy service still met its coverage/quality benchmark <i>and</i> the new carrier came up cleanly &mdash; maintaining consistent quality through the transition.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coexistence &amp; Link-Budget Considerations During Integration</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3 style="margin-top:0">Coexistence</h3>
+        <p style="margin:0">During integration of new LTE/NR carriers at multi-band sites, verified that newly activated carriers <b>coexisted correctly with existing technologies and bands without introducing service impact</b>. Checked for <b>adjacent-channel interference, guard-band compliance, and inter-band interactions</b> after on-air activation to ensure the new carrier did not degrade the performance of neighbouring LTE, NR, or legacy layers.</p>
+      </div>
+      <div class="panel">
+        <h3 style="margin-top:0">Link-Budget Considerations</h3>
+        <p style="margin:0">During site integration and on-air acceptance, confirmed that configured <b>transmit power, antenna parameters, and carrier settings</b> aligned with the planned RF design so that <b>expected coverage and service levels</b> were achieved. Verified that low-band carriers provided broad coverage while mid-band NR layers delivered the intended capacity without creating coverage gaps or excessive overlap with neighbouring cells.</p>
+      </div>
+    </div>
+    <div class="note"><span>💡</span><span>Coexistence work connects directly to 5G NR design rules (PFD limits, adjacent-band emission masks) — the same coexistence thinking carries into NTN, where satellite and terrestrial layers must share spectrum. See <a href="ntn.html">Non-Terrestrial Networks</a>.</span></div>
+  </section>
+
+  <section>
+    <h2>Field notes &amp; common pitfalls</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Refarming shrinks the legacy layer.</b> Confirm the old RAT still meets coverage before celebrating the new carrier.</li>
+      <li><b>Guard bands aren't free.</b> Too small ⇒ interference; too large ⇒ wasted spectrum.</li>
+      <li><b>Coverage vs capacity trade-off is band-driven.</b> Don't expect mid-band (N41/N77) to replicate low-band (L700/N28) footprint.</li>
+      <li><b>Monitor in dense clusters, not just isolated cells</b> &mdash; interference effects only appear under realistic geometry.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standards &amp; references</h2>
+    <div class="panel"><p class="ref"><b>3GPP TS 38.101</b> — NR RF requirements &amp; band definitions. &nbsp;·&nbsp; <b>3GPP TR 38.803 / 37.xxx</b> — coexistence studies. &nbsp;·&nbsp; <b>3GPP TS 38.104</b> — BS transmission &amp; reception (emission masks). &nbsp;·&nbsp; link-budget &amp; propagation methodology.</p></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
