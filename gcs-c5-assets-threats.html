@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assets, Threats and Vulnerabilities | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Assets, Threats and Vulnerabilities</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Assets, threats, vulnerabilities &middot; concepts I own</div>
+  <h1>Assets, Threats and Vulnerabilities</h1>
+  <p class="lede">
+    What we&rsquo;re protecting (assets), how attackers think (threats), where they get in
+    (vulnerabilities), and the crypto, IAM and threat-modelling primitives that hold it all
+    together. Includes the concrete deliverables I produced: a PASTA threat model, an
+    access-control review, a data-leak analysis, a parking-lot USB investigation, and a
+    home asset inventory.
+  </p>
+  <div class="chips">
+    <span class="chip">Asset classification &middot; data states</span>
+    <span class="chip">Symmetric &middot; asymmetric &middot; hashing &middot; PKI</span>
+    <span class="chip">IAM &middot; least privilege</span>
+    <span class="chip">Threat modelling (STRIDE, PASTA)</span>
+    <span class="chip">OWASP Top 10 &middot; CVE / CVSS</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Assets and how I classify them</h2>
+    <div class="panel">
+      <p>An <b>asset</b> is anything of value to the organisation:</p>
+      <ul class="clean">
+        <li><b>Digital</b> &mdash; data, credentials, source code, cryptographic keys.</li>
+        <li><b>Physical</b> &mdash; servers, laptops, badges, USB drives.</li>
+        <li><b>Human</b> &mdash; employees, contractors.</li>
+        <li><b>Intellectual property</b> &mdash; trade secrets, patents, designs.</li>
+      </ul>
+      <p><b>Asset classification levels</b> &mdash; public, internal, confidential, restricted. Handling / storage / transmission controls scale with the level.</p>
+      <p><b>Data states and the control that fits each:</b></p>
+      <ul class="clean">
+        <li><b>At rest</b> &mdash; disk / database encryption (AES-256).</li>
+        <li><b>In transit</b> &mdash; TLS, IPsec, SSH.</li>
+        <li><b>In use</b> &mdash; access control, memory protection, confidential computing.</li>
+      </ul>
+      <p><b>PII / SPII / PHI</b> &mdash; PII is any info that infers identity; SPII is a stricter subset (SSN, biometrics, financial); PHI is protected health information. Regulation treats each differently.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Cryptography I understand</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Symmetric encryption</b> &mdash; one shared key for encrypt / decrypt. Fast. Examples: <b>AES-128 / AES-256</b>, legacy <b>DES / 3DES</b>. Key distribution is the hard part.</li>
+        <li><b>Asymmetric encryption</b> &mdash; a key pair (public / private). Anyone can encrypt with the public key; only the private key holder can decrypt. Examples: <b>RSA</b>, <b>ECC</b>, <b>DH</b>. Slower &mdash; used for key exchange and digital signatures.</li>
+        <li><b>Hashing</b> &mdash; one-way function; produces a fixed-length digest. Used for <b>integrity</b>, not confidentiality. <b>MD5</b> and <b>SHA-1</b> are broken; use <b>SHA-256 / SHA-512</b>. <b>HMAC</b> adds a shared secret so integrity is authenticated.</li>
+        <li><b>Public Key Infrastructure (PKI)</b> &mdash; digital certificates issued by Certificate Authorities (CAs). A certificate binds a public key to an identity. Chain of trust: leaf &rarr; intermediate &rarr; root CA.</li>
+        <li><b>TLS handshake</b> at high level &mdash; client hello &rarr; server hello + cert &rarr; verify cert chain &rarr; key exchange &rarr; encrypted channel.</li>
+      </ul>
+      <p><b>Where this ties to my RAN work:</b> the 5G security stack uses these primitives daily &mdash; SUPI/SUCI concealment uses ECIES (asymmetric); 5G-AKA is a mutual authentication protocol; the key hierarchy (K &rarr; K_AUSF &rarr; K_SEAF &rarr; K_AMF &rarr; K_gNB) uses HMAC-SHA256 KDFs.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Identity and Access Management (IAM)</h2>
+    <div class="panel">
+      <p>The four components of IAM I always name:</p>
+      <ul class="clean">
+        <li><b>Identification</b> &mdash; who claims to be who (username).</li>
+        <li><b>Authentication</b> &mdash; prove the claim (password, MFA token, biometric, certificate).</li>
+        <li><b>Authorisation</b> &mdash; what the identity is allowed to do (RBAC, ABAC).</li>
+        <li><b>Accounting</b> / auditing &mdash; log every access decision.</li>
+      </ul>
+      <p>Related controls I know: <b>SSO</b>, <b>MFA</b>, <b>RBAC</b>, <b>principle of least privilege</b>, automatic access revocation, regular privilege audits.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Threats, vulnerabilities, and the vulnerability-management lifecycle</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Threat</b> = potential cause of harm. <b>Vulnerability</b> = weakness that a threat can exploit. <b>Risk</b> = likelihood &times; impact when a threat meets a vulnerability. You need both a vuln and a threat for a risk to exist.</li>
+        <li><b>Attack surface</b> vs <b>attack vector</b>: the surface is <i>all</i> the entry points; a vector is a specific path an attacker uses.</li>
+        <li>The <b>vulnerability-management lifecycle</b>: <b>Identify &rarr; Assess &rarr; Prioritise &rarr; Remediate &rarr; Verify &rarr; Report</b>.</li>
+        <li>Sources I use: <b>CVE</b> identifiers, <b>NVD</b> (national vulnerability database), <b>CVSS</b> scoring (0.0&ndash;10.0), vendor advisories.</li>
+        <li>Common vulnerability categories: mis-configuration, unpatched software, weak credentials, insecure defaults, injection flaws (SQL / command / LDAP / XSS), broken access control.</li>
+        <li><b>OWASP Top 10</b> web-app risks: broken access control, cryptographic failures, injection, insecure design, security misconfiguration, vulnerable and outdated components, identification &amp; authentication failures, software &amp; data integrity failures, security logging &amp; monitoring failures, server-side request forgery (SSRF).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>How attackers attack</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Malware families</h3>
+      <ul class="clean">
+        <li><b>Virus</b> &mdash; needs a user to execute; attaches to a host file.</li>
+        <li><b>Worm</b> &mdash; self-propagates over the network without user action.</li>
+        <li><b>Trojan</b> &mdash; hides inside legitimate software.</li>
+        <li><b>Ransomware</b> &mdash; encrypts data and demands payment.</li>
+        <li><b>Spyware / adware</b> &mdash; exfiltrates behaviour or serves ads.</li>
+        <li><b>Rootkit</b> &mdash; hides in the kernel to survive.</li>
+        <li><b>Botnet</b> &mdash; network of compromised hosts under C2.</li>
+        <li><b>Cryptojacker</b> &mdash; steals CPU/GPU to mine cryptocurrency.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Social engineering</h3>
+      <ul class="clean">
+        <li><b>Phishing</b> (mass email), <b>spear phishing</b> (targeted), <b>whaling</b> (executives).</li>
+        <li><b>Smishing</b> (SMS), <b>vishing</b> (voice).</li>
+        <li><b>Business Email Compromise (BEC)</b>.</li>
+        <li><b>Pretexting</b>, <b>baiting</b>, <b>tailgating</b>, <b>quid pro quo</b>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Web-based attacks</h3>
+      <ul class="clean">
+        <li><b>SQL injection</b>, <b>XSS</b> (reflected / stored / DOM), <b>CSRF</b>, <b>SSRF</b>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Password attacks</h3>
+      <ul class="clean">
+        <li><b>Brute force</b>, <b>dictionary</b>, <b>credential stuffing</b>, <b>rainbow tables</b>, <b>password spraying</b>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Attacker mindset &mdash; the four-step approach I apply</h3>
+      <ol class="clean">
+        <li><b>Identify a target.</b></li>
+        <li><b>Determine how the target can be accessed.</b></li>
+        <li><b>Evaluate attack vectors</b> that can be exploited.</li>
+        <li><b>Find the tools and methods</b> of attack.</li>
+      </ol>
+      <p>Then compare to the defender view (the <b>Cyber Kill Chain</b>: reconnaissance &rarr; weaponisation &rarr; delivery &rarr; exploitation &rarr; installation &rarr; command &amp; control &rarr; actions on objectives) and to the <b>MITRE ATT&amp;CK</b> matrix of tactics and techniques.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Threat-modelling methods I&rsquo;m fluent in</h3>
+      <ul class="clean">
+        <li><b>STRIDE</b> &mdash; Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege.</li>
+        <li><b>PASTA</b> &mdash; Process for Attack Simulation and Threat Analysis; 7 stages (see below).</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Risk assessment frameworks</h3>
+      <p><b>NIST SP 800-30</b> is the standard I refer to for a formal risk-assessment process &mdash; identify, analyse, prioritise, communicate, and periodically re-evaluate risks. Pairs naturally with the NIST RMF for the ongoing management side.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Deliverables I produced</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">PASTA threat model for a sneaker-marketplace mobile app</h3>
+      <p><b>Scenario:</b> the growing security team of a sneaker-collector company was about to launch a mobile app for buying and selling shoes. I ran a full PASTA (Process for Attack Simulation and Threat Analysis) threat model across all seven stages.</p>
+      <table class="cmp">
+        <tr><th>Stage</th><th>What I documented</th></tr>
+        <tr><td><b>I. Define business and security objectives</b></td><td>App allows users to create member profiles; securely processes financial transactions and handles payments, account management, transaction processing. Because it handles payment data, it must comply with <b>PCI DSS</b>.</td></tr>
+        <tr><td><b>II. Define the technical scope</b></td><td>APIs, PKI, AES, SHA-256, SQL. I prioritised <b>APIs</b> because they enable communication with external systems, transmit sensitive info, and are a common cyberattack target &mdash; securing them has an outsized impact on overall security and data integrity.</td></tr>
+        <tr><td><b>III. Decompose application</b></td><td>Built a data-flow diagram showing how buyer / seller data moves between the app, the payment gateway, and internal storage.</td></tr>
+        <tr><td><b>IV. Threat analysis</b></td><td>Prioritised threats identified: <b>Injection</b> (SQL injection through the marketplace search / listing forms) and <b>Session hijacking</b> (attackers stealing an authenticated user&rsquo;s session to impersonate them).</td></tr>
+        <tr><td><b>V. Vulnerability analysis</b></td><td>Two exploitable weaknesses: <b>lack of prepared statements</b> (opens SQL injection) and <b>broken API token</b> handling (enables session hijack / impersonation).</td></tr>
+        <tr><td><b>VI. Attack modeling</b></td><td>Built an attack-tree diagram that walked from the weakness through to the impact.</td></tr>
+        <tr><td><b>VII. Risk analysis and impact</b></td><td>Mitigations: enforce <b>SHA-256</b> for password / credit-card storage; document <b>incident-response procedures</b>; enforce a strong <b>password policy</b>; apply <b>principle of least privilege</b> on APIs and DB access.</td></tr>
+      </table>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Access-control review &mdash; contractor still active four years after contract end</h3>
+      <p><b>Scenario:</b> a login event at 8:29:57 AM on 10/03/23 from IP <code>152.207.255.255</code>, made by user Robert Taylor Jr with the <b>Legal / Administrator</b> role, accessing payroll systems.</p>
+      <p><b>Issue I identified:</b> Robert Taylor Jr was an <b>admin</b>, but his contract had ended in <b>2019</b>. His account should have been disabled &mdash; yet it accessed payroll in 2023.</p>
+      <p><b>Recommendations I delivered:</b></p>
+      <ul class="clean" style="margin:0">
+        <li>Restrict access to sensitive resources based on user roles and job responsibilities.</li>
+        <li>Set user accounts to <b>expire automatically</b> after 30 days or when access is no longer needed.</li>
+        <li>Provide contractors with limited, <b>role-based access only</b>.</li>
+        <li>Enable <b>MFA</b> on all accounts.</li>
+        <li>Regularly <b>audit user privileges</b> to ensure appropriate access levels.</li>
+      </ul>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Data-leak analysis &mdash; internal folder link accidentally shared publicly</h3>
+      <p><b>Scenario:</b> a sales manager shared access to a folder of internal-only documents with their team during a meeting. The folder held files for an unannounced product plus customer analytics and promo materials. Access wasn&rsquo;t revoked afterwards. A sales rep later intended to share the promo link with a business partner on a call, but accidentally shared the <i>internal</i> folder link instead. The partner then posted that link on their company&rsquo;s social media, assuming it was the promo material.</p>
+      <p><b>Framework I applied</b> &mdash; NIST CSF hierarchy: <b>Function &rarr; Category &rarr; Subcategory &rarr; Reference</b>. The relevant control was <b>NIST SP 800-53 AC-6 &mdash; Least Privilege</b>.</p>
+      <p><b>Control (AC-6) &mdash; Least Privilege:</b> only the minimal access and authorisation required to complete a task or function should be provided to users.</p>
+      <p><b>Control enhancements I recommended:</b></p>
+      <ul class="clean" style="margin:0">
+        <li>Restrict access to sensitive resources based on user role.</li>
+        <li>Automatically revoke access to information after a defined period.</li>
+        <li>Keep activity logs of provisioned user accounts.</li>
+        <li>Regularly audit user privileges.</li>
+      </ul>
+      <p><b>Justification I wrote:</b> data breaches are reduced by limiting internal-folder access exclusively to authorised employees and by tying sensitive-resource access to current role. Automatic revocation + activity logging + regular audits give both prevention and accountability.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Parking-lot USB investigation</h3>
+      <p><b>Scenario:</b> found a USB stick with the hospital logo on the parking-lot ground. No one around had dropped it. Brought it back and investigated it safely.</p>
+      <p><b>Safe-handling method:</b> plugged the USB into a <b>virtualisation-software sandbox</b> on an isolated workstation. Virtualisation runs a simulated OS in a container disconnected from other files and networks, so any malware on the USB can&rsquo;t reach production systems.</p>
+      <p><b>Contents I found:</b> personal documents belonging to a person named Jorge, alongside work files containing PII for other individuals and sensitive information about the hospital&rsquo;s operations. Mixing personal and work files on the same drive is unsafe &mdash; it increases the risk of unauthorised access, accidental disclosure and data breach.</p>
+      <p><b>Attacker-mindset analysis:</b></p>
+      <ul class="clean" style="margin:0">
+        <li>Timesheets reveal coworker information usable for targeted phishing / social engineering.</li>
+        <li>Personal info can be used to impersonate trusted contacts and deceive Jorge&rsquo;s relatives.</li>
+        <li>Employee / schedule / operations details help an attacker gain unauthorised access to business systems or facilities.</li>
+      </ul>
+      <p><b>Risk analysis:</b> a malicious USB may hold ransomware, spyware, keyloggers, or trojans that infect a computer once connected. If another employee plugged it in, malware could spread across the network; credentials, personal data, business documents and financial records could be exposed and used for identity theft, phishing, or business-disruption.</p>
+      <p><b>Recommended mitigations:</b> employee security-awareness training; routine antivirus scans; <b>disable AutoPlay</b> on company computers so malicious code can&rsquo;t auto-execute on insertion.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Home asset inventory (attacker-mindset self-reflection)</h3>
+      <p><b>Reflection I wrote:</b></p>
+      <p><b>Attack surfaces of a home</b> &mdash; both physical and digital. Physical: doors, windows, garages. Digital: Wi-Fi network, smart-home devices, connected computers. Weak locks, outdated software, poor passwords or an unsecured network all create vulnerabilities that expose the home to unauthorised access or cyber attack.</p>
+      <p><b>Attack vectors + defences</b> &mdash; unlocked doors and windows, weak Wi-Fi passwords, phishing emails, and vulnerable smart-home devices. Attackers can exploit those to steal personal information, gain unauthorised access, or compromise connected systems. Existing defences include strong locks, alarm systems, firewalls, antivirus, and secure Wi-Fi encryption. Additional protection: enable MFA, keep device software updated, use strong unique passwords, and monitor security cameras and network activity.</p>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confusing symmetric vs asymmetric encryption</b> &mdash; symmetric is fast but key distribution is hard; asymmetric solves distribution but is slow. Real systems combine both (asymmetric to exchange a symmetric session key, then symmetric for the bulk data).</li>
+        <li><b>Using hashing for confidentiality</b> &mdash; hashing is one-way and for integrity only. Don&rsquo;t &ldquo;encrypt&rdquo; sensitive data by hashing it.</li>
+        <li><b>Skipping the least-privilege step on contractors</b> &mdash; the Robert Taylor Jr case above is a classic. Auto-expiry + regular audits are the fix.</li>
+        <li><b>Plugging in unknown USB sticks on production machines</b> &mdash; always sandbox or isolate first.</li>
+        <li><b>Treating threat modelling as a one-off design exercise</b> &mdash; it should be refreshed as the app evolves and new APIs / features change the attack surface.</li>
+        <li><b>Ignoring the human vulnerability</b> &mdash; social engineering exploits people, not technology. Awareness training belongs alongside every technical control.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Additional assets / threats / vulnerabilities concepts I know</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Data governance roles</h3>
+      <ul class="clean">
+        <li><b>Data owner</b> &mdash; senior person accountable for the data asset (usually a business leader). Decides classification and who can access.</li>
+        <li><b>Data controller</b> &mdash; the entity that determines the purpose and means of processing personal data (a GDPR term).</li>
+        <li><b>Data processor</b> &mdash; the entity that processes personal data on behalf of the controller (also GDPR).</li>
+        <li><b>Data custodian</b> &mdash; the technical steward who implements the data controls the owner defines.</li>
+      </ul>
+      <p><b>Data states, restated:</b> <b>at rest</b> (disk / DB &mdash; encrypt with AES-256), <b>in transit</b> (TLS / IPsec / SSH), <b>in use</b> (memory protection, confidential computing).</p>
+      <p><b>Data exfiltration</b> &mdash; unauthorised movement of data out of the organisation; the endpoint many attacks aim for.</p>
+      <p><b>Non-repudiation</b> &mdash; the guarantee that a party cannot deny having sent / signed something. Enforced by digital signatures + logging + accountability.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Malware types not covered above</h3>
+      <ul class="clean">
+        <li><b>Scareware</b> &mdash; fake &ldquo;your PC is infected&rdquo; pop-ups pressuring the user to buy or install something malicious.</li>
+        <li><b>Dropper</b> &mdash; small first-stage program whose job is to download the real payload.</li>
+        <li><b>Loader</b> &mdash; the next stage that loads and executes the payload in memory.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Web-based attack detail</h3>
+      <ul class="clean">
+        <li><b>Cross-site scripting (XSS)</b> &mdash; injecting script into a trusted web page. Three flavours:
+          <ul class="clean" style="margin-top:6px">
+            <li><b>Reflected XSS</b> &mdash; malicious script comes in via a URL parameter and is reflected back in the response (targets one user at a time).</li>
+            <li><b>Stored XSS</b> &mdash; malicious script is saved on the server (e.g. in a comment field) and served to every visitor.</li>
+            <li><b>DOM-based XSS</b> &mdash; script is executed as a result of modifying the DOM in the browser; no server involvement.</li>
+          </ul>
+        </li>
+        <li><b>SQL injection</b> &mdash; injecting SQL through an input field; can read, modify or delete the database if inputs aren&rsquo;t parameterised.</li>
+        <li><b>Injection attack</b> (general) &mdash; feeding untrusted input that the app interprets as code.</li>
+        <li><b>Input validation</b> &mdash; check every input at the boundary; reject anything that doesn&rsquo;t match the expected shape.</li>
+        <li><b>Prepared statements</b> &mdash; parameterised queries; the fix for SQL injection.</li>
+        <li><b>Session hijacking</b> &mdash; stealing a valid session ID / cookie so the attacker acts as the user without needing the password. Enabled by cookie theft, XSS, weak session-ID generation, MITM.</li>
+        <li><b>Session ID / Session cookie</b> &mdash; token that identifies an authenticated session; must be random, expire, and be transmitted over HTTPS with <code>HttpOnly</code> + <code>Secure</code> flags.</li>
+        <li><b>API token</b> &mdash; equivalent of a session credential for machine-to-machine calls; rotated, scoped, and never checked into source.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">More social-engineering variants</h3>
+      <ul class="clean">
+        <li><b>Angler phishing</b> &mdash; impersonating a customer-support account on social media and replying to real users&rsquo; complaints with a malicious link.</li>
+        <li><b>Quid pro quo</b> &mdash; attacker offers a benefit (help, gift) in exchange for information or access.</li>
+        <li><b>Tailgating (piggybacking)</b> &mdash; following an authorised person through a secure door before it closes.</li>
+        <li><b>Rapport</b> &mdash; social engineers deliberately build friendly relationships over time to lower a target&rsquo;s guard.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Cryptography extras</h3>
+      <ul class="clean">
+        <li><b>Cipher</b> &mdash; the algorithm used for encryption (AES, RSA). A cipher plus a mode (e.g. AES-256-GCM) defines the actual transform.</li>
+        <li><b>Hash function</b> &mdash; a one-way function that maps arbitrary input to a fixed-length digest (SHA-256).</li>
+        <li><b>Hash collision</b> &mdash; two different inputs producing the same hash. Rare in strong hashes; possible in broken ones (MD5, SHA-1) &mdash; the reason those are deprecated.</li>
+        <li><b>Salting</b> &mdash; adding a unique per-user random value to a password before hashing so two users with the same password get different hashes; defeats rainbow tables.</li>
+        <li><b>Rainbow table</b> &mdash; pre-computed lookup of hash &rarr; plaintext for common passwords; effective only against unsalted hashes.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Vulnerabilities &amp; threat operations</h3>
+      <ul class="clean">
+        <li><b>Zero-day</b> &mdash; a vulnerability the vendor doesn&rsquo;t yet know about, so there&rsquo;s no patch. Extremely valuable to attackers; usually chained with other techniques.</li>
+        <li><b>Vulnerability scanner</b> &mdash; automated tool that checks systems against a database of known CVEs.</li>
+        <li><b>Access controls</b> &mdash; the overall category of technical + administrative safeguards that enforce authentication and authorisation.</li>
+        <li><b>Access Control List (ACL)</b> &mdash; a list attached to a resource that spells out which principals can do which actions on it.</li>
+        <li><b>User provisioning / de-provisioning</b> &mdash; the lifecycle of creating accounts on hire, adjusting on role change, and revoking on exit; classic point of failure (the contractor-still-active case above).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Defence in depth</b> &mdash; layer controls (perimeter firewall + segmentation + EDR + MFA + monitoring) so no single failure exposes the asset.</li>
+        <li><b>Zero trust</b> &mdash; never trust, always verify; every request authenticated, authorised and encrypted regardless of network location.</li>
+        <li><b>Adversarial AI</b> &mdash; manipulating ML models with poisoned data or crafted inputs to bypass detection.</li>
+        <li><b>Supply-chain attacks</b> &mdash; hitting a trusted third party to reach many downstream targets.</li>
+        <li><b>Where this ties to my RAN work</b> &mdash; the 5G security stack (SUPI/SUCI, 5G-AKA, IPsec, PKI) uses exactly these crypto and IAM primitives; I already reason about identity, authentication and confidentiality at the protocol level.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

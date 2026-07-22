@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Put It to Work | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Put It to Work</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">SOC operations, escalation, comms &middot; concepts I own</div>
+  <h1>Put It to Work</h1>
+  <p class="lede">
+    The operational side &mdash; asset classification, incident escalation, stakeholder communication.
+  </p>
+  <div class="chips">
+    <span class="chip">Asset classification</span>
+    <span class="chip">Escalation criteria</span>
+    <span class="chip">Stakeholder communication</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Protecting data and communicating incidents</h2>
+    <div class="panel">
+      <p>Everyday responsibilities:</p>
+      <ul class="clean">
+        <li>Alert triage in the SIEM &mdash; separate signal from noise.</li>
+        <li>Log review across auth, network, endpoint and cloud sources.</li>
+        <li>Running playbooks step-by-step for known incident types.</li>
+        <li>Ticket hygiene &mdash; every alert gets a clean audit trail.</li>
+        <li>Escalation when the incident is outside my scope or severity level.</li>
+      </ul>
+      <p><b>Classify assets by sensitivity</b> and map controls to each class: public, internal, confidential, restricted. Higher classification &rarr; stronger controls (encryption, MFA, more frequent access review).</p>
+      <p><b>Access reviews</b> &mdash; who has access to what, is it still needed, is it least privilege? Do them on a defined cadence.</p>
+      <p><b>Reliability, availability, security (RAS) trade-offs</b> &mdash; every added control costs something (latency, cost, usability). The right answer balances risk reduction with operational cost.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Escalating incidents</h2>
+    <div class="panel">
+      <p><b>Escalation</b> = passing an incident up the chain (or across teams) when its severity, scope or complexity exceeds my role&rsquo;s authority.</p>
+      <p><b>Escalation criteria:</b></p>
+      <ul class="clean">
+        <li><b>Severity</b> &mdash; potential business impact if not contained. Common tiers: Critical / High / Medium / Low.</li>
+        <li><b>Scope</b> &mdash; how many users / hosts / systems are affected.</li>
+        <li><b>Sensitivity</b> &mdash; is PII, PHI, cardholder data, IP or a privileged account involved?</li>
+        <li><b>Regulatory impact</b> &mdash; does GDPR / HIPAA / PCI DSS require notification?</li>
+      </ul>
+      <p><b>Who to escalate to:</b> SOC lead / tier 2, IR team, legal, PR / communications, HR (for insider incidents), executive leadership for a Critical.</p>
+      <p><b>Anatomy of a good escalation ticket</b> &mdash; one glance should answer:</p>
+      <ul class="clean">
+        <li><b>What happened</b> (concise summary).</li>
+        <li><b>Scope &amp; affected assets</b>.</li>
+        <li><b>What is already known</b> &mdash; IoCs, timeline, first-detected timestamp.</li>
+        <li><b>What has already been done</b> &mdash; containment steps, verifications.</li>
+        <li><b>What I need from the escalation path</b> &mdash; decisions, additional access, communication approval.</li>
+      </ul>
+      <p><b>Incident handler&rsquo;s journal</b> &mdash; timestamped notes of every action during the incident. Feeds the post-incident report and preserves <b>chain of custody</b>.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Communicating effectively with stakeholders</h2>
+    <div class="panel">
+      <p><b>Stakeholders to deal with:</b> management (VPs, CISO), engineering, product, legal / compliance, HR, customer support, customers, regulators, external partners / auditors.</p>
+      <p><b>Tailor the message to the audience:</b></p>
+      <ul class="clean">
+        <li><b>Executive summary</b> &mdash; impact, timeline, decisions needed, cost, next steps. No jargon.</li>
+        <li><b>Technical write-up</b> &mdash; IoCs, packet-level detail, log evidence, remediation steps. For peer analysts and engineers.</li>
+        <li><b>Customer-facing</b> &mdash; plain language, empathetic, factual, no unnecessary internals.</li>
+      </ul>
+      <p><b>Written comms</b>: incident summary, executive brief, playbook updates, post-mortem, weekly SOC report.</p>
+      <p><b>Verbal comms</b>: shift stand-up, incident bridge, hand-off between shifts, tabletop exercise.</p>
+      <p><b>Difficult conversations:</b> delivering bad news to a customer or executive; holding a boundary on scope; saying &ldquo;we don&rsquo;t know yet&rdquo; without losing credibility.</p>
+      <p><b>Ethical duty of care:</b> don&rsquo;t overclaim, don&rsquo;t hide facts, respect the privacy of affected users.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Under-escalating a Critical incident</b> to avoid noise &mdash; wastes the head-start you have on containment.</li>
+        <li><b>Over-escalating routine noise</b> &mdash; erodes trust in your judgement and clogs the escalation channel.</li>
+        <li><b>Writing an escalation ticket that&rsquo;s just &ldquo;something is wrong&rdquo;</b> &mdash; the receiving analyst has to redo all the triage. Always include the 5 W&rsquo;s and what you&rsquo;ve already tried.</li>
+        <li><b>Mixing exec and technical audiences in the same message</b> &mdash; write two.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Post-mortem discipline</b> &mdash; every real incident gets a blame-free write-up, root-cause analysis, corrective actions with owners, and a follow-up date.</li>
+        <li><b>Runbook / playbook maintenance</b> &mdash; playbooks aren&rsquo;t &ldquo;write once&rdquo;; every incident should improve the next version.</li>
+        <li><b>Metrics that show a SOC is maturing</b> &mdash; MTTD, MTTR, false-positive rate, percent of alerts closed by tier 1 without escalation, time-to-contain.</li>
+        <li><b>Cross-functional collaboration</b> &mdash; my RAN background already involves live incident coordination across vendor, macro, core and IT teams; that collaboration muscle transfers directly to SOC work with legal, engineering, product and PR.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Security Risks | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Manage Security Risks</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Risk management, frameworks, controls, playbooks &middot; concepts I own</div>
+  <h1>Manage Security Risks</h1>
+  <p class="lede">
+    How I think about risk in an organisation &mdash; the eight security domains, threats vs risks vs
+    vulnerabilities, the NIST Risk Management Framework, the CIA triad, security controls, audits,
+    SIEM tools and dashboards, and incident-response playbooks. The Botium Toys audit is the
+    concrete deliverable I produced from this body of knowledge.
+  </p>
+  <div class="chips">
+    <span class="chip">8 security domains</span>
+    <span class="chip">NIST RMF (7 steps)</span>
+    <span class="chip">NIST CSF · CIA</span>
+    <span class="chip">Controls: admin / technical / physical</span>
+    <span class="chip">Playbook (6 phases)</span>
+    <span class="chip s">Botium Toys audit delivered</span>
+  </div>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>The eight security domains &mdash; in depth</h2>
+    <div class="panel">
+      <p>The CISSP-defined categorisation use to organise security work and spot coverage gaps:</p>
+      <ol class="clean">
+        <li><b>Security &amp; Risk Management</b> &mdash; defining security goals, risk mitigation, compliance, business continuity, legal regulations, professional ethics. Also covers <b>InfoSec</b> disciplines: incident response, vulnerability management, application security, cloud security, infrastructure security. Example: adjusting how PII is treated to meet GDPR.</li>
+        <li><b>Asset Security</b> &mdash; managing storage, maintenance, retention and destruction of physical and virtual data. Includes security-impact analysis, recovery plans, data-exposure management. Example: overseeing hard-drive destruction so private data can&rsquo;t be recovered.</li>
+        <li><b>Security Architecture &amp; Engineering</b> &mdash; effective tools, systems and processes to protect assets and data. Core concept: <b>shared responsibility</b>. Design principles that live here: threat modelling, least privilege, defence in depth, fail securely, separation of duties, keep it simple, zero trust, trust but verify. Example: using a SIEM to spot unusual logins that hint at a threat actor.</li>
+        <li><b>Communication &amp; Network Security</b> &mdash; securing physical networks and wireless comms across on-site, remote and cloud. Handles Bluetooth / public Wi-Fi risks. Example: restricting network access so remote workers reach the org securely.</li>
+        <li><b>Identity &amp; Access Management (IAM)</b> &mdash; four components:
+          <ul class="clean" style="margin-top:6px">
+            <li><b>Identification</b> &mdash; user claims identity (username, access card, biometric).</li>
+            <li><b>Authentication</b> &mdash; verify identity (password, PIN, MFA).</li>
+            <li><b>Authorisation</b> &mdash; what the identity can do once verified (least privilege by role).</li>
+            <li><b>Accountability</b> &mdash; monitor + record user actions (login attempts, actions taken) for audit.</li>
+          </ul>
+          Example: give a customer-service rep read-only access to a customer&rsquo;s phone number only while resolving the ticket, then revoke.
+        </li>
+        <li><b>Security Assessment &amp; Testing</b> &mdash; control testing, data analysis, security audits, penetration testing. Example: audit user permissions regularly so nobody accumulates unnecessary access.</li>
+        <li><b>Security Operations</b> &mdash; investigations + preventative measures. Uses training / awareness, reporting, IDS/IPS, SIEM, log management, incident management, playbooks, post-breach forensics, lessons learned. Example: respond to an unknown device appearing on the internal network.</li>
+        <li><b>Software Development Security</b> &mdash; secure coding baked into every SDLC phase (design review during design; secure code review during development / testing; pen testing during deployment). Example: pharma company&rsquo;s new medical device must have encryption configured before shipping.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Threats, risks, vulnerabilities</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Threat</b> &mdash; any circumstance or event that can negatively impact assets (social engineering, malware).</li>
+        <li><b>Risk</b> &mdash; anything that can impact confidentiality, integrity or availability of an asset. The likelihood of a threat occurring. Analogy: risk is being late to work; threats are traffic, an accident, a flat tire.</li>
+        <li><b>Vulnerability</b> &mdash; a weakness that a threat can exploit. Both a vulnerability AND a threat must be present for a risk to exist.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Risk levels:</b></p>
+      <ul class="clean">
+        <li><b>Low</b> &mdash; info whose loss would not harm reputation, operations or finances (e.g. published research, website content).</li>
+        <li><b>Medium</b> &mdash; not public; could cause some damage (e.g. early leak of quarterly earnings).</li>
+        <li><b>High</b> &mdash; info protected by law / regulation; severe damage if compromised (SPII, PII, IP).</li>
+      </ul>
+      <p style="margin-top:8px"><b>Common vulnerabilities:</b> outdated firewall / software / applications, weak passwords, unprotected confidential data, un-trained people (the human vulnerability).</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Named threats, risks and vulnerabilities I&rsquo;m aware of</h3>
+      <p><b>Threats:</b> insider threats, advanced persistent threats (APTs).</p>
+      <p style="margin-top:8px"><b>Risk-affecting factors:</b></p>
+      <ul class="clean">
+        <li><b>External risk</b> &mdash; anything outside the org (threat actor attempting private-info access).</li>
+        <li><b>Internal risk</b> &mdash; current / former employee, vendor or trusted partner.</li>
+        <li><b>Legacy systems</b> &mdash; old workstations / mainframes not tracked or updated; a vending machine that still takes credit cards; a workstation still connected to a legacy accounting system.</li>
+        <li><b>Multiparty risk</b> &mdash; outsourcing to third parties that gain access to trade secrets / software designs.</li>
+        <li><b>Software compliance / licensing</b> &mdash; software not updated / non-compliant; unpatched vulnerabilities.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Specific vulnerabilities:</b></p>
+      <ul class="clean">
+        <li><b>ProxyLogon</b> &mdash; pre-authenticated vulnerability affecting Microsoft Exchange; attacker deploys code remotely.</li>
+        <li><b>ZeroLogon</b> &mdash; vulnerability in Microsoft Netlogon authentication protocol.</li>
+        <li><b>Log4Shell</b> &mdash; lets attackers run Java code on someone else&rsquo;s computer or leak sensitive info; remote takeover of internet-connected devices.</li>
+        <li><b>PetitPotam</b> &mdash; affects Windows NTLM; LAN-based attacker forces an authentication request.</li>
+        <li><b>Security logging &amp; monitoring failures</b> &mdash; insufficient logging so attackers exploit vulns undetected.</li>
+        <li><b>Server-side request forgery (SSRF)</b> &mdash; attacker manipulates a server-side app to access / update backend resources or steal data.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Where I look them up in real work:</b> NIST National Vulnerability Database (NVD), CISA Known Exploited Vulnerabilities Catalog, OWASP Top 10.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Ransomware and the three layers of the web</h3>
+      <p><b>Ransomware</b> encrypts an organisation&rsquo;s data and demands payment for a <b>decryption key</b>. Can freeze systems, leave devices unusable, and lock confidential data. Negotiations and leaked data usually surface on the dark web.</p>
+      <p><b>The three layers of the web:</b></p>
+      <ul class="clean">
+        <li><b>Surface web</b> &mdash; content accessed via a normal browser (public sites).</li>
+        <li><b>Deep web</b> &mdash; requires authorisation (e.g. an org&rsquo;s intranet).</li>
+        <li><b>Dark web</b> &mdash; only accessible via special software; where stolen PII is sold and ransom negotiations happen.</li>
+      </ul>
+      <p><b>The three key impacts of threats / risks / vulnerabilities:</b></p>
+      <ol class="clean">
+        <li><b>Financial</b> &mdash; interrupted production, cost to fix, fines from non-compliance.</li>
+        <li><b>Identity theft</b> &mdash; PII/SPII sold or leaked on the dark web.</li>
+        <li><b>Reputation damage</b> &mdash; customers leave, bad press, legal penalties, permanent brand damage.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Risk-management strategies</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Acceptance</b> &mdash; accept a risk to avoid disrupting business continuity.</li>
+        <li><b>Avoidance</b> &mdash; create a plan to avoid the risk entirely.</li>
+        <li><b>Transference</b> &mdash; transfer the risk to a third party (e.g. cyber-insurance).</li>
+        <li><b>Mitigation</b> &mdash; lessen the impact of a known risk (patch, add MFA, add a control).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>NIST Risk Management Framework (RMF) &mdash; the seven steps</h2>
+    <div class="panel">
+      <ol class="clean">
+        <li><b>Prepare</b> &mdash; activities needed to manage security and privacy risks <i>before</i> a breach. Monitor for risks, identify controls that reduce them.</li>
+        <li><b>Categorize</b> &mdash; develop risk-management processes and tasks by thinking about how CIA of systems and information can be impacted. Follow the org&rsquo;s processes to reduce risk to critical assets like customer info.</li>
+        <li><b>Select</b> &mdash; choose, customise and document the controls that protect the org. Keep playbooks up to date; help manage documentation.</li>
+        <li><b>Implement</b> &mdash; implement security and privacy plans. Example: if employees keep needing password resets, change the password requirements.</li>
+        <li><b>Assess</b> &mdash; determine if established controls are implemented correctly. Identify weaknesses and decide whether tools / procedures need to change.</li>
+        <li><b>Authorize</b> &mdash; own the security and privacy risks that may exist. Generate reports, develop plans of action, establish project milestones aligned to security goals.</li>
+        <li><b>Monitor</b> &mdash; be aware of how systems are operating; daily assessment and maintenance of technical operations.</li>
+      </ol>
+      <p><b>Other frameworks in this space:</b> HITRUST (Health Information Trust Alliance).</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Frameworks vs controls</h2>
+    <div class="panel">
+      <p><b>Security frameworks</b> &mdash; guidelines used for building plans to mitigate risks and threats to data and privacy. Four core components of a framework:</p>
+      <ol class="clean">
+        <li>Identify and document security goals.</li>
+        <li>Set guidelines to achieve those goals.</li>
+        <li>Implement strong security processes.</li>
+        <li>Monitor and communicate results.</li>
+      </ol>
+      <p><b>Security controls</b> &mdash; safeguards designed to reduce specific risks. Used <i>with</i> frameworks to build strong security posture.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>CIA triad</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confidentiality</b> &mdash; only authorised users can access assets or data. Enforced by encryption, access control, MFA, least privilege.</li>
+        <li><b>Integrity</b> &mdash; data is correct, authentic and reliable; not tampered with. Enforced by hashing, digital signatures, checksums, HMAC.</li>
+        <li><b>Availability</b> &mdash; data is accessible to those authorised. Enforced by backups, redundancy, DDoS protection.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Frameworks I know by name</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>NIST CSF (Cybersecurity Framework)</b> &mdash; five functions: Identify &middot; Protect &middot; Detect &middot; Respond &middot; Recover.</li>
+        <li><b>NIST RMF (Risk Management Framework)</b> &mdash; seven steps (see above).</li>
+        <li><b>Federal Energy Regulatory Commission &mdash; NERC (FERC-NERC)</b> &mdash; applies to organisations working with the North American power grid.</li>
+        <li><b>Federal Risk and Authorization Management Program (FedRAMP)</b> &mdash; US federal cloud security framework.</li>
+        <li><b>Center for Internet Security (CIS) Controls</b> &mdash; prioritised safeguards for the most common attacks.</li>
+        <li><b>GDPR (General Data Protection Regulation)</b> &mdash; EU data-privacy law; 72-hour breach-notification rule.</li>
+        <li><b>PCI DSS (Payment Card Industry Data Security Standard)</b> &mdash; controls for organisations that handle cardholder data.</li>
+        <li><b>HIPAA</b> &mdash; US health-data regulation.</li>
+        <li><b>ISO / IEC 27001</b> &mdash; international information-security management standard.</li>
+        <li><b>SOC 1 and SOC 2</b> &mdash; audit reports covering financial (SOC 1) and trust-service criteria (SOC 2: security, availability, processing integrity, confidentiality, privacy).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Security controls &mdash; categories and types</h2>
+    <div class="panel">
+      <p><b>Three categories</b> (family of the control):</p>
+      <ul class="clean">
+        <li><b>Administrative / managerial</b> &mdash; policies and procedures that address the human side (acceptable-use policy, on-boarding / off-boarding, training).</li>
+        <li><b>Technical</b> &mdash; firewalls, IDS/IPS, antivirus / EDR, encryption, MFA, IAM.</li>
+        <li><b>Physical</b> &mdash; door locks, cabinet locks, CCTV surveillance, badge readers.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Four types</b> (the effect the control has &mdash; and a single control can span types):</p>
+      <ul class="clean">
+        <li><b>Preventative</b> &mdash; stops a threat before it happens (firewall rule blocking a port).</li>
+        <li><b>Detective</b> &mdash; identifies a threat as it happens (SIEM alert on failed logins).</li>
+        <li><b>Corrective</b> &mdash; fixes / recovers after an incident (restore from backup, apply a patch).</li>
+        <li><b>Deterrent</b> &mdash; discourages would-be attackers (visible CCTV, warning banners).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Security ethics</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confidentiality</b> &mdash; do not share confidential info without a business reason.</li>
+        <li><b>Privacy protections</b> &mdash; safeguard PII / SPII; only collect and retain what&rsquo;s needed.</li>
+        <li><b>Laws</b> &mdash; comply with GDPR, HIPAA, PCI DSS, CCPA and local regulations.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>SIEM tools and dashboards</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Logs &mdash; the raw material</h3>
+      <ul class="clean">
+        <li><b>Firewall logs</b> &mdash; attempted / established inbound and outbound traffic.</li>
+        <li><b>Network logs</b> &mdash; devices entering / leaving the network and connections between them.</li>
+        <li><b>Server logs</b> &mdash; events on services: websites, email, file shares. Includes login, password, username requests.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">SIEM &mdash; what, why, how</h3>
+      <p><b>What:</b> Security Information and Event Management &mdash; application that collects and analyses log data to monitor critical activities. Provides real-time visibility, automated alerts, centralised storage.</p>
+      <p><b>Why:</b> without SIEM you drown in raw logs. It indexes and reduces what an analyst reviews manually and correlates events across sources you couldn&rsquo;t otherwise link.</p>
+      <p><b>How:</b> collect &rarr; normalise &rarr; correlate against rules &rarr; alert &rarr; surface on dashboards.</p>
+      <p><b>Deployment models:</b> self-hosted (best when data must stay on-prem), cloud-hosted (vendor manages infra), cloud-native (designed for cloud, scalable / flexible / highly available), hybrid.</p>
+      <p><b>SOAR (Security Orchestration, Automation and Response)</b> &mdash; a collection of apps, tools and workflows that use automation to respond to security events. Handles common events without waiting for a human, freeing analysts for complex incidents.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Tools and dashboards</h3>
+      <p><b>Splunk Enterprise</b> (self-hosted), <b>Splunk Cloud</b> (cloud-hosted), <b>Google Chronicle</b> (cloud-native).</p>
+      <p><b>Splunk dashboards:</b></p>
+      <ul class="clean">
+        <li><b>Security posture</b> &mdash; last 24 h of notable events; SOC real-time monitoring.</li>
+        <li><b>Executive summary</b> &mdash; high-level view for stakeholders.</li>
+        <li><b>Incident review</b> &mdash; visual timeline of events leading up to an incident.</li>
+        <li><b>Risk analysis</b> &mdash; risk per object (user, machine, IP); helps prioritise mitigation.</li>
+      </ul>
+      <p><b>Chronicle dashboards:</b></p>
+      <ul class="clean">
+        <li><b>Enterprise insights</b> &mdash; recent alerts; suspicious domain IOCs with confidence + severity.</li>
+        <li><b>Data ingestion &amp; health</b> &mdash; event-log volume, log sources, ingestion success rate.</li>
+        <li><b>IOC matches</b> &mdash; top threats over time by domain, IP, device IOC.</li>
+        <li><b>Main dashboard</b> &mdash; timeline of security events (e.g. failed-login spike).</li>
+        <li><b>Rule detections</b> &mdash; incidents by severity and occurrence; per-rule alert lists.</li>
+        <li><b>User sign-in overview</b> &mdash; access behaviour; catches users signing in from multiple locations at once.</li>
+      </ul>
+      <p><b>Metrics from a dashboard:</b> response time, availability, failure rate.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Practical exercise I completed &mdash; SIEM tabletop for an e-commerce outage</h3>
+      <p>Walked through this scenario with an AI-guided coach: a company&rsquo;s main e-commerce website went offline; customers couldn&rsquo;t access it.</p>
+      <ul class="clean" style="margin:0">
+        <li><b>Server logs</b> &mdash; when did the site go down, what caused the crash, what errors, what resources.</li>
+        <li><b>Firewall logs</b> &mdash; external or internal attack? Who tried and when? What was blocked / allowed?</li>
+        <li><b>Network-device logs</b> &mdash; source IPs of the suspicious traffic; unusual patterns.</li>
+        <li><b>Application logs</b> &mdash; user interactions, transactions, internal errors, location of activity.</li>
+      </ul>
+      <p style="margin-top:8px"><b>How SIEM helped:</b> centralised log management (one place, one search), automated alerting (rule fires on failed-login spike from a suspicious IP), event correlation (link a blocked firewall attempt to an app error at the same moment), dashboards with severity to prioritise. Proactive value: continuous monitoring + rule tuning + severity prioritisation + alert correlation lets me catch incidents before they escalate.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Playbooks and incident response</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">What a playbook is</h3>
+      <p>A <b>playbook</b> is a manual containing the operational steps for a specific event type. In security it&rsquo;s a documented set of manual + automated actions that make response consistent, faster and auditable. Common types: incident-response playbooks, vulnerability-management playbooks, product-specific runbooks.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">The six phases of an incident-response playbook</h3>
+      <ol class="clean">
+        <li><b>Preparation</b> &mdash; policies, playbooks, tooling, training, contact lists.</li>
+        <li><b>Detection &amp; analysis</b> &mdash; recognise events, triage, verify, classify severity, scope the incident.</li>
+        <li><b>Containment</b> &mdash; stop the bleeding: isolate hosts, block IPs, disable accounts.</li>
+        <li><b>Eradication &amp; recovery</b> &mdash; remove the attacker&rsquo;s foothold, patch, restore from clean backup, harden.</li>
+        <li><b>Post-incident activity</b> &mdash; lessons learned, playbook update, evidence retention, root-cause analysis.</li>
+        <li><b>Coordination</b> &mdash; who to notify (SOC lead, legal, comms, execs, customers, regulators) and when.</li>
+      </ol>
+      <p><b>Escalation criteria the playbook drives:</b> severity, scope, sensitivity, regulatory impact.</p>
+      <p><b>Documentation discipline:</b> incident handler&rsquo;s journal (timestamped notes), chain of custody for evidence, one ticket per incident.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">How SIEM + playbook + analyst work together</h3>
+      <ol class="clean">
+        <li>SIEM detects an alert (e.g. large data volume moved outside working hours).</li>
+        <li>Analyst opens the playbook for that alert type.</li>
+        <li>Follow triage steps &rarr; verify vs false-positive.</li>
+        <li>If real, follow containment &rarr; eradication &rarr; recovery steps.</li>
+        <li>After the incident, do a post-mortem and update the playbook so the next analyst is faster.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>How to run a security audit</h2>
+    <div class="panel">
+      <p>A <b>security audit</b> is a review of an organisation&rsquo;s security records, activities and related documents to identify areas of improvement and confirm controls are working. Audits are internal (SOC / IT) or external (regulators / third parties).</p>
+      <p><b>Internal-audit workflow (applied on Botium Toys):</b></p>
+      <ol class="clean">
+        <li>Establish scope and goals.</li>
+        <li>Conduct a risk assessment of assets, threats, risks and vulnerabilities.</li>
+        <li>Complete a controls assessment &mdash; document controls in place vs missing.</li>
+        <li>Assess compliance against the frameworks the org is subject to.</li>
+        <li>Communicate results to stakeholders with prioritised recommendations.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Capstone deliverable &mdash; Botium Toys security audit</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">Scope and goals I defined</h3>
+      <ul class="clean" style="margin:0">
+        <li><b>Scope</b> &mdash; the entire security program at Botium Toys. All assets, internal processes and procedures, implementation of controls and compliance best practices.</li>
+        <li><b>Goals</b> &mdash; assess existing assets and complete a controls-and-compliance checklist to determine which controls and best practices need to be implemented to improve Botium Toys&rsquo; security posture.</li>
+      </ul>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Current assets I inventoried</h3>
+      <ul class="clean" style="margin:0">
+        <li>On-premises equipment for in-office business needs.</li>
+        <li>Employee equipment: end-user devices (desktops, laptops, smartphones), remote workstations, headsets, cables, keyboards, mice, docking stations, surveillance cameras.</li>
+        <li>Storefront products for retail sale on site and online; adjoining warehouse.</li>
+        <li>Systems, software and services: accounting, telecommunication, database, security, e-commerce, inventory management.</li>
+        <li>Internet access; internal network.</li>
+        <li>Data retention and storage.</li>
+        <li>Legacy system maintenance: end-of-life systems requiring human monitoring.</li>
+      </ul>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Controls-assessment checklist &mdash; my findings</h3>
+      <table class="cmp">
+        <tr><th>Control</th><th>In place?</th><th>My note</th></tr>
+        <tr><td><b>Least privilege</b></td><td>No</td><td>All employees have access to customer data; privileges must be limited to reduce breach risk.</td></tr>
+        <tr><td><b>Disaster recovery plans</b></td><td>No</td><td>None in place; needed to ensure business continuity.</td></tr>
+        <tr><td><b>Password policies</b></td><td>No</td><td>Minimal requirements; a threat actor could more easily access secure data.</td></tr>
+        <tr><td><b>Separation of duties</b></td><td>No</td><td>CEO runs daily operations and manages payroll &mdash; creates fraud / critical-data risk.</td></tr>
+        <tr><td><b>Firewall</b></td><td>Yes</td><td>Existing firewall blocks traffic based on appropriately defined rules.</td></tr>
+        <tr><td><b>Intrusion detection system (IDS)</b></td><td>No</td><td>Needed to identify possible intrusions by threat actors.</td></tr>
+        <tr><td><b>Backups</b></td><td>No</td><td>Backups of critical data needed to ensure business continuity after breach.</td></tr>
+        <tr><td><b>Antivirus software</b></td><td>Yes</td><td>Installed and monitored regularly by IT.</td></tr>
+        <tr><td><b>Manual monitoring / maintenance of legacy systems</b></td><td>No</td><td>Legacy systems noted but no schedule; procedures unclear &mdash; breach risk.</td></tr>
+        <tr><td><b>Encryption</b></td><td>No</td><td>Not currently used; implementing would provide confidentiality of sensitive info.</td></tr>
+        <tr><td><b>Password management system</b></td><td>No</td><td>None in place; would improve productivity and reduce weak-password risk.</td></tr>
+        <tr><td><b>Locks (offices, storefront, warehouse)</b></td><td>Yes</td><td>Physical locks sufficient.</td></tr>
+        <tr><td><b>CCTV surveillance</b></td><td>Yes</td><td>Installed and functioning at the physical location.</td></tr>
+        <tr><td><b>Fire detection / prevention</b></td><td>Yes</td><td>Physical location has a functioning fire-detection and prevention system.</td></tr>
+      </table>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Compliance-assessment checklist &mdash; my findings</h3>
+      <p><b>PCI DSS:</b></p>
+      <table class="cmp">
+        <tr><th>Best practice</th><th>Compliant?</th><th>Note</th></tr>
+        <tr><td>Only authorised users have access to customers&rsquo; credit-card info.</td><td>No</td><td>All employees currently have access to internal data.</td></tr>
+        <tr><td>Credit-card info is accepted, processed, transmitted and stored in a secure environment.</td><td>No</td><td>Card info not encrypted; all employees have access.</td></tr>
+        <tr><td>Encryption implemented on credit-card transaction touchpoints and data.</td><td>No</td><td>No encryption in use.</td></tr>
+        <tr><td>Secure password-management policies adopted.</td><td>No</td><td>Password policy nominal; no password manager.</td></tr>
+      </table>
+      <p style="margin-top:12px"><b>GDPR:</b></p>
+      <table class="cmp">
+        <tr><th>Best practice</th><th>Compliant?</th><th>Note</th></tr>
+        <tr><td>EU customers&rsquo; data is kept private / secured.</td><td>No</td><td>No encryption for confidentiality of EU customer data.</td></tr>
+        <tr><td>Plan to notify EU customers within 72 h of a breach.</td><td>Yes</td><td>72-h notification plan in place.</td></tr>
+        <tr><td>Data properly classified and inventoried.</td><td>No</td><td>Assets inventoried but not classified.</td></tr>
+        <tr><td>Privacy policies / procedures / processes enforced.</td><td>Yes</td><td>Policies exist and are enforced.</td></tr>
+      </table>
+      <p style="margin-top:12px"><b>SOC 1 / SOC 2:</b></p>
+      <table class="cmp">
+        <tr><th>Best practice</th><th>Compliant?</th><th>Note</th></tr>
+        <tr><td>User-access policies are established.</td><td>No</td><td>Least privilege / separation of duties missing.</td></tr>
+        <tr><td>Sensitive data (PII/SPII) is confidential.</td><td>No</td><td>No encryption of PII/SPII.</td></tr>
+        <tr><td>Data integrity in place (consistent, accurate, validated).</td><td>Yes</td><td>Integrity controls present.</td></tr>
+        <tr><td>Data available to authorised individuals only.</td><td>No</td><td>Data available to all employees today; must be limited.</td></tr>
+      </table>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Recommendations I delivered to the IT manager / stakeholders</h3>
+      <ul class="clean" style="margin:0">
+        <li><b>Least privilege</b> &mdash; employees only access data required for their role.</li>
+        <li><b>Separation of duties</b> &mdash; split CEO&rsquo;s day-to-day and payroll responsibilities.</li>
+        <li><b>Encryption</b> &mdash; encrypt cardholder and customer data at rest, in transit, in use.</li>
+        <li><b>Password management system + stronger password policy</b>.</li>
+        <li><b>Disaster-recovery plan + regular backups</b>.</li>
+        <li><b>Intrusion detection system (IDS)</b>.</li>
+        <li><b>Ongoing legacy-system management</b> on a defined schedule.</li>
+        <li><b>Formal asset classification and inventory</b> so the right controls apply per class.</li>
+      </ul>
+      <p style="margin-top:8px"><span class="tag-good">Outcome:</span> a full internal audit report against NIST CSF with prioritised, actionable recommendations mapped to administrative, technical and physical controls &mdash; the deliverable produced by a real SOC/GRC team and presented to leadership.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Treating a framework as a checklist</b> &mdash; NIST CSF / RMF are continuous processes, not one-off audits.</li>
+        <li><b>Confusing control category and control type</b> &mdash; category is <i>who / what</i> the control works on (admin / technical / physical); type is <i>the effect</i> (preventive / detective / corrective / deterrent). A single control can span types.</li>
+        <li><b>Ignoring physical controls</b> &mdash; locks, CCTV and badge readers are as much a part of the posture as firewalls and encryption.</li>
+        <li><b>Skipping the compliance layer</b> &mdash; controls without a mapping to the frameworks the org is subject to (PCI DSS, GDPR, HIPAA, SOC 2) leave auditable gaps.</li>
+        <li><b>Missing the risk-vs-threat-vs-vulnerability distinction</b> &mdash; you need a threat AND a vulnerability for a risk to exist; missing either half changes the response.</li>
+        <li><b>Not updating the playbook after an incident</b> &mdash; the post-incident update is the difference between a SOC that gets better and one that keeps repeating the same investigation.</li>
+        <li><b>Following the SIEM dashboard blind</b> &mdash; dashboards are visualisations; if the underlying log ingestion breaks, the dashboard lies.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Additional risk / continuity concepts I know</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Business continuity plan (BCP)</b> &mdash; the org-wide plan that keeps critical business functions running during and after a disruption. Focus: people, processes, customers.</li>
+        <li><b>Disaster recovery plan (DRP)</b> &mdash; the IT-focused plan to restore infrastructure, systems and data after a disaster. Focus: technology, data, recovery time / point objectives (RTO / RPO).</li>
+        <li><b>Data owner</b> &mdash; the senior business leader accountable for a data asset. <b>Data custodian</b> &mdash; the technical steward who implements the controls the owner defines.</li>
+        <li><b>Data controller</b> &mdash; the entity determining the purpose / means of processing personal data (GDPR term). <b>Data processor</b> &mdash; the entity processing data on behalf of the controller.</li>
+        <li><b>Standards</b> &mdash; formal, agreed rules an organisation adopts (ISO 27001, NIST, PCI DSS). <b>Procedures</b> &mdash; step-by-step instructions for how to carry a policy out. Policy sets direction; standards fix the rules; procedures walk the how.</li>
+        <li><b>Security governance</b> &mdash; the leadership practices that support, define and direct security efforts across the org.</li>
+        <li><b>CVE Numbering Authority (CNA)</b> &mdash; an organisation authorised to assign CVE IDs to newly discovered vulnerabilities.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Threat modelling methods</b> &mdash; <b>STRIDE</b> (Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege) and <b>PASTA</b> (Process for Attack Simulation and Threat Analysis). Both give a structured way to enumerate attacker paths through a design.</li>
+        <li><b>SIEM + SOAR + IoT + AI/ML trajectory</b> &mdash; the SOC of the near future combines automated detection, automated response and analyst-in-the-loop for hard incidents.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

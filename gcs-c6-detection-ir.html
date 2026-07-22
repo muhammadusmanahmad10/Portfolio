@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound the Alarm: Detection and Response | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Sound the Alarm: Detection and Response</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Detection &amp; incident response &middot; concepts I own</div>
+  <h1>Sound the Alarm: Detection and Response</h1>
+  <p class="lede">
+    The core of SOC work: monitor, detect, investigate, respond. The NIST SP 800-61 incident-response
+    lifecycle, packet analysis with tcpdump and Wireshark, IDS/IPS with Suricata, SIEM investigation
+    in Splunk and Chronicle. My RAN background already puts me at the Wireshark / tshark end of this
+    daily &mdash; this page shows the real playbooks, tickets and
+    incident reports I produced.
+  </p>
+  <div class="chips">
+    <span class="chip">NIST SP 800-61 lifecycle</span>
+    <span class="chip">tcpdump &middot; Wireshark &middot; Suricata</span>
+    <span class="chip">Splunk &middot; Chronicle</span>
+    <span class="chip">MITRE ATT&amp;CK</span>
+    <span class="chip">Incident handler's journal</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Detection and incident response &mdash; how I think about it</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Event vs incident</h3>
+      <p>An <b>event</b> is any observable occurrence. An <b>incident</b> is an event that violates policy or threatens confidentiality, integrity or availability. Not every event is an incident; part of the analyst&rsquo;s job is telling them apart.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">NIST SP 800-61 incident-response lifecycle</h3>
+      <ol class="clean">
+        <li><b>Preparation</b> &mdash; policies, playbooks, tooling, training, contact lists.</li>
+        <li><b>Detection &amp; analysis</b> &mdash; recognise events, triage, verify, classify severity, scope the incident.</li>
+        <li><b>Containment, eradication &amp; recovery</b> &mdash; stop the bleeding, remove the attacker&rsquo;s foothold, restore service.</li>
+        <li><b>Post-incident activity</b> &mdash; lessons learned, playbook updates, evidence retention, root-cause analysis.</li>
+      </ol>
+      <p><b>Documentation discipline:</b> chain of custody (evidence integrity), incident handler&rsquo;s journal (timestamped notes), formal ticket per incident.</p>
+      <p><b>Triage</b> &mdash; prioritise alerts by impact (business criticality) and urgency (attacker progress).</p>
+      <p><b>The 5 W&rsquo;s</b> I capture on every incident: Who, What, When, Where, Why. See my incident handler&rsquo;s journal entries below for real examples.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Network monitoring and analysis</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Why network telemetry matters</h3>
+      <p>Attackers must communicate. The network sees it before the endpoint does. Packet captures are the ground truth when logs are ambiguous.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">tcpdump &mdash; command-line packet capture</h3>
+      <p>Uses <b>BPF</b> filter syntax. Common patterns:</p>
+      <pre style="margin:8px 0"><span class="c"># Capture on eth0 for a specific host</span>
+tcpdump -i eth0 host 10.0.0.5
+
+<span class="c"># Capture only port 443</span>
+tcpdump -i eth0 port 443
+
+<span class="c"># Capture SSH inbound and write to a pcap file</span>
+tcpdump -i eth0 tcp and dst port 22 -w capture.pcap
+
+<span class="c"># Read a saved pcap</span>
+tcpdump -r capture.pcap</pre>
+      <p>Runs on the command line with a low resource footprint &mdash; ideal for remote / headless / Linux-based environments where a GUI isn&rsquo;t available.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Wireshark &mdash; GUI packet analyser</h3>
+      <p>Different filter syntax (<b>display filters</b>). Common patterns:</p>
+      <pre style="margin:8px 0">ip.addr == 10.0.0.5
+tcp.port == 443
+http.request.method == "POST"
+dns.qry.name contains "malicious"</pre>
+      <p>Wireshark&rsquo;s value in cybersecurity: capture and analyse network traffic, filter by protocol / IP / port / other criteria, follow streams (TCP / UDP / HTTP), and isolate specific events. Widely used for network troubleshooting, incident response, forensic investigations and security monitoring. This is a tool I already use daily on 5G RAN signalling &mdash; same skills, different protocols.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Suricata &mdash; open-source IDS/IPS</h3>
+      <p>Signature-based intrusion detection / prevention. Rules describe suspicious patterns; matches generate alerts (typically JSON) that stream into a SIEM.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">IoCs vs IoAs</h3>
+      <ul class="clean">
+        <li><b>Indicators of Compromise (IoCs)</b> &mdash; observable artifacts: IP addresses, file hashes, domain names, URLs, filenames.</li>
+        <li><b>Indicators of Attack (IoAs)</b> &mdash; behaviours suggesting an attacker is present (bulk failed logins, unusual outbound C2).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Incident investigation with logs and SIEM</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Log types and what each proves</h3>
+      <ul class="clean">
+        <li><b>Network</b> &mdash; firewall, DNS, proxy.</li>
+        <li><b>Endpoint</b> &mdash; Sysmon, EDR.</li>
+        <li><b>Authentication</b> &mdash; AD, IdP, SSO.</li>
+        <li><b>Application</b> &mdash; web-server access, API access.</li>
+        <li><b>Cloud audit</b> &mdash; CloudTrail, GCP audit.</li>
+      </ul>
+      <p><b>Syslog</b> is the standardised log format (timestamp, host, program, message). Structured (JSON) vs unstructured logs affect how easy they are to search.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Splunk &mdash; SPL query patterns I use</h3>
+      <pre style="margin:8px 0">index=main sourcetype=access_combined status=403
+index=auth EventCode=4625 | stats count by src_ip user</pre>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Chronicle &mdash; YARA-L and UDM search</h3>
+      <p>Chronicle uses YARA-L rules and the Unified Data Model (UDM) for searches. Same investigative discipline as Splunk with different syntax.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">MITRE ATT&amp;CK</h3>
+      <p>Matrix of adversary <b>tactics</b> (why they act) and <b>techniques</b> (how they act). Mapping observed behaviour to ATT&amp;CK gives the SOC a shared vocabulary.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Threat-intelligence tools I&rsquo;ve used</h3>
+      <p><b>VirusTotal</b> &mdash; investigative tool that analyses files and URLs for malicious content (viruses, worms, trojans and more). Very helpful for quickly checking whether an IoC like a website or file hash has been reported malicious by others in the community.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Deliverables I produced</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">Phishing incident-response playbook (version 1.0)</h3>
+      <p><b>Purpose:</b> help level-one SOC analysts respond to phishing incidents appropriately and on time.</p>
+      <p><b>Flow I built:</b></p>
+      <ol class="clean">
+        <li><b>Step 1 &mdash; Receive phishing alert.</b> Process begins when an alert ticket indicates a phishing attempt has been detected.</li>
+        <li><b>Step 2 &mdash; Evaluate the alert.</b> Investigate details and relevant logs. Capture:
+          <ul class="clean" style="margin-top:6px">
+            <li><b>Severity</b>: Low (no escalation), Medium (may need escalation), High (immediate escalation).</li>
+            <li><b>Receiver</b>: email address, IP address.</li>
+            <li><b>Sender</b>: email address, IP address.</li>
+            <li><b>Subject line, message body</b>.</li>
+            <li><b>Attachments or links</b>.</li>
+          </ul>
+          <b>Rule:</b> never open links / attachments on your device unless you&rsquo;re in an authorised, isolated environment (sandbox / VM).
+        </li>
+        <li><b>Step 3.0 &mdash; Does the email contain links or attachments?</b> If yes &rarr; Step 3.1. If no &rarr; Step 4.</li>
+        <li><b>Step 3.1 &mdash; Are the links/attachments malicious?</b> Check reputation via threat-intel tools like <b>VirusTotal</b> (hash the file, look up the URL). If not malicious &rarr; Step 4.</li>
+        <li><b>Step 3.2 &mdash; Update ticket &amp; escalate.</b> If malicious, summarise findings, mark ticket <b>Escalated</b>, notify a level-two SOC analyst.</li>
+        <li><b>Step 4 &mdash; Close the alert ticket.</b> Only if the email has no links/attachments <i>or</i> those links/attachments are confirmed not malicious. Include an investigation summary and the reason for closing.</li>
+      </ol>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">SOC alert ticket A-2703 &mdash; phishing with malicious attachment</h3>
+      <p><b>Alert:</b> <code>SERVER-MAIL Phishing attempt possible download of malware</code> &mdash; severity Medium.</p>
+      <p><b>Email details I extracted:</b></p>
+      <ul class="clean" style="margin:0 0 8px">
+        <li>From: &ldquo;Def Communications&rdquo; <code>&lt;76tguyhh6tgftrt7tg.su&gt;</code>, IP <code>114.114.114.114</code></li>
+        <li>To: <code>hr@inergy.com</code>, IP <code>176.157.125.93</code></li>
+        <li>Subject: <i>Re: Infrastructure Egnieer role</i> (typo present)</li>
+        <li>Body claims to be from &ldquo;Clyde West&rdquo; applying for an engineer role; attaches a <b>password-protected</b> file <code>bfsvc.exe</code> with password <code>paradise10789</code>.</li>
+        <li>Known-malicious file hash (SHA-256): <code>54e6ea47eb04634d3e87fd7787e2136ccfbcc80ade34f246a12cf93bab527f6b</code></li>
+      </ul>
+      <p><b>Ticket comments I wrote:</b></p>
+      <p style="margin-left:16px">The alert detected that an employee downloaded and opened a malicious file from a phishing email. There is an inconsistency between the sender&rsquo;s email address (<code>76tguyhh6tgftrt7tg.su</code>), the name used in the email body (<b>Clyde West</b>), and the sender&rsquo;s displayed name (<b>Def Communications</b>). The email body and subject line contained grammatical errors. The body also included a password-protected attachment (<code>bfsvc.exe</code>) which was downloaded and opened on the affected machine. Having previously investigated the file hash, it is confirmed to be a known malicious file. Alert severity is <b>Medium</b>. Given these findings, I escalated the ticket to a level-two SOC analyst for further action.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Incident final report &mdash; forced-browsing data breach (50,000 customer records)</h3>
+      <p><b>Executive summary:</b> on <b>December 28, 2022 at 7:20 pm PT</b>, an attacker gained unauthorised access to customer PII and financial data. Approximately <b>50,000 customer records</b> were affected. Estimated financial impact: <b>$100,000</b>. Incident is now closed.</p>
+      <p><b>Timeline:</b></p>
+      <ul class="clean" style="margin:0 0 8px">
+        <li><b>Dec 22, 2022, 3:13 pm PT</b> &mdash; an employee received an email from an external address claiming to have stolen customer data. Extortion demand: $25,000 in cryptocurrency. Employee assumed it was spam and deleted it.</li>
+        <li><b>Dec 28, 2022</b> &mdash; same employee received a second email from the same sender, this time with a sample of the stolen data and an increased demand of <b>$50,000</b>.</li>
+        <li><b>Same day</b> &mdash; employee notified the security team; investigation began.</li>
+        <li><b>Dec 28&ndash;31, 2022</b> &mdash; security team focused on determining how the data was stolen and the extent of the theft.</li>
+      </ul>
+      <p><b>Investigation &amp; root cause:</b> a <b>forced-browsing vulnerability</b> in the e-commerce web application. The attacker manipulated the order number in the URL of a purchase-confirmation page and pulled thousands of customer transaction records. Web-app access logs confirmed a single log source generating an exceptionally high volume of sequentially listed customer orders.</p>
+      <p><b>Response &amp; remediation:</b> collaborated with PR to disclose the breach to affected customers; offered free identity-protection services.</p>
+      <p><b>Recommendations I delivered:</b></p>
+      <ul class="clean" style="margin:0">
+        <li>Perform routine <b>vulnerability scans</b> and <b>penetration testing</b>.</li>
+        <li>Implement <b>URL allowlisting</b> &mdash; allow access only to a specified set of URLs and automatically block requests outside that range.</li>
+        <li>Ensure only <b>authenticated users</b> can access protected content via proper access-control mechanisms.</li>
+      </ul>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Incident handler&rsquo;s journal &mdash; four entries I wrote</h3>
+
+      <p><b>Entry #1 &mdash; Ransomware incident at a health-care company.</b></p>
+      <ul class="clean" style="margin:0 0 8px">
+        <li><b>5 W&rsquo;s:</b> Who = organised group of unethical hackers. What = ransomware. When = Tuesday 9:00 am. Where = health-care company. Why = phishing gave unauthorised access; ransomware encrypted org data; ransom demanded for the decryption key. Motive: financial gain.</li>
+        <li><b>Phase mapping:</b> Detection &amp; Analysis (org first detected the ransomware and contacted others for technical assistance). Containment / Eradication / Recovery (org shut down computer systems but had to contact others for help to eradicate + recover).</li>
+      </ul>
+
+      <p><b>Entry #2 &mdash; Investigating a suspicious file hash with VirusTotal.</b></p>
+      <ul class="clean" style="margin:0 0 8px">
+        <li><b>Tool used:</b> VirusTotal &mdash; analyses files and URLs for malicious content and reports what other researchers have found.</li>
+        <li><b>5 W&rsquo;s:</b> Who = unknown threat actor using the <b>Flagpro</b> malware. What = a phishing email attachment with SHA-256 hash <code>54e6ea47eb04634d3e87fd7787e2136ccfbcc80ade34f246a12cf93bab527f6b</code> &mdash; flagged as malicious by 50 security vendors. When = Wed 6/30/2026, 9:30 am. Where = employee&rsquo;s computer at a financial-services company. Why = employee downloaded and executed the file; the malware establishes C2 comms, captures user input, and sends HTTP requests, enabling data theft / further malicious action.</li>
+        <li><b>TTPs observed:</b> Command &amp; Control (C2), Input Capture, HTTP Requests.</li>
+        <li><b>Indicators of compromise (IoCs):</b> Domain <code>org.misecure.com</code>, IP <code>207.148.109.242</code>, file hash <code>287d612e29b71c90aa54947313810a25</code>.</li>
+        <li><b>Recommended response:</b> isolate infected systems, block the malicious domain and IP, quarantine the file, update endpoint security tools, run a full environment scan for additional infections.</li>
+      </ul>
+
+      <p><b>Entry #3 &mdash; Phishing email with a password-protected malicious attachment (ticket A-2703, see above).</b> Recommended actions: isolate the affected system, block the malicious hash + sender, scan for additional compromise, reset affected user credentials if necessary, deliver phishing-awareness training.</p>
+
+      <p><b>Entry #4 &mdash; Forced-browsing customer-data breach (final-report scenario, see above).</b> Full 5 W&rsquo;s captured; recommendations: routine vuln scans + pen tests, URL allowlisting, enforce authenticated access only.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Investigation-findings presentation</h3>
+      <p>Built a short deck to communicate investigation output to stakeholders &mdash; timeline, IoCs, business impact, containment actions, remediation. The right level of detail for a management audience without losing the technical facts a peer analyst needs.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Opening suspicious attachments on your own device</b> &mdash; always sandbox / VM. Password-protected attachments are a specific evasion technique (they hide the payload from automated email scanners so the recipient has to open it manually).</li>
+        <li><b>Confusing IoC and IoA</b> &mdash; IoCs are artefacts (IP, hash, domain); IoAs are behaviours (bulk failed logins). Both matter, but they drive different detections.</li>
+        <li><b>Closing a ticket without investigating attachments</b> &mdash; the playbook exists so no analyst skips the reputation check on a link or file.</li>
+        <li><b>Missing sender-identity inconsistencies</b> &mdash; sender domain that doesn&rsquo;t match displayed name, body signed with a different name, grammatical errors &mdash; all classic phishing tells.</li>
+        <li><b>Not documenting an incident cleanly</b> &mdash; without a proper handler&rsquo;s journal, the post-mortem is guesswork and the next analyst is no faster.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Additional detection &amp; IR concepts I know</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Detection design</h3>
+      <ul class="clean">
+        <li><b>Host-based IDS (HIDS)</b> &mdash; runs on the endpoint and inspects that host&rsquo;s file, process and log activity. <b>Network-based IDS (NIDS)</b> &mdash; sits on a network segment and inspects traffic (Suricata). A mature program uses both.</li>
+        <li><b>Signature-based analysis</b> &mdash; matches against known IoC / pattern signatures. Fast, low-false-positive, but blind to zero-days.</li>
+        <li><b>Anomaly-based analysis</b> &mdash; baselines &ldquo;normal&rdquo; behaviour and alerts on deviations. Catches novel attacks; noisier (more false positives).</li>
+        <li><b>Honeypot</b> &mdash; a decoy system that looks valuable but has no real business use. Any interaction with it is inherently suspicious &mdash; high-signal early warning.</li>
+        <li><b>Zero-day</b> &mdash; vulnerability the vendor doesn&rsquo;t yet know about; no patch exists. Detection here relies on behaviour, not signatures.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Alert-quality vocabulary</h3>
+      <ul class="clean">
+        <li><b>True positive</b> &mdash; alert fires and the incident is real.</li>
+        <li><b>False positive</b> &mdash; alert fires but nothing bad is happening; wastes analyst time.</li>
+        <li><b>True negative</b> &mdash; nothing bad, no alert; the desired steady state.</li>
+        <li><b>False negative</b> &mdash; something bad is happening but nothing alerted; the most dangerous of the four.</li>
+      </ul>
+      <p>Tuning a SOC is really about pushing false positives and false negatives towards zero at the same time.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Threat hunting vs threat intelligence</h3>
+      <ul class="clean">
+        <li><b>Threat hunting</b> &mdash; proactive search for adversaries already inside the environment that haven&rsquo;t triggered an alert. Hypothesis-driven, uses ATT&amp;CK as a playbook.</li>
+        <li><b>Threat intelligence</b> &mdash; contextual information about adversaries (TTPs, IoCs, campaigns) that feeds detection rules.</li>
+        <li><b>Open-source intelligence (OSINT)</b> &mdash; intelligence collected from publicly available sources.</li>
+        <li><b>Common Event Format (CEF)</b> &mdash; a standard format for log messages; makes it easier to normalise events across sources feeding into a SIEM.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Digital forensics</h3>
+      <ul class="clean">
+        <li><b>Digital forensics</b> &mdash; the discipline of identifying, preserving, analysing and presenting digital evidence in a legally defensible way.</li>
+        <li><b>Chain of custody</b> &mdash; documented handoff of evidence from collection to court, showing who had it, when, and what they did. <b>Broken chain of custody</b> = evidence potentially inadmissible.</li>
+        <li><b>Protecting and preserving evidence</b> &mdash; work from images, not originals; hash both to prove nothing changed.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Incident-response operational terms</h3>
+      <ul class="clean">
+        <li><b>Incident response plan</b> &mdash; the org-wide document defining roles, contacts and procedures for handling incidents. Precedes any individual playbook.</li>
+        <li><b>Escalation policy</b> &mdash; formal rules for who gets notified, at what severity, and on what timeline.</li>
+        <li><b>Incident escalation</b> &mdash; the act of raising the incident to a higher tier / team when it exceeds your authority or scope.</li>
+        <li><b>Improper usage</b> &mdash; an incident type where an authorised user violates acceptable-use policy (data misuse, unauthorised installations) &mdash; distinct from an external breach and often handled with HR involvement.</li>
+        <li><b>Unauthorised access</b> &mdash; an outsider (or an insider outside their role) getting into a system they shouldn&rsquo;t.</li>
+        <li><b>Lessons learned meeting</b> &mdash; blame-free post-incident review capturing what happened, what worked, what to improve, and action items with owners + dates.</li>
+        <li><b>Final report</b> &mdash; the definitive record of an incident, its impact, timeline, response, and recommendations. Formal deliverable often shared beyond the SOC.</li>
+        <li><b>Resiliency</b> &mdash; the property of a system that lets it withstand and recover from adverse events. Includes redundancy, backups, failover, disaster recovery.</li>
+        <li><b>Business continuity plan (BCP)</b> vs <b>Disaster recovery plan (DRP)</b> &mdash; BCP keeps the business running during the disruption; DRP restores IT / infrastructure back to normal.</li>
+        <li><b>Log analysis</b> &mdash; systematically reading logs to answer investigative questions: when, who, what, from where, how.</li>
+        <li><b>Network log analysis</b> &mdash; log-analysis specifically focused on network telemetry (firewall, DNS, proxy).</li>
+        <li><b>Visual dashboard</b> &mdash; the SIEM UI that turns raw indexed data into charts / tables / timelines for quick analyst comprehension.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

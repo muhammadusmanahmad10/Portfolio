@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networks and Network Security | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Networks and Network Security</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Networks &amp; network security &middot; concepts I own</div>
+  <h1>Networks and Network Security</h1>
+  <p class="lede">
+    How I think about the network from a security angle &mdash; the devices that carry the traffic,
+    the protocols that ride on them, the attacks that exploit both, and the hardening that closes
+    them down. My RAN background covers most of this stack already (SCTP, IPsec, TCP/UDP, DNS,
+    DHCP, packet captures) &mdash; this page is how I frame that knowledge, plus the
+    real investigations and reports I produced during the certificate.
+  </p>
+  <div class="chips">
+    <span class="chip">TCP/IP &middot; OSI</span>
+    <span class="chip">Firewalls &middot; VPN &middot; segmentation</span>
+    <span class="chip">DoS / DDoS / MITM / spoofing</span>
+    <span class="chip">tcpdump &middot; Wireshark</span>
+    <span class="chip">NIST CSF applied to networks</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Network architecture</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Devices that carry the traffic</h3>
+      <ul class="clean">
+        <li><b>Hub</b> &mdash; repeater; forwards every frame to every port. Rare in modern networks.</li>
+        <li><b>Switch</b> &mdash; L2 device; learns MAC addresses and forwards frames only to the destination port.</li>
+        <li><b>Router</b> &mdash; L3 device; forwards packets based on IP address; connects different networks.</li>
+        <li><b>Modem</b> &mdash; converts between the internal network and a WAN link (cable / DSL / fibre / cellular).</li>
+        <li><b>Firewall</b> &mdash; enforces which traffic can enter or leave a security zone; stateful, stateless or next-gen (NGFW).</li>
+        <li><b>Load balancer</b> &mdash; distributes incoming requests across multiple backend servers to keep them from being overloaded.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Network types</h3>
+      <ul class="clean">
+        <li><b>LAN</b> &mdash; local network (office, home).</li>
+        <li><b>WAN</b> &mdash; wide-area network (branches connected together).</li>
+        <li><b>WLAN</b> &mdash; wireless LAN (Wi-Fi).</li>
+        <li><b>VPN</b> &mdash; encrypted tunnel over an untrusted network so remote workers can safely reach the corporate network.</li>
+        <li><b>Cloud network</b> &mdash; resources hosted by a cloud provider (AWS / GCP / Azure) and reached over the internet.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">TCP/IP stack, mapped to OSI</h3>
+      <ul class="clean">
+        <li><b>Network access</b> &harr; OSI L1/L2 (physical + data link). Frames, MAC, Ethernet.</li>
+        <li><b>Internet</b> &harr; OSI L3 (network). IP, ICMP, ARP; routing.</li>
+        <li><b>Transport</b> &harr; OSI L4. TCP (reliable, connection-oriented) and UDP (unreliable, connection-less).</li>
+        <li><b>Application</b> &harr; OSI L5&ndash;L7 (session + presentation + application). HTTP / HTTPS, DNS, DHCP, SSH, SMTP, FTP.</li>
+      </ul>
+      <p><b>IPv4 vs IPv6</b> and <b>RFC 1918 private ranges</b> (<code>10.x.x.x</code>, <code>172.16&ndash;31.x</code>, <code>192.168.x</code>) are the everyday address vocabulary. <b>MAC vs IP</b> &mdash; MAC is the burnt-in L2 identity, IP is the routable L3 identity assigned per network.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Protocols and where they live</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>TCP</b> &mdash; connection-oriented, reliable, ordered; the three-way handshake is <b>SYN &rarr; SYN-ACK &rarr; ACK</b>. The server allocates memory and a connection-table slot on SYN-ACK, so half-open connections are expensive.</li>
+        <li><b>UDP</b> &mdash; connection-less, unreliable, fast; used for DNS, DHCP, voice, video.</li>
+        <li><b>ARP</b> &mdash; resolves IP &rarr; MAC on the local subnet; abused by <b>ARP poisoning</b>.</li>
+        <li><b>ICMP</b> &mdash; control / diagnostic (ping, traceroute, "destination unreachable"); abused by ICMP flood, Smurf attack.</li>
+        <li><b>HTTP (80) / HTTPS (443)</b> &mdash; the web; HTTPS = HTTP over TLS.</li>
+        <li><b>DNS (53)</b> &mdash; name &rarr; IP; abused by DNS poisoning, cache poisoning, DNS tunneling.</li>
+        <li><b>DHCP (67/68)</b> &mdash; dynamic IP allocation; abused by rogue DHCP servers.</li>
+        <li><b>SSH (22)</b> &mdash; secure remote shell; replacement for the deprecated <b>Telnet (23)</b>.</li>
+        <li><b>FTP / SFTP</b> &mdash; file transfer; SFTP is over SSH.</li>
+        <li><b>SMTP / IMAP / POP3</b> &mdash; email transport.</li>
+        <li><b>802.11 Wi-Fi</b> &mdash; WPA2 vs WPA3 (WPA3 adds forward secrecy and a stronger handshake).</li>
+      </ul>
+      <p><b>Why this ties into my RAN background:</b> the 5G RAN transport stack &mdash; NGAP over SCTP over IP, GTP-U over UDP, IPsec / IKEv2 for the security gateway, PTP over UDP or Ethernet for sync &mdash; is the same protocol vocabulary a SOC analyst reads on the wire.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>How attackers hit the network</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Passive vs active attacks</h3>
+      <p><b>Passive</b> = sniffing / reconnaissance; the attacker observes but doesn&rsquo;t modify traffic. <b>Active</b> = injection, spoofing, tampering.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Denial of Service (DoS) and Distributed DoS (DDoS)</h3>
+      <ul class="clean">
+        <li><b>SYN flood</b> &mdash; attacker fires many TCP SYNs; server holds memory for each half-open session; legitimate connections can&rsquo;t get in.</li>
+        <li><b>ICMP flood</b> &mdash; overwhelm the target with ping traffic.</li>
+        <li><b>Smurf attack</b> &mdash; spoofed broadcast ICMP amplification (older).</li>
+        <li><b>Amplification / reflection</b> &mdash; abuse DNS or NTP to multiply traffic against a victim.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Spoofing and interception</h3>
+      <ul class="clean">
+        <li><b>IP spoofing</b> &mdash; forge the source IP.</li>
+        <li><b>MAC spoofing</b> &mdash; forge the source MAC.</li>
+        <li><b>ARP poisoning</b> &mdash; associate the attacker&rsquo;s MAC with a victim&rsquo;s IP on the LAN.</li>
+        <li><b>DNS poisoning</b> &mdash; feed the resolver a wrong IP for a domain so victims connect to the attacker&rsquo;s server.</li>
+        <li><b>On-path attack (MITM)</b> &mdash; attacker sits between two endpoints, intercepts and can modify traffic.</li>
+        <li><b>Replay attack</b> &mdash; capture then re-transmit valid traffic to gain access.</li>
+        <li><b>Malicious packets</b> &mdash; fragmented or crafted headers designed to evade an IDS or crash a stack.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Network and system hardening</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Network hardening</h3>
+      <ul class="clean">
+        <li><b>Patch management</b> and secure device configuration.</li>
+        <li><b>Disable unused services and ports</b>; port filtering.</li>
+        <li><b>ACLs</b> and <b>network segmentation</b> so a compromise in one segment doesn&rsquo;t spread to the whole network.</li>
+        <li><b>DMZ</b> for internet-facing services; <b>jump hosts</b> for admin access.</li>
+        <li><b>Firewall rulesets</b> reviewed on a regular cadence; deny by default, allow by exception.</li>
+        <li><b>IDS / IPS</b> to detect (IDS) or automatically block (IPS) suspicious traffic.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">OS hardening</h3>
+      <ul class="clean">
+        <li>Baseline / gold-image configuration; endpoint patching cadence.</li>
+        <li>Host firewall + endpoint EDR / AV.</li>
+        <li><b>MFA</b> everywhere for admin and remote access.</li>
+        <li><b>Principle of least privilege</b> on both accounts and services.</li>
+        <li><b>Password policy</b>: length, character set, no reuse, lockout after N failed attempts, rotation cadence.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Firewalls, VPNs and modern design</h3>
+      <ul class="clean">
+        <li><b>Firewall types</b> &mdash; stateless (per-packet ACL) vs stateful (tracks connections) vs NGFW (adds application awareness, IPS, TLS inspection).</li>
+        <li><b>VPN</b> &mdash; encrypted tunnel using IPsec (site-to-site or remote-access) or TLS; encapsulates the inner IP and encrypts it.</li>
+        <li><b>Cloud shared-responsibility model</b> &mdash; provider secures the fabric, customer secures configuration, data and IAM. Hybrid multiplies the attack surface.</li>
+        <li><b>Zero trust</b> &mdash; never trust, always verify; every request is authenticated, authorised and encrypted regardless of network location.</li>
+        <li><b>Defence in depth</b> &mdash; layered controls so a single failure never exposes the asset.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Deliverables I produced</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">Cybersecurity Incident Report &mdash; network traffic analysis (DNS unreachable)</h3>
+      <p><b>Scenario:</b> customers reported &ldquo;destination port unreachable&rdquo; when trying to reach <code>yummyrecipesforme.com</code> at 1:24 pm. I ran a <b>tcpdump</b> packet capture and analysed the log.</p>
+      <p><b>What I saw in the log:</b> the browser issued a UDP DNS query to the DNS server on port 53 (query ID <code>35084+</code>, <code>A?</code> record for <code>yummyrecipesforme.com</code>). Instead of a normal DNS reply the server responded over <b>ICMP</b> with <code>udp port 53 unreachable</code>.</p>
+      <p><b>What that means:</b> port 53 is the well-known port for DNS. An ICMP &ldquo;port 53 unreachable&rdquo; reply strongly suggests the DNS server is not answering &mdash; either the service is down, or a firewall is dropping traffic destined for port 53.</p>
+      <p><b>Likely root causes if the server is actually down:</b> a successful DoS attack against the DNS service, or a configuration error on the server itself.</p>
+      <p><b>Next steps I recommended:</b> confirm whether the DNS service process is running, check the firewall for a rule blocking port 53, and check for a traffic spike / abnormal ICMP volume that would indicate an active attack.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Incident report analysis &mdash; DoS via ICMP flood, framed against NIST CSF</h3>
+      <p><b>Scenario:</b> a multimedia company (web design / graphic design / social media) suffered a two-hour DoS. Attackers sent an ICMP-flood through an <b>unconfigured firewall</b>. Response team blocked ICMP, took non-critical services offline, and restored critical services. I mapped the whole event to the NIST CSF:</p>
+      <table class="cmp">
+        <tr><th>NIST CSF function</th><th>What I documented</th></tr>
+        <tr><td><b>Identify</b></td><td>Reviewed affected systems, network devices, firewall settings. Root cause: an unconfigured firewall let excessive ICMP through, enabling an ICMP-flood DoS that took the internal network down and left users unable to reach network resources for about two hours.</td></tr>
+        <tr><td><b>Protect</b></td><td>Firewall rule to rate-limit incoming ICMP; IDS/IPS that screens ICMP for suspicious characteristics; a regular cadence for reviewing firewall configuration; routine security audits.</td></tr>
+        <tr><td><b>Detect</b></td><td>Network monitoring software + firewall logs + IDS to watch incoming ICMP, flag abnormal traffic patterns, spot spoofed source addresses, and raise an alert when something looks off.</td></tr>
+        <tr><td><b>Respond</b></td><td>Isolate affected systems so the disruption cannot spread; bring critical services back online; comb network logs for suspicious activity; escalate to upper management and legal / regulators when required.</td></tr>
+        <tr><td><b>Recover</b></td><td>Recover systems hit by the ICMP flood (internal network services + firewall configuration). Verify each service against network backups, system logs and monitoring data. Restore firewall settings to a secure baseline. Re-enable monitoring + IDS/IPS to confirm no residual malicious traffic.</td></tr>
+      </table>
+      <p style="margin-top:8px"><b>My takeaway:</b> properly configured firewall rules and ongoing network monitoring are the difference between an ICMP flood being an inconvenience and a two-hour outage. IDS/IPS and traffic rate-limiting are essential preventive controls.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Security risk assessment report &mdash; three hardening measures I prioritised</h3>
+      <ol class="clean" style="margin:0">
+        <li><b>Multi-factor authentication (MFA)</b> &mdash; require more than one independent factor (biometric, physical ID card, PIN, password) before an app grants access. Even if a password is brute-forced or shared, the second factor stops the attacker; because a borrowed password is much less useful, sharing is discouraged in the first place.</li>
+        <li><b>Company-wide password policy</b> &mdash; minimum length, permitted character set, no credential sharing, and account lockout after N (e.g. five) consecutive failed logins. Complexity + rotation + no-reuse rules add friction that slows a brute-force attacker.</li>
+        <li><b>Regular firewall maintenance</b> &mdash; keep the allow / deny ruleset aligned with current standards; move suspicious sources onto the deny list; revisit the ruleset after every security event where unwanted traffic got through. Kept current, this control defends against a range of DoS / DDoS attacks.</li>
+      </ol>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Analyse network attacks &mdash; SYN flood diagnosis</h3>
+      <p><b>Scenario:</b> users reported connection-timeout errors on a website. Working through the packet logs, I saw the web server stop answering right after a heavy burst of SYN packets. Classic <b>SYN flood</b>, a variant of DoS.</p>
+      <p><b>How the attack breaks the site:</b></p>
+      <ol class="clean">
+        <li>The TCP three-way handshake normally runs: client SYN &rarr; server SYN-ACK &rarr; client ACK.</li>
+        <li>On the SYN-ACK the server reserves memory and a connection-table slot for that session.</li>
+        <li>In a SYN flood, the attacker fires many SYNs and never completes the handshake. The server&rsquo;s connection table fills with half-open sessions; nothing is left for legitimate requests.</li>
+        <li>The server can&rsquo;t open new connections, so real users see connection-timeout messages.</li>
+      </ol>
+      <p><b>Countermeasures I&rsquo;d apply:</b> SYN cookies at the server, rate-limiting at the firewall, IDS/IPS signatures for flood behaviour, and upstream DDoS-protection service for large-scale attacks.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Apply OS hardening techniques &mdash; HTTP-based compromise + brute-force response</h3>
+      <p><b>Protocol involved:</b> HTTP (application-layer). Confirmed by tcpdump capture while loading <code>yummyrecipesforme.com</code>; the malicious download was also delivered over HTTP.</p>
+      <p><b>How the incident unfolded:</b></p>
+      <ol class="clean">
+        <li>Customers reported the site was prompting them to download and run a file advertised as new recipe content; their PCs then ran slowly.</li>
+        <li>The site owner was locked out of the admin account.</li>
+        <li>I opened the site in a <b>sandbox</b> to keep production safe, started tcpdump, and reproduced the prompt.</li>
+        <li>Accepting the download redirected the browser to a spoofed site: <code>greatrecipesforme.com</code>.</li>
+        <li>tcpdump showed the browser first resolved <code>yummyrecipesforme.com</code> and established the HTTP connection, then abruptly resolved a new IP for <code>greatrecipesforme.com</code> and rerouted traffic there.</li>
+      </ol>
+      <p><b>Working theory:</b> attacker brute-forced the admin account, changed the password, and injected malicious code into the legitimate site to push a file disguised as a browser update. End-user compromise happened once that file was executed.</p>
+      <p><b>Remediations for brute-force I recommended:</b></p>
+      <ul class="clean" style="margin:0">
+        <li><b>Block password reuse</b> &mdash; the original foothold used a default password; policy must prevent any prior or default password being reused on reset.</li>
+        <li><b>Shorten password-rotation interval</b> &mdash; if a credential ever leaks, tighter rotation limits how long the stale password is useful.</li>
+        <li><b>Two-factor authentication (2FA)</b> &mdash; pair the password with a one-time passcode (OTP) sent to email or phone. Even a successful brute-force of the password by itself is no longer enough.</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confusing DoS with DDoS</b> &mdash; DoS is one source; DDoS is many (a botnet). Countermeasures differ: rate limiting handles small DoS; DDoS usually needs an upstream provider.</li>
+        <li><b>Assuming ICMP is safe to leave wide-open</b> &mdash; ICMP is useful diagnostically, but an unconfigured firewall + ICMP = easy DoS.</li>
+        <li><b>Confusing MAC with IP address</b> &mdash; MAC is L2 hardware identity, IP is L3 routable identity. A router changes the source/destination MAC hop-by-hop, but not the IP.</li>
+        <li><b>Trusting a firewall as if it were the whole answer</b> &mdash; it&rsquo;s one layer; defence in depth requires OS hardening, MFA, EDR, monitoring and least privilege too.</li>
+        <li><b>Reading tcpdump without checking direction</b> &mdash; forgetting who&rsquo;s the source and who&rsquo;s the destination flips the whole story of the trace.</li>
+        <li><b>Missing the L4 vs L7 distinction</b> &mdash; a SYN flood is L4 (TCP handshake exhaustion); a Slowloris or HTTP flood is L7 (application). They need different mitigations.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Additional network-security concepts I know</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>On-path attack (MITM)</b> &mdash; attacker positions between two endpoints, intercepts and can modify traffic.</li>
+        <li><b>Passive packet sniffing</b> &mdash; attacker observes traffic silently, doesn&rsquo;t alter it. <b>Active packet sniffing</b> &mdash; attacker manipulates traffic (injects, alters, redirects).</li>
+        <li><b>IP spoofing</b> &mdash; forge source IP to bypass IP-based filters or hide origin.</li>
+        <li><b>Smurf attack</b> &mdash; DDoS combining IP spoofing + broadcast ICMP amplification.</li>
+        <li><b>Ping of death</b> &mdash; malformed / oversized ICMP packet designed to crash the target&rsquo;s IP stack.</li>
+        <li><b>Replay attack</b> &mdash; capture then re-transmit valid traffic to gain unauthorised access.</li>
+        <li><b>ICMP flood</b> &mdash; overwhelm the target with ping requests.</li>
+        <li><b>Controlled zone</b> &mdash; part of the network segmented from unauthorised access (behind firewall + IAM). <b>Uncontrolled zone</b> &mdash; the untrusted network outside those controls (the internet).</li>
+        <li><b>DMZ (Demilitarised Zone)</b> &mdash; a controlled subnet that hosts internet-facing services (web, mail, DNS) so they never sit on the fully-internal network.</li>
+        <li><b>Forward proxy server</b> &mdash; sits between users and the internet; represents users to external services (used for policy enforcement, caching). <b>Reverse proxy server</b> &mdash; sits between external users and internal services; represents the service (used for load balancing, TLS termination, WAF).</li>
+        <li><b>Cloud-based firewalls</b> &mdash; firewall functionality delivered as a cloud service (FWaaS). Elastic, centrally managed; ideal for multi-cloud / hybrid environments.</li>
+        <li><b>Port filtering</b> &mdash; explicitly allow only the ports the org uses, block everything else at the firewall.</li>
+        <li><b>IEEE 802.11 (Wi-Fi)</b> &mdash; the wireless-LAN standard family. Security evolves through WPA &rarr; WPA2 &rarr; WPA3 (WPA3 adds forward secrecy and a stronger handshake).</li>
+        <li><b>Bandwidth</b> &mdash; the maximum data-transfer capacity of a network link (Mbps / Gbps). Attacks like DDoS aim to consume it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Zero trust architecture</b> &mdash; identity- and context-based access with continuous verification, replacing the &ldquo;castle and moat&rdquo; perimeter model.</li>
+        <li><b>Network segmentation and micro-segmentation</b> &mdash; separate high-value assets from user segments; contain blast radius when one segment is compromised.</li>
+        <li><b>TLS handshake</b> at high level &mdash; client hello &rarr; server hello + cert &rarr; verify cert chain &rarr; key exchange &rarr; encrypted channel. Understanding this makes it easier to interpret HTTPS captures.</li>
+        <li><b>My RAN side of this stack</b> &mdash; IPsec/IKEv2 at the security gateway, PKI + certificate enrollment on the femto, SUPI/SUCI concealment and the 5G AKA key hierarchy (K &rarr; K_AUSF &rarr; K_SEAF &rarr; K_AMF &rarr; K_gNB). I already work at the seam where network security meets telecom.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

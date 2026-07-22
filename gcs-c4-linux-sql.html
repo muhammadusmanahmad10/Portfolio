@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools of the Trade: Linux and SQL | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Tools of the Trade: Linux and SQL</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Linux &amp; SQL &middot; concepts I own</div>
+  <h1>Tools of the Trade: Linux and SQL</h1>
+  <p class="lede">
+    The two everyday tools of a security analyst. Linux is where investigations happen &mdash; the shell,
+    the filesystem, users and permissions. SQL is how I ask questions of security-log tables (login
+    attempts, employee records, machine inventory). This page is how I think about both, plus the
+    labs I completed to prove it.
+  </p>
+  <div class="chips">
+    <span class="chip">Bash / Linux CLI</span>
+    <span class="chip">chmod &middot; chown &middot; permissions</span>
+    <span class="chip">SQL: SELECT / WHERE / JOIN</span>
+    <span class="chip">Filters: AND · OR · NOT · LIKE</span>
+    <span class="chip">Log-table investigations</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Operating-system fundamentals</h2>
+    <div class="panel">
+      <p>An <b>operating system</b> mediates between hardware and applications &mdash; kernel, device drivers, processes, memory, file system, user accounts, network stack. Every action on a machine passes through the OS boundary of <b>authentication &rarr; authorisation &rarr; audit</b>.</p>
+      <p>Common OS families I know: <b>Linux</b> (Kali, Parrot, Ubuntu, Debian, RHEL, CentOS), <b>Windows</b>, <b>macOS</b>, <b>ChromeOS</b>. <b>GUI vs CLI</b> &mdash; CLI is preferred in security work for scripting, automation and forensic reproducibility.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Linux &mdash; the SOC everyday workspace</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Anatomy of Linux</h3>
+      <ul class="clean">
+        <li>Open-source, Unix-like OS built around a <b>kernel</b>, a <b>shell</b> (default = <b>Bash</b>) and userland utilities.</li>
+        <li>Distributions used in security work: <b>Kali Linux</b> (pen-test), <b>Parrot</b>, <b>Ubuntu</b>, <b>Debian</b>, <b>Red Hat Enterprise Linux (RHEL)</b>, <b>CentOS</b>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Filesystem hierarchy</h3>
+      <ul class="clean">
+        <li><code>/</code> &mdash; root of the filesystem</li>
+        <li><code>/root</code> &mdash; root user&rsquo;s home</li>
+        <li><code>/home</code> &mdash; regular users&rsquo; homes</li>
+        <li><code>/etc</code> &mdash; system configuration files</li>
+        <li><code>/var</code> &mdash; variable data (logs, spool); <code>/var/log</code> for system + application logs</li>
+        <li><code>/tmp</code> &mdash; temporary files</li>
+        <li><code>/bin</code>, <code>/sbin</code>, <code>/usr/bin</code> &mdash; executable binaries</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Commands</h3>
+      <ul class="clean">
+        <li><b>Navigation / inspection</b>: <code>pwd</code>, <code>ls</code> (<code>-l</code>, <code>-a</code>, <code>-la</code>), <code>cd</code>, <code>cat</code>, <code>head</code>, <code>tail</code> (<code>-f</code> for live logs), <code>less</code>, <code>wc</code>.</li>
+        <li><b>Files &amp; directories</b>: <code>touch</code>, <code>mkdir</code>, <code>rm</code> (<code>-rf</code>), <code>rmdir</code>, <code>mv</code>, <code>cp</code>.</li>
+        <li><b>Search &amp; filter</b>: <code>grep</code> (<code>-i</code>, <code>-r</code>, <code>-v</code>, <code>-c</code>), <code>find</code>, pipes <code>|</code>, redirection <code>&gt;</code> / <code>&gt;&gt;</code>, <code>tee</code>.</li>
+        <li><b>User &amp; group management</b>: <code>whoami</code>, <code>sudo</code>, <code>useradd</code>, <code>userdel</code>, <code>usermod</code>, <code>groupadd</code>, <code>passwd</code>.</li>
+        <li><b>Permissions</b>: <code>chmod</code> (numeric <code>755</code> or symbolic <code>u+x</code>), <code>chown</code>, <code>chgrp</code>.</li>
+        <li><b>Help</b>: <code>man &lt;cmd&gt;</code>, <code>&lt;cmd&gt; --help</code>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">The permission model I can read</h3>
+      <p>Every Linux file has three permission triplets &mdash; <b>user (owner) / group / other</b> &mdash; and each triplet has <b>read (r)</b>, <b>write (w)</b>, <b>execute (x)</b>.</p>
+      <p>Example: <code>-rwxr-x---</code> means the leading <code>-</code> is a regular file (a <code>d</code> would be a directory); owner has r+w+x; group has r+x; other has nothing.</p>
+      <p>How the 10 characters break down:</p>
+      <ul class="clean">
+        <li><b>Position 1</b>: file type &mdash; <code>d</code> = directory, <code>-</code> = regular file.</li>
+        <li><b>Positions 2&ndash;4</b>: rwx for the owner (user).</li>
+        <li><b>Positions 5&ndash;7</b>: rwx for the group.</li>
+        <li><b>Positions 8&ndash;10</b>: rwx for other.</li>
+      </ul>
+      <p><b>Principle of least privilege</b> at the OS level: give every account only the access it strictly needs. Use <b>sudo</b> instead of logging in as <code>root</code>.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>SQL &mdash; how I query security data</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Core concepts</h3>
+      <ul class="clean">
+        <li><b>Relational database</b> &mdash; data organised into tables of rows and columns, related by keys.</li>
+        <li><b>Primary key</b> uniquely identifies each row; <b>foreign key</b> references another table&rsquo;s primary key to enforce a relationship.</li>
+        <li>Why analysts query &mdash; investigating login attempts, employee records, machine inventory, alerts.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Query pattern I use</h3>
+      <ul class="clean">
+        <li><b>Basic query</b>: <code>SELECT col1, col2 FROM table WHERE cond ORDER BY col;</code></li>
+        <li><b>Filtering</b>: <code>=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN&hellip;AND</code>, <code>LIKE '%text%'</code>, <code>IN (&hellip;)</code>, <code>IS NULL</code>.</li>
+        <li><b>Combining conditions</b>: <code>AND</code>, <code>OR</code>, <code>NOT</code>.</li>
+        <li><b>Aggregates</b>: <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, <code>MAX()</code>, <code>GROUP BY</code>, <code>HAVING</code>.</li>
+        <li><b>Wildcards with <code>LIKE</code></b>: <code>%</code> matches any sequence of characters (e.g. <code>'MEX%'</code> matches both <code>MEX</code> and <code>MEXICO</code>).</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Joins &mdash; when the answer lives in more than one table</h3>
+      <ul class="clean">
+        <li><b>INNER JOIN</b> &mdash; only rows that match in both tables.</li>
+        <li><b>LEFT JOIN</b> &mdash; all rows from the left table; matches from the right where they exist.</li>
+        <li><b>RIGHT JOIN</b> &mdash; mirror of LEFT JOIN.</li>
+        <li><b>FULL OUTER JOIN</b> &mdash; all rows from both sides.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Deliverables I produced</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">Applied SQL filters to real security-log investigations</h3>
+      <p>My organisation was hardening its systems. My role was to keep the systems safe, investigate anything suspicious, and identify machines that needed patching. I used SQL against two tables &mdash; <code>log_in_attempts</code> and <code>employees</code> &mdash; to isolate exactly what each task needed. Six real query patterns I wrote:</p>
+
+      <ol class="clean" style="margin:0">
+        <li><b>After-hours failed logins</b> &mdash; every failed sign-in after 18:00 needed a closer look.
+          <pre style="margin:8px 0"><span class="c">-- Failed logins after business hours</span>
+SELECT * FROM log_in_attempts
+WHERE  login_time &gt; '18:00' AND success = FALSE;</pre>
+          <b>Why:</b> a possible security incident happened outside business hours &mdash; combine two conditions with <code>AND</code> so both must hold.
+        </li>
+
+        <li><b>Login attempts on specific dates</b> &mdash; suspicious activity flagged on 2022-05-09, so any logins from that day or the day before are of interest.
+          <pre style="margin:8px 0"><span class="c">-- Logins on 2022-05-08 OR 2022-05-09</span>
+SELECT * FROM log_in_attempts
+WHERE  login_date = '2022-05-09' OR login_date = '2022-05-08';</pre>
+          <b>Why <code>OR</code>:</b> a row matching either date should return.
+        </li>
+
+        <li><b>Login attempts outside Mexico</b> &mdash; foreign logins stand out as likely problems.
+          <pre style="margin:8px 0"><span class="c">-- Everything except Mexico (stored as MEX or MEXICO)</span>
+SELECT * FROM log_in_attempts
+WHERE  NOT country LIKE 'MEX%';</pre>
+          <b>Why <code>LIKE</code> + <code>%</code>:</b> country field stores both <code>MEX</code> and <code>MEXICO</code>; the percent-sign wildcard matches either.
+        </li>
+
+        <li><b>Machines belonging to Marketing employees in the East building</b> &mdash; needed to push an update.
+          <pre style="margin:8px 0"><span class="c">-- Marketing staff in the East building</span>
+SELECT * FROM employees
+WHERE  department = 'Marketing' AND office LIKE 'East%';</pre>
+          <b>Why both conditions:</b> AND requires <i>both</i> to hold; <code>East%</code> matches any office number in the East building.
+        </li>
+
+        <li><b>Machines belonging to Finance OR Sales employees</b> &mdash; a different update for those two departments.
+          <pre style="margin:8px 0"><span class="c">-- Finance or Sales</span>
+SELECT * FROM employees
+WHERE  department = 'Finance' OR department = 'Sales';</pre>
+          <b>Why <code>OR</code>:</b> anyone in either department qualifies.
+        </li>
+
+        <li><b>Everyone outside IT</b> &mdash; final update needed to reach non-IT staff.
+          <pre style="margin:8px 0"><span class="c">-- Everyone not in IT</span>
+SELECT * FROM employees
+WHERE  NOT department = 'Information Technology';</pre>
+          <b>Why <code>NOT</code>:</b> exclude a single department from the result set.
+        </li>
+      </ol>
+      <p style="margin-top:8px"><span class="tag-good">Summary:</span> across all six tasks I used <b>AND</b>, <b>OR</b>, <b>NOT</b>, and <b>LIKE with <code>%</code> wildcards</b> against two tables to isolate exactly what each investigation needed &mdash; the same pattern I&rsquo;d apply to any SIEM-adjacent log table.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Corrected Linux file permissions on a research team&rsquo;s project directory</h3>
+      <p><b>Scenario:</b> the research team&rsquo;s <code>projects</code> directory had permissions that didn&rsquo;t match the authorisation each item should carry. My job was to review and correct them so the team&rsquo;s system stayed secure.</p>
+
+      <p><b>Step 1 &mdash; check current file and directory details:</b></p>
+      <pre style="margin:8px 0"><span class="c"># long-format listing including hidden files</span>
+ls -la</pre>
+      <p>The output showed one directory (<code>drafts</code>), one hidden file (<code>.project_x.txt</code>, hidden because the name starts with <code>.</code>), and five project files. The <b>10-character permission string</b> in the first column encoded who could do what.</p>
+
+      <p><b>Worked example</b> &mdash; <code>project_t.txt</code> had string <code>-rw-rw-r--</code>. Leading <code>-</code> means regular file. Owner and group have read + write. Other has read only. Nobody has execute.</p>
+
+      <p><b>Step 2 &mdash; remove write access from other on <code>project_k.txt</code>:</b></p>
+      <pre style="margin:8px 0"><span class="c"># strip write from &quot;other&quot; on project_k.txt</span>
+chmod o-w project_k.txt
+ls -la</pre>
+
+      <p><b>Step 3 &mdash; archived hidden file needed read-only for user + group, nothing for other:</b></p>
+      <pre style="margin:8px 0"><span class="c"># overwrite permissions on the hidden archived file</span>
+chmod u=r,g=r .project_x.txt
+ls -la</pre>
+      <p>Overwrote existing permissions in one shot: <code>u=r</code> = user read-only, <code>g=r</code> = group read-only, everything else cleared.</p>
+
+      <p><b>Step 4 &mdash; only user <code>researcher2</code> should be able to enter the <code>drafts</code> directory:</b></p>
+      <pre style="margin:8px 0"><span class="c"># take execute permission away from group on the drafts directory</span>
+chmod g-x drafts
+ls -la</pre>
+      <p>The user <code>researcher2</code> already had execute permission, so no addition was needed. Removing the group&rsquo;s execute means only <code>researcher2</code> can descend into <code>drafts</code>.</p>
+
+      <p style="margin-top:8px"><span class="tag-good">Summary:</span> workflow is always <b>ls -la &rarr; interpret the 10-character string &rarr; chmod &rarr; ls -la again to confirm</b>. Symbolic (<code>u+x</code>, <code>o-w</code>, <code>u=r,g=r</code>) is fine for one-off changes.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confusing <code>AND</code> vs <code>OR</code></b> &mdash; a wrong operator changes an investigation completely (&ldquo;Marketing AND East building&rdquo; is a very different result from &ldquo;Marketing OR East building&rdquo;).</li>
+        <li><b>Forgetting to quote strings</b> &mdash; <code>WHERE country = MEX</code> fails; must be <code>= 'MEX'</code>.</li>
+        <li><b>Missing wildcard cases</b> &mdash; if the data has both <code>MEX</code> and <code>MEXICO</code>, an <code>=</code> match misses half; use <code>LIKE 'MEX%'</code>.</li>
+        <li><b>Running <code>rm -rf</code> as root without checking the path</b> &mdash; classic irrecoverable mistake; there is no undo in Linux.</li>
+        <li><b>Editing permissions on the wrong file / user account</b> &mdash; always <code>ls -la</code> immediately before and after the change.</li>
+        <li><b>Forgetting to use <code>sudo</code></b> for admin tasks &mdash; leads to noisy &ldquo;permission denied&rdquo; errors and time wasted.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Additional OS &amp; database concepts I know</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Bootloader</b> &mdash; the program that loads the OS kernel into memory during boot.</li>
+        <li><b>Kernel</b> &mdash; the OS core that mediates between hardware and user-space processes; manages memory, CPU scheduling, drivers, syscalls.</li>
+        <li><b>CPU (Central Processing Unit)</b> &mdash; the chip that executes instructions.</li>
+        <li><b>Peripheral devices</b> &mdash; keyboards, mice, printers, external drives, headsets. Some (USB drives) are attack surfaces in themselves.</li>
+        <li><b>Legacy operating system</b> &mdash; an old / end-of-life OS still in production. Often unpatched and disproportionately risky &mdash; should be inventoried, isolated and monitored.</li>
+        <li><b>Filesystem Hierarchy Standard (FHS)</b> &mdash; the standard that defines the Linux directory layout (<code>/etc</code>, <code>/var</code>, <code>/usr</code>, etc.). Why it matters: it lets analysts know exactly where to look on any Linux system.</li>
+        <li><b>Root directory</b> &mdash; the top of the filesystem, written as <code>/</code> on Linux. Not to be confused with the root user&rsquo;s home (<code>/root</code>).</li>
+        <li><b>Absolute path</b> &mdash; a full path starting from <code>/</code> (e.g. <code>/var/log/syslog</code>). <b>Relative path</b> &mdash; a path from the current working directory (e.g. <code>logs/syslog</code>).</li>
+        <li><b>Wildcard</b> &mdash; a symbol standing in for other characters. On the shell: <code>*</code> (any characters), <code>?</code> (single character). In SQL <code>LIKE</code>: <code>%</code> (any sequence) and <code>_</code> (single char).</li>
+        <li><b>Standard input / output / error</b> &mdash; the three default streams a process reads / writes: <code>stdin</code>, <code>stdout</code>, <code>stderr</code>. Redirected with <code>&lt;</code>, <code>&gt;</code>, <code>2&gt;</code>.</li>
+        <li><b>World-writable file</b> &mdash; a file whose permission triplet gives &ldquo;other&rdquo; write access. Almost always a mistake &mdash; anyone on the system can modify it.</li>
+        <li><b>User interface (UI)</b> &mdash; GUI vs CLI; SOC work leans CLI for scripting and reproducibility.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Regex with <code>grep</code></b> &mdash; pattern matching on logs (e.g. <code>grep -E "^ERROR|FATAL" /var/log/syslog</code>).</li>
+        <li><b>Piping SQL with Linux tools</b> &mdash; export a query result to CSV, then <code>grep</code>, <code>sort</code>, <code>uniq -c</code>, <code>awk</code> for quick pivots.</li>
+        <li><b>Bash scripting for automation</b> &mdash; wrap a repeated investigation into a script; the same discipline I apply to my Python + tshark validators.</li>
+        <li><b>Sudoers file discipline</b> &mdash; grant specific commands rather than blanket root access.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

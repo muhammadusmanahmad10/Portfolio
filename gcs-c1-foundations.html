@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations of Cybersecurity | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Foundations of Cybersecurity</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Foundations &middot; concepts I own</div>
+  <h1>Foundations of Cybersecurity</h1>
+  <p class="lede">
+    The foundational knowledge and core framework of a security analyst &mdash; including an
+    understanding of what cybersecurity truly encompasses, the day-to-day responsibilities of the
+    role, the mindset and techniques of threat actors, the CIA Triad, the eight key security domains,
+    historical cyberattacks that have shaped modern security practices, and the essential tools used
+    by security analysts. Every concept documented on this page represents the knowledge and skills
+    that I apply throughout my cybersecurity learning journey and professional development.
+  </p>
+  <div class="chips">
+    <span class="chip">CIA triad</span>
+    <span class="chip">8 security domains</span>
+    <span class="chip">NIST CSF</span>
+    <span class="chip">SIEM &middot; Splunk &middot; Chronicle</span>
+    <span class="chip">Threat actors &amp; social engineering</span>
+  </div>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>What cybersecurity actually is</h2>
+    <div class="panel">
+      <p><b>Cybersecurity</b> is the practice of ensuring <b>confidentiality, integrity and availability</b> of information by protecting networks, devices, people and data from unauthorised access or criminal exploitation.</p>
+      <p>The reason it exists is straightforward: the digital footprint of every organisation is growing &mdash; more devices, more apps, more data &mdash; and the threat surface grows with it. A single breach can cost a company millions in fines, wipe out customer trust and expose individuals to identity theft. Security teams exist to prevent that outcome and to keep the business running when things do go wrong.</p>
+      <p>The tangible consequences of a breach I think about: <b>financial loss</b>, <b>reputation damage</b>, <b>regulatory fines</b> (GDPR, HIPAA, PCI DSS), <b>operational downtime</b>, and <b>direct harm to users</b> whose personal data was exposed.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What a security analyst does day-to-day</h2>
+    <div class="panel">
+      <p>A security analyst&rsquo;s role splits cleanly into three responsibilities:</p>
+      <ol class="clean">
+        <li><b>Protect computer and network systems</b> &mdash; monitor the internal network; be first to respond when a threat is detected; contribute to <b>penetration testing / ethical hacking</b> so weaknesses are found before attackers find them.</li>
+        <li><b>Proactively prevent threats</b> &mdash; work with IT to install prevention software; support product security so it&rsquo;s built in from the start, not bolted on.</li>
+        <li><b>Conduct periodic security audits</b> &mdash; review records, activities and documents; e.g. verify that confidential info like individual passwords isn&rsquo;t exposed to every employee.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>Internal vs external threats</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>External threat</b> &mdash; someone outside the organisation trying to access private info, networks or devices.</li>
+        <li><b>Internal threat</b> &mdash; a current / former employee, external vendor or trusted partner. Can be <b>accidental</b> (an employee clicks a phishing link) or <b>intentional</b> (an insider steals data or abuses systems for personal use).</li>
+        <li><b>Threat actor</b> &mdash; any person or group presenting a security risk to computers, applications, networks or data.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why security matters to the business</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Regulatory compliance</b> &mdash; meets HIPAA, GDPR, PCI DSS to avoid fines / audits and uphold the ethical duty to users.</li>
+        <li><b>Business continuity</b> &mdash; keeps operations running even during / after an incident (e.g. after a data breach).</li>
+        <li><b>Cost reduction</b> &mdash; fewer recovery costs, less operational downtime, avoided fines.</li>
+        <li><b>Brand trust</b> &mdash; a breach damages the brand; strong security preserves customer trust and revenue.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>PII, SPII and identity theft</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>PII (Personally Identifiable Information)</b> &mdash; anything used to infer someone&rsquo;s identity: full name, DOB, physical address, phone, email, IP address.</li>
+        <li><b>SPII (Sensitive PII)</b> &mdash; a stricter subset: SSN, financial and medical info, biometric data (facial recognition). SPII loss is significantly more damaging than PII loss.</li>
+        <li><b>Identity theft</b> &mdash; stealing personal information to commit fraud while impersonating the victim. Primarily financial in motive; when PII/SPII is compromised, identity theft is the first concern.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skills I bring into this role</h2>
+    <div class="panel">
+      <p><b>Transferable skills I already own from my RAN engineering background:</b></p>
+      <ul class="clean">
+        <li><b>Communication</b> &mdash; I already explain complex protocol issues to non-technical stakeholders (project managers, leadership) and write incident-style reports; the same discipline applies to describing a threat, risk or vulnerability to a business audience.</li>
+        <li><b>Collaboration</b> &mdash; I work across teams (macro / core / vendor / IT) on live production issues; a SOC works exactly the same way with engineers, forensic investigators and IR leads.</li>
+        <li><b>Analytical thinking</b> &mdash; my day job is separating symptom from root cause in a packet trace; that&rsquo;s the same discipline behind alert triage.</li>
+        <li><b>Problem-solving</b> &mdash; identify, diagnose, remediate is my normal cycle; in security the cycle is detect &rarr; contain &rarr; eradicate &rarr; recover.</li>
+        <li><b>Time management</b> &mdash; on-air outages train you to prioritise by business impact under pressure; SOC alert queues need the same discipline.</li>
+        <li><b>Growth mindset</b> &mdash; telecom evolves fast and I keep up with each release; security demands the same.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Technical skills I own or am actively building:</b></p>
+      <ul class="clean">
+        <li><b>Packet analysis with Wireshark / tshark</b> &mdash; I do this daily on 5G signalling (NGAP, NAS, SIP, RTP, GTP-U, IPsec/IKEv2). The same tool is what an analyst uses to inspect suspicious network traffic.</li>
+        <li><b>Python and SQL</b> &mdash; I write Python + tshark validators for RAN protocol correlation; I can adapt that to log parsing, allow-list updates, alert triaging.</li>
+        <li><b>SIEM concepts</b> &mdash; I understand how to collect, correlate and alert on log events (Splunk, Chronicle) &mdash; the same log-correlation mindset I already apply to RAN OAM counters.</li>
+        <li><b>Intrusion detection concepts</b> &mdash; understand signature-based IDS/IPS behaviour and how it feeds a SIEM.</li>
+        <li><b>Threat-landscape awareness</b> &mdash; stay current on threat-actor tactics, malware families and social-engineering trends.</li>
+        <li><b>Incident-response discipline</b> &mdash; follow playbooks, escalate at the correct severity, document actions cleanly.</li>
+      </ul>
+    </div>
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Entry-level SOC analyst responsibilities</h3>
+      <ul class="clean" style="margin:0">
+        <li><b>Day-to-day I would take on:</b> monitor security logs in a SIEM, investigate alerts, analyse dashboards for anomalies, assist incident response, run basic threat analysis, and use Python to automate repetitive tasks (log parsing, alert triaging).</li>
+        <li><b>How SIEM protects data:</b> it correlates events across sources, surfaces unauthorised access, unusual login patterns and malware behaviour, and assigns severity so I can prioritise and respond before the impact spreads.</li>
+        <li><b>Proactive value:</b> monitoring + analysis + automation together shrink <b>mean-time-to-detect</b> and <b>mean-time-to-respond</b>, and free me to hunt for what the automated rules missed.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>The historical attacks that shaped the field</h2>
+
+    <div class="panel case">
+      <h3 style="margin-top:0">Brain virus (1986)</h3>
+      <p><b>Origin:</b> Alvi brothers, Pakistan. Written to track illegal copies of medical software.</p>
+      <p><b>How it spread:</b> once a pirated copy was used, the virus infected that computer. Any disk inserted into the machine was infected. Every new machine that used one of those disks was infected. Global spread within months.</p>
+      <p><b>Legacy:</b> not destructive to data / hardware, but slowed productivity everywhere. First major example that the industry needed a plan to maintain <i>security and productivity together</i>. It also cemented the term <b>computer virus</b> in the industry &mdash; malicious code written to interfere with computer operations and cause damage to data / software. The modern umbrella term is <b>malware</b>.</p>
+    </div>
+
+    <div class="panel case" style="margin-top:14px">
+      <h3 style="margin-top:0">Morris worm (1988)</h3>
+      <p><b>Origin:</b> Robert Morris, meant to measure the size of the internet by crawling and installing itself on each machine to count it.</p>
+      <p><b>What went wrong:</b> the program didn&rsquo;t track which machines it had already infected, so it re-installed itself repeatedly until machines ran out of memory and crashed.</p>
+      <p><b>Impact:</b> ~6,000 computers (about 10% of the internet at the time), millions of dollars in damages.</p>
+      <p><b>Legacy:</b> <b>Computer Emergency Response Teams (CERTs / CSIRTs)</b> were formed after the Morris worm to coordinate incident response. They still exist today with expanded scope.</p>
+    </div>
+
+    <div class="panel case" style="margin-top:14px">
+      <h3 style="margin-top:0">LoveLetter / ILOVEYOU (2000)</h3>
+      <p><b>Origin:</b> Onel De Guzman, designed to steal internet login credentials.</p>
+      <p><b>How it worked:</b> victim received an email with subject &ldquo;I Love You&rdquo; and an attachment &ldquo;Love Letter For You&rdquo;. Opening the attachment ran malware that scanned the victim&rsquo;s address book, auto-sent itself to every contact, and installed a program to harvest credentials.</p>
+      <p><b>Impact:</b> ~45 million machines globally, ~$10 billion in damages.</p>
+      <p><b>Legacy:</b> the first prominent example of <b>social engineering</b> &mdash; a manipulation technique that exploits human error to gain private information, access or valuables. Every SOC today runs regular internal training on how to spot <b>phishing</b>.</p>
+    </div>
+
+    <div class="panel case" style="margin-top:14px">
+      <h3 style="margin-top:0">Equifax breach (2017)</h3>
+      <p><b>What happened:</b> attackers infiltrated credit-reporting agency Equifax; 143 million customer records stolen (~40% of all Americans). Records included SSNs, DOB, driver&rsquo;s licence numbers, home addresses, credit-card numbers.</p>
+      <p><b>Root cause:</b> not one bug &mdash; several known, unpatched vulnerabilities that Equifax had failed to remediate in the months before the breach.</p>
+      <p><b>Legacy:</b> $575M+ settlement with the US government. Alerted every company to the real financial cost of skipping preventative security.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Attack taxonomy I know</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Phishing family (social engineering)</h3>
+      <ul class="clean">
+        <li><b>Business Email Compromise (BEC)</b> &mdash; attacker impersonates a known source to make a legitimate-looking request for financial gain.</li>
+        <li><b>Spear phishing</b> &mdash; targets a specific user or group; email looks like it&rsquo;s from a trusted source.</li>
+        <li><b>Whaling</b> &mdash; spear phishing aimed at executives.</li>
+        <li><b>Vishing</b> &mdash; voice-based (phone) exploitation.</li>
+        <li><b>Smishing</b> &mdash; SMS-based.</li>
+        <li><b>Social-media phishing</b> &mdash; attacker researches the target on social media before the attack.</li>
+        <li><b>Watering-hole attack</b> &mdash; compromise a website a target group frequents.</li>
+        <li><b>USB baiting</b> &mdash; leave a malicious USB stick for someone to plug in.</li>
+        <li><b>Physical social engineering</b> &mdash; impersonate an employee / vendor to enter a physical location.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Malware family</h3>
+      <ul class="clean">
+        <li><b>Virus</b> &mdash; needs a user to execute; attaches itself to files.</li>
+        <li><b>Worm</b> &mdash; self-replicates and spreads across the network without user action.</li>
+        <li><b>Ransomware</b> &mdash; encrypts data, demands payment for the decryption key.</li>
+        <li><b>Spyware</b> &mdash; collects private data without consent; steals emails, texts, voice / image recordings, location.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Other attack classes</h3>
+      <ul class="clean">
+        <li><b>Password attacks</b> &mdash; brute force, rainbow tables. Sit under communication-and-network security.</li>
+        <li><b>Physical attacks</b> &mdash; malicious USB cable / flash drive, card cloning &amp; skimming. Sit under asset security.</li>
+        <li><b>Adversarial AI</b> &mdash; manipulates AI/ML technology to run attacks more efficiently.</li>
+        <li><b>Supply-chain attack</b> &mdash; targets systems, apps, hardware or software to find where malware can be deployed. Costly because it affects multiple orgs through a single third-party breach.</li>
+        <li><b>Cryptographic attacks</b> &mdash; birthday, collision, downgrade.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Why social engineering keeps working &mdash; the seven principles</h3>
+      <ol class="clean">
+        <li><b>Authority</b> &mdash; impersonate someone with power; people obey authority.</li>
+        <li><b>Intimidation</b> &mdash; bullying / persuasion to force compliance.</li>
+        <li><b>Consensus / social proof</b> &mdash; &ldquo;other employees already gave me this access.&rdquo;</li>
+        <li><b>Scarcity</b> &mdash; goods / services are limited &mdash; act now.</li>
+        <li><b>Familiarity</b> &mdash; fake emotional connection.</li>
+        <li><b>Trust</b> &mdash; long-term emotional relationship they later exploit.</li>
+        <li><b>Urgency</b> &mdash; force a fast decision without thinking.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Threat actors and hacker types</h2>
+    <div class="panel">
+      <p><b>Threat-actor categories:</b></p>
+      <ul class="clean">
+        <li><b>Advanced Persistent Threat (APT)</b> &mdash; highly skilled (often nation-state); researches targets, gains persistent unauthorised access, stays undetected a long time. Goals: damage critical infrastructure (power grid), steal IP (trade secrets, patents).</li>
+        <li><b>Insider threat</b> &mdash; abuses authorised access for sabotage, corruption, espionage or unauthorised data access / leaks.</li>
+        <li><b>Hacktivist</b> &mdash; political agenda; uses digital tech for demonstrations, propaganda, social-change campaigns, fame.</li>
+      </ul>
+      <p style="margin-top:8px"><b>Hacker categories</b> (defined by legality / intent):</p>
+      <ul class="clean">
+        <li><b>Authorised (ethical)</b> &mdash; follow a code of ethics and the law. Perform organisational risk evaluations.</li>
+        <li><b>Semi-authorised (researchers)</b> &mdash; find vulnerabilities but don&rsquo;t exploit them.</li>
+        <li><b>Unauthorised (unethical)</b> &mdash; break the law; collect and sell confidential data for financial gain.</li>
+        <li>Contracted hackers may work legal or illegal jobs for pay; vigilantes protect from unethical hackers.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>The eight security domains</h2>
+    <div class="panel">
+      <ol class="clean">
+        <li><b>Security &amp; Risk Management</b> &mdash; goals, risk mitigation, compliance, business continuity, law. Example: adjust HIPAA-related policies when a regulation changes.</li>
+        <li><b>Asset Security</b> &mdash; secure digital and physical assets; storage, maintenance, retention and destruction of data. Example: oversee hard-drive destruction so confidential data isn&rsquo;t recoverable.</li>
+        <li><b>Security Architecture &amp; Engineering</b> &mdash; optimise data security via tools, systems and processes. Example: configure a firewall correctly.</li>
+        <li><b>Communication &amp; Network Security</b> &mdash; manage and secure physical networks and wireless comms. Example: build a network policy preventing employees from connecting to unsecured Wi-Fi hotspots.</li>
+        <li><b>Identity &amp; Access Management (IAM)</b> &mdash; validate identities, control access to physical (offices) and logical (networks / apps) assets. Example: set up employee keycard access.</li>
+        <li><b>Security Assessment &amp; Testing</b> &mdash; control testing, data analysis, audits. Example: audit user permissions so only the correct staff can view payroll.</li>
+        <li><b>Security Operations</b> &mdash; investigations and preventative measures. Example: respond to an unknown device appearing on the internal network.</li>
+        <li><b>Software Development Security</b> &mdash; secure coding practices in the SDLC. Example: advise on password policies for a new mobile app.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Frameworks, controls and the CIA triad</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Frameworks vs controls</h3>
+      <p><b>Security frameworks</b> &mdash; guidelines for building plans to mitigate risk and threats to data and privacy. <b>Security controls</b> &mdash; specific safeguards that reduce specific risks. Frameworks are the plan; controls are the safeguards that implement the plan. Together they define an organisation&rsquo;s <b>security posture</b>: its ability to defend critical assets and react to change.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">CIA triad &mdash; the foundational model</h3>
+      <ul class="clean">
+        <li><b>Confidentiality</b> &mdash; only authorised parties can read the data. Enforced by encryption, access control, authentication, MFA.</li>
+        <li><b>Integrity</b> &mdash; data has not been tampered with. Enforced by hashing (SHA-256), digital signatures, checksums, HMAC.</li>
+        <li><b>Availability</b> &mdash; the data / service is reachable when needed. Enforced by backups, redundancy, load balancing, DDoS protection.</li>
+      </ul>
+      <p>Every control ultimately maps to one or more legs of the triad.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">NIST Cybersecurity Framework (CSF) &mdash; five continuous functions</h3>
+      <ol class="clean">
+        <li><b>Identify</b> &mdash; understand assets, data, business context and cybersecurity risk.</li>
+        <li><b>Protect</b> &mdash; safeguards to deliver critical services (IAM, awareness, data security).</li>
+        <li><b>Detect</b> &mdash; identify occurrence of a cybersecurity event (monitoring, detection).</li>
+        <li><b>Respond</b> &mdash; act on a detected event (planning, comms, analysis, mitigation, improvements).</li>
+        <li><b>Recover</b> &mdash; restore services impaired by the event (recovery planning, improvements, comms).</li>
+      </ol>
+      <p><b>NIST SP 800-53</b> is the companion catalogue of the actual security and privacy controls used to implement the CSF.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">OWASP secure-design principles</h3>
+      <ol class="clean">
+        <li><b>Minimise the attack surface</b>.</li>
+        <li><b>Defence in depth</b> &mdash; layered controls; no single failure breaches the asset.</li>
+        <li><b>Principle of least privilege</b> &mdash; every account has only the access it needs.</li>
+        <li><b>Secure defaults</b> &mdash; new systems / accounts start locked down.</li>
+        <li><b>Fix security issues correctly</b> &mdash; root cause, not symptom.</li>
+        <li><b>Separation of duties</b> &mdash; no single person can complete a sensitive action alone.</li>
+        <li><b>Avoid security by obscurity</b>.</li>
+        <li><b>Keep security simple</b>.</li>
+      </ol>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Security ethics</h3>
+      <p><b>Security ethics</b> are the guidelines for making appropriate decisions as a security professional. Because analysts often have greater access to sensitive data than most employees, that access has to be treated as a privilege and used strictly within policy.</p>
+      <ul class="clean">
+        <li><b>Confidentiality</b> &mdash; don&rsquo;t share confidential info you have access to; even doing a favour by giving a colleague out-of-process access is an ethical violation.</li>
+        <li><b>Privacy protections</b> &mdash; safeguard PII / SPII / PHI; only access personal data through approved channels, never via personal request.</li>
+        <li><b>Laws</b> &mdash; comply with GDPR, HIPAA, PCI DSS, CCPA and local regulations; act honestly, responsibly, transparently and based on evidence.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Counterattacks &mdash; what&rsquo;s legal and what isn&rsquo;t</h3>
+      <p>In the US, launching a counterattack on a threat actor is <b>illegal</b> for civilians under laws like the <b>Computer Fraud and Abuse Act (1986)</b> and the <b>Cybersecurity Information Sharing Act (2015)</b>. Only approved federal / military personnel are permitted to counterattack. Everyone else can only <b>defend</b>. A civilian counterattack is treated as vigilantism (a <b>vigilante</b> is someone outside law enforcement who tries to stop a crime on their own) and can escalate the incident or trigger international consequences if the attacker is state-sponsored.</p>
+      <p>Internationally, the <b>International Court of Justice (ICJ)</b> allows a counterattack only if all four conditions are met: it affects only the party that attacked first, it is a direct communication asking the attacker to stop, it does not escalate, and its effects can be reversed. In practice organisations almost never counterattack &mdash; the conditions are hard to prove and the downside is severe.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Logs and SIEM &mdash; how to read what&rsquo;s happening</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Logs &mdash; the raw material of every investigation</h3>
+      <p>A <b>log</b> is a record of events that occur within an organisation&rsquo;s systems and networks. Three common sources:</p>
+      <ul class="clean">
+        <li><b>Firewall logs</b> &mdash; attempted / established inbound connections from the internet + outbound requests from inside.</li>
+        <li><b>Network logs</b> &mdash; devices entering / leaving the network + connections between devices and services.</li>
+        <li><b>Server logs</b> &mdash; events on services: websites, email, file shares. Includes login, password and username requests.</li>
+      </ul>
+      <p>SIEMs sit on top of these logs. Without good log collection, no detection works.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">SIEM (Security Information and Event Management)</h3>
+      <p><b>What it is:</b> an application that collects and analyses log data to monitor critical activities. Provides real-time visibility, event monitoring / analysis, automated alerts, centralised log storage.</p>
+      <p><b>How it works:</b> collect logs from every source &rarr; normalise to a common format &rarr; correlate against detection rules &rarr; generate alerts on suspicious patterns &rarr; surface on dashboards.</p>
+      <p><b>Deployment models I understand:</b> self-hosted (org runs its own infra &mdash; best when data must stay on-prem), cloud-hosted (vendor manages infra), cloud-native (designed for cloud from the ground up), and hybrid combinations.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">SIEM tools I&rsquo;m familiar with</h3>
+      <ul class="clean">
+        <li><b>Splunk Enterprise</b> &mdash; self-hosted; retain / analyse / search log data with real-time alerts.</li>
+        <li><b>Splunk Cloud</b> &mdash; cloud-hosted; ideal for cloud / hybrid environments.</li>
+        <li><b>Google Chronicle</b> &mdash; cloud-native; log monitoring, data analysis and data collection at scale.</li>
+      </ul>
+      <p><b>Splunk dashboards:</b></p>
+      <ul class="clean">
+        <li><b>Security posture</b> &mdash; last 24 h of notable events; SOC real-time monitoring.</li>
+        <li><b>Executive summary</b> &mdash; high-level view for stakeholders; incident + trend summaries over time.</li>
+        <li><b>Incident review</b> &mdash; visual timeline leading to an incident; highlights high-risk items.</li>
+        <li><b>Risk analysis</b> &mdash; risk per object (user, computer, IP); helps prioritise mitigation.</li>
+      </ul>
+      <p><b>Chronicle dashboards:</b></p>
+      <ul class="clean">
+        <li><b>Enterprise insights</b> &mdash; recent alerts; suspicious domain IOCs with confidence + severity scores.</li>
+        <li><b>Data ingestion &amp; health</b> &mdash; event-log volume, log sources, ingestion success rate.</li>
+        <li><b>IOC matches</b> &mdash; top threats over time by domain, IP, device IOC.</li>
+        <li><b>Main dashboard</b> &mdash; timeline of security events (e.g. spike in failed logins).</li>
+        <li><b>Rule detections</b> &mdash; incidents by severity + occurrence; per-rule alert lists.</li>
+        <li><b>User sign-in overview</b> &mdash; access behaviour; find users signing in from multiple locations at once.</li>
+      </ul>
+      <p><b>Open-source vs proprietary:</b> open-source (Linux, Suricata) is free, user-customisable and community-audited &mdash; often more secure because eyes are on the source. Proprietary (Splunk, Chronicle) is vendor-managed with paid support and updates.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">SOAR &mdash; where SIEM is heading</h3>
+      <p><b>SOAR (Security Orchestration, Automation and Response)</b> is a collection of apps, tools and workflows that use automation to respond to security events. It handles routine incidents without waiting for a human, so analysts can focus on the complex, uncommon ones that can&rsquo;t be automated.</p>
+    </div>
+
+    <div class="panel case good" style="margin-top:14px">
+      <h3 style="margin-top:0">Practical exercise I completed &mdash; SIEM tabletop for an e-commerce outage</h3>
+      <p>Ran through this scenario with an AI-guided coach: the company&rsquo;s main e-commerce site went offline, customers can&rsquo;t access it.</p>
+      <ol class="clean" style="margin:0">
+        <li><b>What we&rsquo;re protecting:</b> customer PII / SPII, transaction integrity, availability.</li>
+        <li><b>Log sources I&rsquo;d consult and why:</b>
+          <ul class="clean" style="margin-top:6px">
+            <li><b>Server logs</b> &mdash; exact time site went down + error that caused the crash.</li>
+            <li><b>Firewall logs</b> &mdash; whether the attack was external or internal + who tried.</li>
+            <li><b>Network-device logs</b> &mdash; which IPs were involved in the suspicious traffic.</li>
+            <li><b>Application logs</b> &mdash; what actions were performed / attempted inside the app.</li>
+          </ul>
+        </li>
+        <li><b>How SIEM helps here:</b> centralised log management (all sources searchable in one place); automated alerting (rule fires on failed-login spike from a suspicious IP); event correlation (link a blocked firewall attempt to an app error at the same moment); dashboards + severity to prioritise.</li>
+        <li><b>Proactive value:</b> continuous monitoring + rule tuning + severity prioritisation + alert correlation lets me catch incidents before they escalate.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Confusing threat / risk / vulnerability</b> &mdash; a threat is an event that <i>can</i> harm; a vulnerability is a weakness; a risk is what emerges when a threat can exploit a vulnerability. Both must be present for a risk to exist.</li>
+        <li><b>Confusing PII with SPII</b> &mdash; SPII (SSN, financial, medical, biometric) is a stricter subset with much larger blast radius if lost.</li>
+        <li><b>Virus vs worm</b> &mdash; a virus needs a user to execute it; a worm self-replicates across the network without user action.</li>
+        <li><b>Reading dashboards without checking the underlying logs</b> &mdash; dashboards are visualisations; if the raw logs aren&rsquo;t ingested correctly, the dashboard lies.</li>
+        <li><b>Treating internal threats as always malicious</b> &mdash; many are accidental (a click on a phishing link) and are best addressed with training, not blame.</li>
+        <li><b>Chasing every alert equally</b> &mdash; without severity + business-impact prioritisation, the SOC drowns.</li>
+        <li><b>Assuming the technical control alone is enough</b> &mdash; administrative controls (policy, training) and physical controls (locks, CCTV) are equally part of the answer.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Additional foundational concepts I know</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Open-source intelligence (OSINT)</b> &mdash; intelligence gathered from publicly available sources (social media, DNS records, public documents). A core research skill for both attackers and defenders.</li>
+        <li><b>Bug bounty</b> &mdash; a paid program run by an org to reward researchers for responsibly disclosing vulnerabilities.</li>
+        <li><b>Security governance</b> &mdash; leadership practices that support, define and direct the security effort across the organisation.</li>
+        <li><b>Non-repudiation</b> &mdash; assurance that someone cannot deny having sent or signed a message. Enforced through digital signatures + logging.</li>
+        <li><b>Data at rest / in transit / in use</b> &mdash; the three states data lives in; each needs its own controls (disk encryption; TLS / IPsec / SSH; memory protection).</li>
+        <li><b>Confidential vs internal vs public data</b> &mdash; classification levels that determine handling requirements.</li>
+        <li><b>Security mindset</b> &mdash; the habit of asking &ldquo;how could this be abused?&rdquo; when reviewing any design, feature or configuration.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Defence in depth</b> &mdash; layer controls (perimeter firewall + segmentation + EDR + MFA + monitoring) so a single failure never exposes the asset.</li>
+        <li><b>Zero trust</b> &mdash; never trust, always verify; every request is authenticated, authorised and encrypted regardless of network location.</li>
+        <li><b>Cyber Kill Chain (Lockheed Martin)</b> &mdash; reconnaissance &rarr; weaponisation &rarr; delivery &rarr; exploitation &rarr; installation &rarr; command &amp; control &rarr; actions on objectives. Useful when explaining <i>where</i> in the attack lifecycle a detection fired.</li>
+        <li><b>MITRE ATT&amp;CK</b> &mdash; a matrix of adversary <i>tactics</i> (why they act) and <i>techniques</i> (how they act) that gives the SOC a common vocabulary for observed behaviour.</li>
+        <li><b>Blue team vs red team vs purple team</b> &mdash; blue defends, red simulates the adversary, purple is the collaboration that keeps both sides sharp.</li>
+        <li><b>Incident lifecycle (NIST SP 800-61):</b> Preparation &rarr; Detection &amp; analysis &rarr; Containment &rarr; Eradication &amp; recovery &rarr; Post-incident activity &rarr; Coordination.</li>
+        <li><b>IoCs vs IoAs</b> &mdash; IoCs (indicators of compromise) are observable artifacts (IP, hash, domain, file); IoAs (indicators of attack) are behaviours that suggest an attacker is present (e.g. bulk failed logins, LOLBins spawning shells).</li>
+        <li><b>MTTD and MTTR</b> &mdash; mean-time-to-detect and mean-time-to-respond are the two KPIs a SOC lives or dies by.</li>
+        <li><b>Threat intelligence</b> &mdash; contextual info about adversaries (TTPs, IoCs) that feeds detection rules; sources include ISACs, vendor feeds, open-source.</li>
+        <li><b>Where cybersecurity meets my telecom background</b> &mdash; the 5G stack already uses cybersecurity primitives daily: IPsec / IKEv2 for the security gateway, PKI / certificate enrollment (TS 33.310), SUPI/SUCI concealment, 5G-AKA mutual authentication, and the HMAC-based key hierarchy (K &rarr; K_AUSF &rarr; K_SEAF &rarr; K_AMF &rarr; K_gNB). I&rsquo;m already fluent at the boundary between RAN and security.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>

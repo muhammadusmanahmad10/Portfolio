@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automate Cybersecurity Tasks with Python | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; <a href="google-cybersecurity.html">Google Cybersecurity Certificate</a> &nbsp;/&nbsp; Automate Cybersecurity Tasks with Python</span>
+    <span class="name">Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+  </div>
+
+  <div class="eyebrow">Python for security automation &middot; concepts I own</div>
+  <h1>Automate Cybersecurity Tasks with Python</h1>
+  <p class="lede">
+    Python at the level a security analyst actually needs it &mdash; not to build web apps, but to
+    automate the repetitive parts of the job: parsing logs, cleaning input, checking against
+    an allow list, updating a file. My RAN background already uses Python + tshark for protocol
+    validation; on this page I walk through the allow-list
+    algorithm I built during the course.
+  </p>
+  <div class="chips">
+    <span class="chip">Python 3</span>
+    <span class="chip">Regex &middot; file I/O</span>
+    <span class="chip">Strings &middot; lists &middot; loops</span>
+    <span class="chip">Log parsing</span>
+    <span class="chip">Allow-list automation</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Why Python matters in security</h2>
+    <div class="panel">
+      <p>Python is the SOC&rsquo;s Swiss-army knife: readable syntax, cross-platform, an enormous standard library, and near-universal presence in modern security tooling. Analysts use it to automate the tasks that would otherwise burn hours a day &mdash; log parsing, IoC lookups, allow/deny-list updates, ticket enrichment, quick data-cleaning.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Core language I use</h2>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Types and variables</h3>
+      <ul class="clean">
+        <li><b>Data types</b>: <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code>.</li>
+        <li><b>Variables</b> &mdash; assignment, type conversion (<code>int()</code>, <code>str()</code>, <code>float()</code>), comments with <code>#</code>.</li>
+        <li><b>Output</b>: <code>print()</code>, string concatenation with <code>+</code>, f-strings <code>f"..."</code>.</li>
+        <li><b>Input</b> from the user with <code>input()</code>.</li>
+        <li><b>Arithmetic</b>: <code>+ - * / // % **</code>. <b>String ops</b>: <code>+</code>, <code>*</code>, membership <code>in</code>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Control flow</h3>
+      <ul class="clean">
+        <li><b>Conditionals</b>: <code>if</code> / <code>elif</code> / <code>else</code>. Operators <code>== != &lt; &lt;= &gt; &gt;=</code>. Logical <code>and</code>, <code>or</code>, <code>not</code>.</li>
+        <li><b>Loops</b>: <code>for x in iterable:</code>, <code>while cond:</code>. <code>range(start, stop, step)</code>, <code>break</code>, <code>continue</code>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Functions and scope</h3>
+      <ul class="clean">
+        <li><code>def name(args): ... return value</code>. Positional / keyword args, default values, docstrings.</li>
+        <li><b>Scope</b> &mdash; local vs global; parameter passing by reference for mutable objects (lists, dicts) and by value for immutable (int, str, tuple).</li>
+        <li><b>Built-ins I use often</b>: <code>len()</code>, <code>type()</code>, <code>int()</code>, <code>str()</code>, <code>input()</code>, <code>sum()</code>, <code>min()</code>, <code>max()</code>, <code>sorted()</code>, <code>enumerate()</code>.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Strings and lists</h3>
+      <ul class="clean">
+        <li><b>Strings</b>: indexing (<code>s[0]</code>), slicing (<code>s[2:5]</code>), <code>len()</code>, <code>.lower()</code>, <code>.upper()</code>, <code>.strip()</code>, <code>.split(sep)</code>, <code>.replace(a,b)</code>, <code>.startswith()</code>, <code>.endswith()</code>, <code>.find()</code>, membership with <code>in</code>.</li>
+        <li><b>Lists</b>: creation <code>[1,2,3]</code>, indexing, slicing, <code>.append()</code>, <code>.remove()</code>, <code>.insert()</code>, <code>.pop()</code>, <code>.sort()</code>, <code>.reverse()</code>.</li>
+        <li><b>Dicts</b> (<code>{key: value}</code>) and <b>tuples</b> (<code>(a,b,c)</code>) at working level.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Regular expressions (regex)</h3>
+      <ul class="clean">
+        <li><code>re.search(pattern, string)</code> &mdash; find first match.</li>
+        <li><code>re.findall(pattern, string)</code> &mdash; return all matches.</li>
+        <li><code>re.sub(pattern, replacement, string)</code>.</li>
+        <li>Common patterns: <code>\d</code> (digit), <code>\w</code> (word char), <code>\s</code> (whitespace), <code>.</code>, <code>*</code>, <code>+</code>, <code>?</code>, character classes <code>[abc]</code>, groups <code>(...)</code>.</li>
+        <li>Analyst use: extract IPs, timestamps, usernames from log lines.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">File I/O</h3>
+      <p>The <code>open()</code> function; modes <code>"r"</code> (read), <code>"w"</code> (write / overwrite), <code>"a"</code> (append). Always use the <code>with</code> statement so the file is safely closed:</p>
+      <pre style="margin:8px 0"><span class="k">with</span> <span class="fn">open</span>(<span class="s">"file.txt"</span>, <span class="s">"r"</span>) <span class="k">as</span> f:
+    data = f.read()</pre>
+      <p>Read patterns: <code>.read()</code> (whole file to string), <code>.readlines()</code> (list of lines), or iterate line-by-line. Write: <code>.write()</code>.</p>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Errors and debugging</h3>
+      <ul class="clean">
+        <li>Common exceptions: <code>SyntaxError</code>, <code>NameError</code>, <code>TypeError</code>, <code>ValueError</code>, <code>IndexError</code>, <code>KeyError</code>, <code>FileNotFoundError</code>.</li>
+        <li>Add <code>print()</code> statements to trace execution when needed.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Deliverable I produced</h2>
+
+    <div class="panel case good">
+      <h3 style="margin-top:0">Update an allow list of IP addresses &mdash; end-to-end algorithm</h3>
+      <p><b>Scenario:</b> at the organisation, access to restricted content is controlled with an <b>allow list of IP addresses</b> in <code>allow_list.txt</code>. A separate <code>remove_list</code> variable identifies IPs that should no longer have access. I built a Python algorithm that automates updating the allow list.</p>
+
+      <p><b>Step 1 &mdash; open the file:</b></p>
+      <pre style="margin:8px 0">import_file = <span class="s">"allow_list.txt"</span>
+
+<span class="k">with</span> <span class="fn">open</span>(import_file, <span class="s">"r"</span>) <span class="k">as</span> file:
+    <span class="c"># file operations go here</span>
+    ...</pre>
+      <p><b>Why:</b> the <b>with statement</b> paired with <code>open()</code> guarantees the file is closed on exit, even if an error occurs. The <code>"r"</code> argument opens the file for reading. The <b>as</b> keyword binds the file object to a variable (<code>file</code>) for the block.</p>
+
+      <p><b>Step 2 &mdash; read the file into a string:</b></p>
+      <pre style="margin:8px 0"><span class="k">with</span> <span class="fn">open</span>(import_file, <span class="s">"r"</span>) <span class="k">as</span> file:
+    ip_addresses = file.read()</pre>
+      <p><b>Why:</b> <code>.read()</code> converts the file&rsquo;s contents into a single string I can then split.</p>
+
+      <p><b>Step 3 &mdash; convert the string into a list:</b></p>
+      <pre style="margin:8px 0">ip_addresses = ip_addresses.split()</pre>
+      <p><b>Why:</b> <code>.split()</code> with no argument splits on whitespace, turning the whitespace-separated string of IPs into a Python list &mdash; a list is what I can call <code>.remove()</code> on later.</p>
+
+      <p><b>Step 4 &mdash; iterate through the remove list and remove matches from the allow list:</b></p>
+      <pre style="margin:8px 0"><span class="k">for</span> element <span class="k">in</span> remove_list:
+    <span class="k">if</span> element <span class="k">in</span> ip_addresses:
+        ip_addresses.remove(element)</pre>
+      <p><b>Why:</b> the <code>for</code> loop walks every IP in <code>remove_list</code>. The inner <code>if</code> is important &mdash; calling <code>.remove()</code> on a value not in the list raises <b>ValueError</b>. Checking membership with <code>in</code> avoids that.</p>
+
+      <p><b>Step 5 &mdash; convert the list back to a string and overwrite the file:</b></p>
+      <pre style="margin:8px 0">ip_addresses = <span class="s">"\n"</span>.join(ip_addresses)
+
+<span class="k">with</span> <span class="fn">open</span>(import_file, <span class="s">"w"</span>) <span class="k">as</span> file:
+    file.write(ip_addresses)</pre>
+      <p><b>Why:</b> <code>.join()</code> combines all list items into a single string using the separator (I used <code>"\n"</code> so each IP lands on its own line). Opening the file with <code>"w"</code> mode writes over its contents. <code>.write()</code> replaces the file with the updated string. The restricted content is no longer reachable by the removed IPs.</p>
+
+      <p><b>Complete function I wrote:</b></p>
+      <pre style="margin:8px 0"><span class="k">def</span> <span class="fn">update_allow_list</span>(import_file, remove_list):
+    <span class="k">with</span> <span class="fn">open</span>(import_file, <span class="s">"r"</span>) <span class="k">as</span> file:
+        ip_addresses = file.read()
+
+    ip_addresses = ip_addresses.split()
+
+    <span class="k">for</span> element <span class="k">in</span> remove_list:
+        <span class="k">if</span> element <span class="k">in</span> ip_addresses:
+            ip_addresses.remove(element)
+
+    ip_addresses = <span class="s">"\n"</span>.join(ip_addresses)
+
+    <span class="k">with</span> <span class="fn">open</span>(import_file, <span class="s">"w"</span>) <span class="k">as</span> file:
+        file.write(ip_addresses)</pre>
+
+      <p><span class="tag-good">Concept:</span> this same pattern (read &rarr; parse &rarr; mutate &rarr; write back) is exactly how SOCs update firewall block-lists, DNS deny-lists, EDR exclusion lists.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Calling <code>.remove()</code> on a missing element</b> &mdash; raises <b>ValueError</b>; always guard with <code>if x in list:</code> first.</li>
+        <li><b>Forgetting the <code>with</code> statement</b> &mdash; the file stays open, holding a handle; on many hosts you&rsquo;ll eventually hit a file-descriptor limit or corrupt the file.</li>
+        <li><b>Using <code>"w"</code> instead of <code>"a"</code></b> &mdash; <code>"w"</code> overwrites; if I meant to append and used <code>"w"</code>, I&rsquo;ve just erased the file.</li>
+        <li><b>Reading a huge file with <code>.read()</code></b> &mdash; loads the whole thing into memory. For big logs iterate line-by-line instead.</li>
+        <li><b>String vs list confusion</b> &mdash; <code>.remove()</code> works on lists but not strings; if I skip the <code>.split()</code> step the algorithm breaks silently.</li>
+        <li><b>Not writing docstrings</b> &mdash; a script another analyst has to inherit is only as useful as its documentation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Additional Python concepts I know</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Package manager (<code>pip</code>)</b> &mdash; installs external packages: <code>pip install requests</code> for HTTP calls, <code>pip install pyshark</code> for packet analysis.</li>
+        <li><b>Python Standard Library</b> &mdash; the modules that ship with Python itself: <code>os</code>, <code>sys</code>, <code>re</code>, <code>datetime</code>, <code>ipaddress</code>, <code>hashlib</code>, <code>csv</code>, <code>json</code>, <code>subprocess</code>. Enough on its own for most SOC scripts.</li>
+        <li><b>PEP 8 style guide</b> &mdash; the community style guide for Python code (four-space indentation, snake_case names, 79-char lines). Following it makes scripts easier for other analysts to read and audit.</li>
+        <li><b>Indentation</b> &mdash; Python uses whitespace to define code blocks. Inconsistent indentation raises <code>IndentationError</code>. Four spaces per level is the convention.</li>
+        <li><b>Built-in function</b> &mdash; a function that comes with Python and needs no import (e.g. <code>len()</code>, <code>print()</code>, <code>type()</code>). <b>User-defined function</b> &mdash; a function I define with <code>def</code>.</li>
+        <li><b>Argument (Python)</b> &mdash; a value passed into a function call. <b>Options</b> &mdash; command-line flags (e.g. <code>--input file.txt</code>) parsed with <code>argparse</code>.</li>
+        <li><b>Return statement</b> &mdash; the <code>return</code> keyword hands a value back out of a function to the caller.</li>
+        <li><b>Global variable</b> vs <b>local variable</b> &mdash; global lives at module scope; local lives only inside its function. Rely on locals; globals make code harder to reason about.</li>
+        <li><b>Loop condition</b> &mdash; the expression a <code>while</code> loop checks each iteration; false ends the loop. <b>Loop variable</b> &mdash; the name that takes each value in a <code>for</code> loop.</li>
+        <li><b>Iterative statement</b> &mdash; another name for a loop (<code>for</code> / <code>while</code>).</li>
+        <li><b>Conditional statement</b> &mdash; <code>if</code> / <code>elif</code> / <code>else</code>.</li>
+        <li><b>Data types by name</b> &mdash; <b>integer</b> (whole number), <b>float</b> (decimal), <b>string</b> (text), <b>Boolean</b> (True / False), <b>list</b>, <b>tuple</b>, <b>dictionary</b> (key-value pairs), <b>set</b>, <b>date and time</b> (via <code>datetime</code>).</li>
+        <li><b>Key-value pair</b> &mdash; the element of a dictionary; <code>{"user": "alice", "ip": "10.0.0.5"}</code>.</li>
+        <li><b>Bracket notation</b> &mdash; using <code>[]</code> to index lists (<code>lst[0]</code>) or access dict values (<code>d["key"]</code>).</li>
+        <li><b>Substring</b> &mdash; a slice of a string, obtained via <code>s[a:b]</code>.</li>
+        <li><b>List concatenation</b> &mdash; joining lists with <code>+</code> or <code>extend()</code>.</li>
+        <li><b>Immutable vs mutable</b> &mdash; strings and tuples are immutable (can&rsquo;t be changed in place); lists and dicts are mutable. Matters when passing to functions.</li>
+        <li><b>Automation</b> &mdash; the reason security teams use Python at all &mdash; codify a repeatable process so it doesn&rsquo;t need a human every time.</li>
+      </ul>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">Error / exception types I recognise</h3>
+      <ul class="clean">
+        <li><b>SyntaxError</b> &mdash; the code doesn&rsquo;t parse (missing colon, unbalanced parenthesis).</li>
+        <li><b>NameError</b> &mdash; using a variable that isn&rsquo;t defined.</li>
+        <li><b>TypeError</b> &mdash; operation on wrong type (adding a string to an int).</li>
+        <li><b>ValueError</b> &mdash; right type but wrong value (<code>int("abc")</code>).</li>
+        <li><b>IndexError</b> &mdash; list index out of range.</li>
+        <li><b>KeyError</b> &mdash; missing dictionary key.</li>
+        <li><b>FileNotFoundError</b> &mdash; the file path doesn&rsquo;t exist.</li>
+        <li><b>Logic error</b> &mdash; the code runs cleanly but produces the wrong result; caught only by testing / review, not by the interpreter.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Broader concepts I&rsquo;m fluent in that expand on the above</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Log parsing patterns</b> &mdash; open the file, iterate line-by-line, split or regex-match, filter by keyword / IP / user, write results. Same shape as the allow-list algorithm above.</li>
+        <li><b>Modules I&rsquo;d reach for in a SOC context</b> &mdash; <code>re</code>, <code>datetime</code>, <code>ipaddress</code>, <code>hashlib</code>, <code>csv</code>, <code>json</code>, <code>subprocess</code>, <code>requests</code> (for threat-intel API calls).</li>
+        <li><b>My RAN cross-over</b> &mdash; I already write Python + tshark validators for 5G signalling (registration/PDU, Xn HO, NG HO, WPS-user). The pattern of &ldquo;filter a pcap, correlate messages per UE, emit CSV + PASS/FAIL&rdquo; is the exact same shape as parsing security logs and emitting alerts.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; CyberSecurity Engineer</span>
+    <span><a href="google-cybersecurity.html">&larr; Back to certificate hub</a></span>
+  </div>
+
+</div>
+</body>
+</html>
