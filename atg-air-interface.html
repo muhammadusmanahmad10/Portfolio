@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATG Air Interface | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">800 MHz LTE Air-to-Ground &middot; concept I own</div>
+  <h1>ATG Air Interface &mdash; 800 MHz LTE Air-to-Ground</h1>
+  <p class="lede">
+    Gogo's 800 MHz Air-to-Ground (ATG) network is an LTE air interface built for a single purpose
+    &mdash; delivering in-flight connectivity from sparse ground base-stations up to aircraft at
+    cruise altitude. The combination of <b>narrowband spectrum</b>, a <b>single-frequency network</b>,
+    <b>long inter-site distance</b> and an <b>aircraft-shaped UE</b> makes almost every classic LTE
+    tuning instinct point the wrong way. This page captures how I think about the ATG air interface
+    and why terrestrial LTE habits have to be re-grounded before using them here.
+  </p>
+  <div class="chips">
+    <span class="chip">800 MHz narrowband</span>
+    <span class="chip">Single-frequency network</span>
+    <span class="chip">100+ km inter-site</span>
+    <span class="chip">Low grazing angles &middot; high Doppler</span>
+    <span class="chip">Aircraft-as-UE</span>
+  </div>
+
+  <section>
+    <h2>Band &amp; bandwidth &mdash; narrow on purpose</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Downlink:</b> ~9 RB near 850 MHz (approximately 1.6 MHz of usable bandwidth).</li>
+        <li><b>Uplink:</b> ~6 RB near 895 MHz (~1.08 MHz).</li>
+        <li><b>Frequency band:</b> ~800 MHz &mdash; sub-GHz for long range and favourable Fresnel-zone clearance
+          from ground sites to aircraft at cruise altitude.</li>
+        <li><b>Spectrum is scarce</b> &mdash; every RB counts. A single bad PCI plan or a single cell leaking
+          interference at the edge visibly degrades throughput for every aircraft in the region.</li>
+      </ul>
+      <p>Because the carrier is narrow, the usual &ldquo;throw more bandwidth&rdquo; tool from terrestrial LTE
+        is off the table. Headroom comes from <b>cleaner SINR</b>, <b>better mobility</b>, and <b>better MIMO rank</b>,
+        not from a wider carrier.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Single-frequency network &mdash; every cell is a co-channel interferer</h2>
+    <div class="panel">
+      <p>Terrestrial LTE/5G networks typically reuse multiple carriers across neighbouring cells. On ATG,
+        there is only one carrier, so every neighbour cell is co-channel. At cruise altitude an aircraft sees
+        many ground cells simultaneously; whichever one isn&rsquo;t serving the UE is contributing to the
+        interference floor.</p>
+      <ul class="clean">
+        <li><b>Interference-limited by design.</b> SINR, not RSRP, is the operating quantity.</li>
+        <li><b>Dominance matters.</b> With no frequency separation, the only way to get clean SINR is for
+          one cell to dominate the others at the aircraft&rsquo;s position (through geometry, tilt and power).</li>
+        <li><b>PCI collisions bite harder.</b> On 2-TX cells, PCI mod-3 collisions put CRS and PSS on the same
+          REs, corrupting channel estimation for both cells. See <a href="pci-planning-atg.html">PCI Planning for 2-TX ATG Cells</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Sparse long-range ground sites</h2>
+    <div class="panel">
+      <p>Ground base-stations on the ATG network are spaced 100+ km apart to blanket the continental US with
+        a few hundred sites. That gives several consequences the air interface is designed around:</p>
+      <ul class="clean">
+        <li><b>Low grazing angles.</b> From an aircraft at cruise the elevation angle to a neighbour cell can
+          be a few degrees &mdash; shallow enough that polarization, pointing and aircraft attitude all matter.</li>
+        <li><b>Long propagation delays.</b> PRACH preamble format, Ncs / zero-correlation-zone and cell-radius
+          parameters are all stretched beyond terrestrial defaults.
+          See <a href="prach-atg.html">UL Random Access &amp; PRACH for ATG</a>.</li>
+        <li><b>Few, large cells.</b> Handover rate is lower than terrestrial but each handover is a bigger deal
+          &mdash; the UE has fewer fallbacks if one goes wrong.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>High Doppler &amp; aircraft dynamics</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Doppler shifts at ~800 MHz</b> are moderate but non-trivial at 500+ kt groundspeed; PRACH
+          requires the <b>high-speed / restricted set</b> to avoid inter-preamble correlation.</li>
+        <li><b>Roll, bank and pitch rotate the aircraft antennas.</b> Signal on the vertical and horizontal
+          polarizations swaps rapidly during banking, producing transient fades that look like short
+          SINR dips to the diagnostic chain.</li>
+        <li><b>Altitude changes LOS geometry.</b> On climb and descent the serving-cell set rotates faster
+          than cruise &mdash; mobility tuning has to accommodate both regimes.</li>
+      </ul>
+      <p>See <a href="flight-test-analysis.html">Flight-Test Analysis &amp; Radio-vs-Attitude Behaviour</a> for how these
+        effects actually appear on the diagnostic chain.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The aircraft as the UE</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Aircard = the LTE modem</b> mounted on the aircraft, with external fuselage antennas.
+          The aircraft, not a handset, is what the eNB sees.</li>
+        <li>Load-change testing therefore has two surfaces: the <b>ground-station (GBSS) software load</b>
+          and the <b>aircard firmware load</b>. Both get validated in the lab before a flight.
+          See <a href="atg-lab-methodology.html">ATG Lab Validation Methodology</a>.</li>
+        <li><b>One UE, one flight, many cells.</b> A single flight exercises dozens of handovers across the
+          network &mdash; each one is a data point about network behaviour, not just UE behaviour.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why terrestrial habits don&rsquo;t transfer cleanly</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>&ldquo;Just add a carrier&rdquo;</b> &mdash; there isn&rsquo;t one. SINR, not BW, is the lever.</li>
+      <li><b>&ldquo;Long TTT damps ping-pong&rdquo;</b> &mdash; it also lets the serving cell die before the handover fires.
+        See <a href="high-mobility-ho-tuning.html">High-Mobility Handover Tuning</a>.</li>
+      <li><b>&ldquo;PCI mod-6 is enough&rdquo;</b> &mdash; on 2-TX cells, mod-3 drives CRS/PSS collisions and matters more than mod-6 for interference.</li>
+      <li><b>&ldquo;RSRP is king&rdquo;</b> &mdash; on a single-frequency network with no dominance, RSRP is often the same across cells
+        and SINR/RSRQ do the discriminating.</li>
+      <li><b>&ldquo;TCP will fill the pipe&rdquo;</b> &mdash; with long RTT and a modest MCS budget, TCP window / RTT caps throughput well below radio capability unless the server is close or the window is tuned.
+        See <a href="throughput-radio-transport.html">TCP/UDP Throughput &amp; the Radio-Transport Boundary</a>.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RLF &amp; Recovery on ATG (cause codes) | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">RLF cause codes &middot; concept I own</div>
+  <h1>RLF &amp; Recovery on ATG &mdash; Cause Codes</h1>
+  <p class="lede">
+    Not every radio-link failure is the same. On ATG I separate RLFs by the <b>cause code</b> that ended the
+    RRC connection &mdash; T310 (DL out-of-sync), RLC max-ReTx (UL data unrecoverable), MAC-RA (UL access
+    broken) &mdash; because each one points at a different part of the network and a different fix. Recovery
+    is governed by T311; a re-establishment that doesn&rsquo;t complete before T311 expiry forces a full
+    connection setup, which breaks the user session visibly.
+  </p>
+  <div class="chips">
+    <span class="chip">T310 (DL out-of-sync)</span>
+    <span class="chip">RLC max-ReTx (UL data)</span>
+    <span class="chip">MAC-RA (UL access)</span>
+    <span class="chip">T311 re-establishment</span>
+    <span class="chip">SIB-acquisition failure</span>
+  </div>
+
+  <section>
+    <h2>The three RLF causes &mdash; what they mean</h2>
+    <div class="panel">
+      <table class="cmp">
+        <tr><th>Cause code</th><th>Where it fires</th><th>What&rsquo;s actually broken</th></tr>
+        <tr>
+          <td><b>T310 expiry</b></td>
+          <td>UE DL side (physical-layer problem indications accumulate)</td>
+          <td>UE can no longer decode the serving cell reliably &mdash; DL out-of-sync. Typical of coverage/fade
+            or a mod-3-conflicted neighbour corrupting CRS.</td>
+        </tr>
+        <tr>
+          <td><b>RLC max-ReTx</b></td>
+          <td>UE UL (data-plane AM RLC)</td>
+          <td>A UL RLC PDU can&rsquo;t be acknowledged even after maxRetxThreshold retransmissions. The UL path
+            has died while a UL data session is in progress.</td>
+        </tr>
+        <tr>
+          <td><b>MAC-RA failure</b></td>
+          <td>UE MAC during random access</td>
+          <td>The UE tried to re-establish contact with the cell via PRACH and failed to complete random
+            access within the configured attempts. Points at PRACH config or UL geometry.</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Recovery flow &mdash; T311 is the stopwatch</h2>
+    <div class="panel">
+      <ol class="clean">
+        <li>RLF fires &mdash; one of T310 / RLC max-ReTx / MAC-RA ends the current RRC connection.</li>
+        <li>UE starts <b>T311</b> and begins a <b>cell-search</b> for a suitable candidate.</li>
+        <li>If the UE finds a cell and reads its SIBs, it issues <b>RRCReestablishmentRequest</b> (Msg3 on PRACH).</li>
+        <li>If the eNB has the UE&rsquo;s context, it responds with <b>RRCReestablishment</b>.</li>
+        <li>UE sends <b>RRCReestablishmentComplete</b>; session resumes with cause code logged.</li>
+      </ol>
+      <p>If T311 expires before step 4 lands, the UE drops to <b>RRC_IDLE</b> and must do a full connection
+        setup (and NAS re-attach on EPS) &mdash; which is <i>visible to the user</i>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why re-establishment often fails on ATG</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>No dominance at cell-edge.</b> If the UE is in a no-dominance zone when RLF fires, every
+          candidate cell has similar RSRP and SINR &mdash; no cell is &ldquo;strong enough&rdquo; to complete
+          random access reliably.</li>
+        <li><b>SIB-acquisition failure</b> on the candidate cell &mdash; usually because the target is
+          mod-3-conflicted with the serving cell (<a href="pci-planning-atg.html">PCI Planning</a>) and
+          SIB decoding fails.</li>
+        <li><b>Msg3 PRACH failure</b> &mdash; UE&rsquo;s PRACH preamble doesn&rsquo;t reach / isn&rsquo;t detected
+          on the candidate cell. See <a href="prach-atg.html">UL Random Access &amp; PRACH for ATG</a>.</li>
+        <li><b>eNB no longer has context</b> &mdash; the UE context was freed; eNB answers with reject
+          and UE falls back to full setup.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reading the RLF story in a flight log</h2>
+    <div class="panel"><ol class="clean">
+      <li>Mark the RLF timestamp.</li>
+      <li>Walk back 10&ndash;15 s on the SINR and MCS trace. What was the trajectory?</li>
+      <li>Was there an A3 trigger that failed to complete? If yes, check TTT and hysteresis.</li>
+      <li>Check the cause code &mdash; T310 vs RLC vs MAC-RA tells you which part of the chain actually died.</li>
+      <li>Walk forward: did T311 catch the recovery, or did the UE drop to full setup?</li>
+      <li>Overlay attitude (bank angle) &mdash; is this a geometry event or a network event?</li>
+    </ol></div>
+  </section>
+
+  <section>
+    <h2>Mitigations and where each attaches</h2>
+    <div class="panel">
+      <table class="cmp">
+        <tr><th>Observed pattern</th><th>Typical fix</th></tr>
+        <tr><td>T310 cluster during banking / cell-edge</td><td>Shorten TTT, add hysteresis &mdash; see <a href="high-mobility-ho-tuning.html">High-Mobility Handover Tuning</a>.</td></tr>
+        <tr><td>RLC max-ReTx during UL upload</td><td>Check UL SINR, UL power headroom, scheduler aggression on UL in low-headroom.</td></tr>
+        <tr><td>MAC-RA during recovery</td><td>Check PRACH format / Ncs / cell-radius / high-speed set &mdash; see <a href="prach-atg.html">PRACH for ATG</a>.</td></tr>
+        <tr><td>Re-establishment failing with SIB-acquisition fail on target</td><td>Check target cell PCI mod-3 vs serving &mdash; see <a href="pci-planning-atg.html">PCI Planning</a>.</td></tr>
+        <tr><td>No-dominance coverage hole</td><td>Tilt / power to establish cell dominance; mod-3 re-plan.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Lumping all RLFs together.</b> Cause code is the diagnostic key.</li>
+      <li><b>Chasing a T310 cluster as a mobility bug</b> when it&rsquo;s actually a PCI mod-3 collision on
+        the serving cell.</li>
+      <li><b>Chasing an RLC max-ReTx as a UL-radio problem</b> when it&rsquo;s a UL scheduler keeping MCS
+        too high in low-headroom.</li>
+      <li><b>Missing the T311 expiry</b> &mdash; counting re-establishment-failure and full-setup-fallback
+        separately matters for the user-impact story.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

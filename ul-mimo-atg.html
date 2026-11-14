@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UL MIMO on ATG (DCI Format 4, Rank &amp; Codewords) | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">UL MIMO &middot; concept I own</div>
+  <h1>UL MIMO on ATG &mdash; DCI Format 4, Rank &amp; Codewords</h1>
+  <p class="lede">
+    ATG uplink is 2T aircard &rarr; 2R eNB, so UL spatial multiplexing is on the table. Reading the uplink
+    trace cleanly requires separating <b>codewords</b> from <b>layers</b>, understanding the
+    <b>per-codeword MCS gap</b>, and knowing when a high cw1 BLER at low MCS is a healthy &ldquo;probing&rdquo;
+    behaviour rather than a fault.
+  </p>
+  <div class="chips">
+    <span class="chip">DCI format 4 (UL spatial mux)</span>
+    <span class="chip">1C1L vs 2C2L</span>
+    <span class="chip">cw0 / cw1</span>
+    <span class="chip">Per-CW MCS gap</span>
+    <span class="chip">PUSCH power split</span>
+  </div>
+
+  <section>
+    <h2>Codewords vs layers &mdash; the one place to not get sloppy</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Codeword (CW)</b> &mdash; an independently-coded transport block with its own MCS and HARQ process.</li>
+      <li><b>Layer</b> &mdash; a spatial stream carried on the air. A codeword is mapped to one or more layers.</li>
+      <li>Common UL configurations on 2x2:
+        <ul class="clean" style="margin-top:4px">
+          <li><b>1C1L (1 codeword, 1 layer)</b> &mdash; rank-1; single codeword mapped to one layer. The baseline.</li>
+          <li><b>2C2L (2 codewords, 2 layers)</b> &mdash; rank-2 spatial mux; each CW independently coded and
+            mapped to its own layer. Doubles peak UL throughput when SINR and channel conditioning allow.</li>
+        </ul>
+      </li>
+      <li><b>cw0</b> and <b>cw1</b> &mdash; the two independently-coded transport blocks in 2C2L.
+        Each has its own MCS, its own HARQ ACK/NACK, its own BLER.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>DCI format 4 &mdash; the UL spatial-multiplex grant</h2>
+    <div class="panel">
+      <p>DCI format 4 is the LTE UL grant that enables UL spatial multiplexing. Key fields to read in the trace:</p>
+      <ul class="clean">
+        <li><b>RB allocation</b> for the PUSCH.</li>
+        <li><b>MCS and NDI</b> per codeword &mdash; two sets.</li>
+        <li><b>Precoding information</b> (TPMI) &mdash; which precoder the eNB wants the UE to apply.</li>
+        <li><b>Number of layers</b> &mdash; implied by the CW-to-layer mapping and TPMI.</li>
+        <li><b>TPC command</b> for PUSCH power.</li>
+      </ul>
+      <p>1C1L grants use the simpler UL DCI formats (0/0A/0B); 2C2L uses format 4.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The per-codeword MCS gap</h2>
+    <div class="panel">
+      <p>In 2C2L, the eNB rarely assigns the same MCS to both codewords. The gap exists for several reasons:</p>
+      <ul class="clean">
+        <li><b>Spatial eigenvalues differ.</b> The two layers see different effective SNRs after precoding.</li>
+        <li><b>OLLA per-CW adjustment.</b> Outer-loop link adaptation adjusts each CW&rsquo;s MCS independently
+          based on its own BLER target.</li>
+        <li><b>Probing.</b> The eNB deliberately pushes cw1 to a slightly higher MCS than its past success
+          suggests to test whether the channel can support more &mdash; a controlled BLER on cw1 is expected.</li>
+      </ul>
+      <p>So a trace showing cw0 clean at MCS 18 and cw1 with 20&ndash;30% BLER at MCS 10 is often the <b>probing
+        behaviour working as designed</b> &mdash; not a scheduler fault.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>PUSCH power split in UL spatial mux</h2>
+    <div class="panel"><ul class="clean">
+      <li>Total PUSCH power is split across the transmitting antennas; the per-antenna PA headroom determines
+        the achievable per-layer SNR at the eNB.</li>
+      <li>On 2C2L the UE uses both PAs &mdash; so maximum PUSCH power <i>per antenna</i> is lower than in 1C1L
+        where all power goes to a single antenna.</li>
+      <li><b>Consequence:</b> at cell-edge where power is the limit, 1C1L can actually deliver more usable
+        throughput than 2C2L, because it concentrates energy on a single layer.</li>
+      <li>The scheduler should drop rank to 1 near cell-edge &mdash; if it doesn&rsquo;t, you&rsquo;ll see a
+        sustained cw1 fail with very high BLER and no OLLA recovery.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Rank adaptation on a flight trace</h2>
+    <div class="panel"><ul class="clean">
+      <li>Rank is a function of channel conditioning (eigenvalue spread) and SINR.</li>
+      <li>On ATG the common rank-collapse triggers are: bank-angle polarization rotation, a cell-edge SINR
+        collapse, or receiver-chain asymmetry on one branch.</li>
+      <li>In the trace, rank is usually visible as a step signal; MCS/throughput should follow the step.</li>
+      <li>If rank stays at 2 while SINR is collapsing, you&rsquo;ve likely got a rank-adaptation delay bug or
+        an overly-sticky OLLA.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>What a &ldquo;healthy&rdquo; UL trace looks like</h2>
+    <div class="panel"><ul class="clean">
+      <li>cw0 BLER near the OLLA target (~10% initial, &lt;1% residual after HARQ).</li>
+      <li>cw1 BLER a bit higher &mdash; typical of probing.</li>
+      <li>MCS per CW adjusting smoothly, not oscillating.</li>
+      <li>Rank stepping down cleanly at cell-edge, up cleanly when conditions return.</li>
+      <li>No sustained MAC-RA attempts in the trace (no UL access problem).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Conflating codewords and layers.</b> &ldquo;High cw1 BLER&rdquo; is not &ldquo;high layer-2 BLER&rdquo; &mdash;
+        the mapping matters.</li>
+      <li><b>Reading cw1 probing BLER as a fault.</b> It&rsquo;s expected when cw0 is healthy.</li>
+      <li><b>Expecting 2C2L throughput at cell-edge.</b> Power-limited rank-2 under-performs rank-1.</li>
+      <li><b>Missing a stuck-rank-2 scheduler bug</b> &mdash; verify rank follows SINR, not the other way around.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

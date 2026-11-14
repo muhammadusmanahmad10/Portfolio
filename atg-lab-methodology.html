@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATG Lab Validation Methodology | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">ATG lab validation &middot; methodology I own</div>
+  <h1>ATG Lab Validation Methodology</h1>
+  <p class="lede">
+    Every new ATG ground-station (GBSS) software load and every new aircard firmware load passes through
+    the lab before it&rsquo;s flown. The lab is the gate between the vendor&rsquo;s release and the live
+    network &mdash; so the lab plan has to cover the three things that will decide whether the load survives
+    on a real flight: <b>call setup</b>, <b>TCP/UDP throughput</b>, and <b>handover</b>. This page captures
+    the methodology I use to make the lab a credible proxy for the air.
+  </p>
+  <div class="chips">
+    <span class="chip">GBSS software load</span>
+    <span class="chip">Aircard firmware load</span>
+    <span class="chip">Call setup &middot; throughput &middot; HO</span>
+    <span class="chip">Lab-as-gate</span>
+    <span class="chip">Reproducible pass/fail</span>
+  </div>
+
+  <section>
+    <h2>What gets validated per load</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>GBSS software load</b> &mdash; the ground base-station software. Changes can affect scheduler,
+        mobility, PRACH handling, OAM counters, and interactions with the aircard.</li>
+      <li><b>Aircard firmware load</b> &mdash; the aircraft-side LTE modem firmware. Changes can affect
+        measurement reporting, link adaptation behaviour, PRACH preamble selection and power control.</li>
+      <li>Every new load of either kind passes the same lab plan before field release.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>The three canonical lab surfaces</h2>
+    <div class="panel">
+      <h3 style="margin-top:0">1. Call setup</h3>
+      <ul class="clean">
+        <li>Initial attach &mdash; from power-on to RRC_CONNECTED + default bearer.</li>
+        <li>Reconnection after RLF &mdash; re-establishment via T311.</li>
+        <li>Tracking Area Update, Paging-response, Idle-to-Connected.</li>
+        <li>Pass/fail on setup time, setup failure, and MAC-RA count during the run.</li>
+      </ul>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">2. Throughput (TCP &amp; UDP, DL &amp; UL)</h3>
+      <ul class="clean">
+        <li>UDP at target rates &mdash; proves radio can carry; isolates from transport.</li>
+        <li>TCP single-stream &mdash; the user-visible case; must be qualified against BDP.</li>
+        <li>TCP parallel streams &mdash; confirms air-interface capacity when single-stream is BDP-bound.</li>
+        <li>Pass/fail on throughput floor and ceiling, BLER, scheduler fairness across multiple UEs.</li>
+        <li>See <a href="throughput-radio-transport.html">Radio-Transport Boundary</a> for how we decide the test is actually measuring the radio.</li>
+      </ul>
+    </div>
+    <div class="panel" style="margin-top:14px">
+      <h3 style="margin-top:0">3. Handover</h3>
+      <ul class="clean">
+        <li>Intra-eNB and inter-eNB HO in both directions.</li>
+        <li>HO under interference injection via Spirent / Vertex (RoT moderate &amp; heavy).</li>
+        <li>HO under channel emulation that mimics aircraft banking fades.</li>
+        <li>Pass/fail on HO success %, HO interrupt time, re-establishment-failure on failed HO.</li>
+        <li>Mobility parameters (TTT, hysteresis) swept where applicable to confirm the load behaves across the operator&rsquo;s range &mdash; see <a href="high-mobility-ho-tuning.html">High-Mobility Handover Tuning</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Making the lab a credible proxy for the air</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Channel emulation</b> &mdash; Spirent / Vertex reproduce long-delay propagation (100 km round trip),
+        aircraft-speed Doppler, and interference from co-channel neighbours.</li>
+      <li><b>PRACH config</b> &mdash; use the actual field PRACH parameters (format 3, large Ncs, HighSpeedFlag on).
+        See <a href="prach-atg.html">PRACH for ATG</a>.</li>
+      <li><b>PCI collision cases</b> &mdash; deliberately set two emulated cells to mod-3 conflict to validate behaviour
+        &mdash; see <a href="pci-planning-atg.html">PCI Planning</a>.</li>
+      <li><b>RoT discipline</b> &mdash; verified via UL RSSI counter on the eNB; a test case is only meaningful if the
+        injected interference actually landed (<a href="lab-interference-rot.html">Lab Interference &amp; RoT</a>).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Test-case discipline &mdash; pass/fail must be reproducible</h2>
+    <div class="panel"><ul class="clean">
+      <li>Each test case documents: pre-conditions, exact configuration, execution steps, measurements collected, and pass/fail criteria.</li>
+      <li>Pass/fail criteria are <i>numeric and unambiguous</i> &mdash; e.g. &ldquo;HO success rate &ge; 99.5% over 100 attempts, interrupt time &le; 150 ms 95th-percentile.&rdquo;</li>
+      <li>Every pass/fail decision is backed by a log capture that another engineer can re-analyse.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Gate-to-flight checklist</h2>
+    <div class="panel"><ol class="clean">
+      <li>All P0 test cases passed.</li>
+      <li>All P1 test cases passed or waived with vendor sign-off.</li>
+      <li>Any P2 open items tracked in <a href="vendor-defect-tracking.html">Vendor Defect Tracking</a>.</li>
+      <li>Baseline KPIs from the previous load captured for comparison.</li>
+      <li>Load-note written: what changed, what we tested, what we expect on the flight.</li>
+    </ol></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Lab-only &ldquo;good enough&rdquo;</b> &mdash; a load that passes benign lab conditions can still break under aircraft Doppler. Always include Doppler + long-RTT emulation.</li>
+      <li><b>Pass/fail that depends on opinion</b> &mdash; numeric criteria only, documented up front.</li>
+      <li><b>Skipping the baseline comparison</b> &mdash; without last-load numbers, a regression can hide in plain sight.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

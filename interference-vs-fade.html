@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interference vs Fade Diagnosis | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Interference-vs-fade diagnostics &middot; concept I own</div>
+  <h1>Interference vs Fade Diagnosis &mdash; RSRP / RSSI / RSRQ / SINR</h1>
+  <p class="lede">
+    A dropping SINR can be any of four very different things: a <b>coverage/fade</b> problem, an
+    <b>interference</b> problem, a <b>receiver / noise-floor</b> problem, or a <b>channel-conditioning</b>
+    problem (correlation / rank collapse). Each demands a different fix. The way to separate them is to
+    read RSRP, RSSI, RSRQ and SINR as a <i>pattern</i>, not as individual values &mdash; and to remember
+    the identity <code>RSRQ = N &middot; RSRP / RSSI</code>.
+  </p>
+  <div class="chips">
+    <span class="chip">RSRP (signal)</span>
+    <span class="chip">RSSI (total band)</span>
+    <span class="chip">RSRQ = N·RSRP/RSSI</span>
+    <span class="chip">SINR (operating)</span>
+    <span class="chip">CRS-domain interference</span>
+  </div>
+
+  <section>
+    <h2>The four definitions, in one place</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>RSRP</b> &mdash; Reference-Signal Received Power. Per-RE power of the serving cell&rsquo;s CRS,
+        averaged over the band. Measures <i>our</i> signal.</li>
+      <li><b>RSSI</b> &mdash; wideband Received Signal Strength Indicator. Total power in the measurement band
+        including serving, neighbours and noise.</li>
+      <li><b>RSRQ</b> &mdash; <code>N &middot; RSRP / RSSI</code> where N is the number of PRBs in the measurement
+        band. Rises when more of the band is &ldquo;ours&rdquo;; falls when the band is full of other stuff.</li>
+      <li><b>SINR</b> &mdash; Signal-to-Interference-plus-Noise Ratio. The quantity the eNB&rsquo;s link-adaptation
+        actually tracks and the one that sets MCS/Rank.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>The four failure modes &mdash; separated by pattern</h2>
+    <div class="panel">
+      <table class="cmp">
+        <tr><th>Mode</th><th>RSRP</th><th>RSSI</th><th>RSRQ</th><th>SINR</th><th>What&rsquo;s happening</th></tr>
+        <tr>
+          <td><b>Coverage / fade</b></td>
+          <td>Falls</td>
+          <td>Falls (tracks RSRP)</td>
+          <td>Roughly stable</td>
+          <td>Roughly stable then falls at noise floor</td>
+          <td>Signal and total band shrink together &mdash; path loss or body/attitude fade.</td>
+        </tr>
+        <tr>
+          <td><b>Interference-limited</b></td>
+          <td>Stable</td>
+          <td>Rises</td>
+          <td>Falls (RSRP ÷ bigger RSSI)</td>
+          <td>Falls</td>
+          <td>Another cell is punching into the band &mdash; our signal is still there, but the band is noisier.</td>
+        </tr>
+        <tr>
+          <td><b>Receiver noise / desense</b></td>
+          <td>Stable (equal on both branches)</td>
+          <td>Equal</td>
+          <td>Equal</td>
+          <td>One branch deficit, ~5 dB</td>
+          <td>One RX chain has elevated noise floor &mdash; RSRP matches but MIMO-rank-2 can&rsquo;t hold.</td>
+        </tr>
+        <tr>
+          <td><b>Channel conditioning / correlation</b></td>
+          <td>Stable</td>
+          <td>Stable</td>
+          <td>Stable</td>
+          <td>Stable but rank drops</td>
+          <td>Antennas de-correlate &mdash; the eigen-channel loses rank even though SINR is fine.</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>CRS-domain interference &mdash; the one that only RSRQ reveals</h2>
+    <div class="panel">
+      <p>If a neighbour cell is idle (no PDSCH traffic) but still transmitting CRS, it doesn&rsquo;t show up
+        on RSSI much (no data power), but it <b>does</b> interfere on CRS REs &mdash; and CRS is what RSRP
+        and channel estimation ride on. The signature:</p>
+      <ul class="clean">
+        <li><b>RSRP stable, RSSI stable, RSRQ depressed, SINR depressed on PDSCH</b> &mdash; especially when
+          the neighbour has the same PCI mod-3 (see <a href="pci-planning-atg.html">PCI Planning</a>).</li>
+        <li>Terrestrial drive-test tools often miss this because they log RSSI in a high-traffic hour and
+          the band looks busy for many reasons. On ATG&rsquo;s SFN, mod-3 PCI conflicts are the typical cause.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Internal vs external interference</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Internal</b> &mdash; another cell on the same operator, same carrier. Shows up on one or two specific
+          geographic zones that correspond to pairs of cells. Fixable by PCI re-plan, tilt, power or frame offset.</li>
+        <li><b>External</b> &mdash; an emitter from outside the network (another service, PIM, repeater). Shows
+          up broadly or on specific sub-bands. Online vs offline FFT scan is the standard separator: see
+          <a href="rf-optimization.html">RF Optimization &amp; KPIs</a>.</li>
+        <li><b>Receiver-side</b> &mdash; symmetric-RSRP but asymmetric-SINR across branches. Points to the
+          radio chain (LNA / filter / cable / connector) on one branch. Bench NF/sensitivity test.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Diagnostic reading order I always use</h2>
+    <div class="panel"><ol class="clean">
+      <li>Look at RSRP first &mdash; is it stable or falling?</li>
+      <li>Look at RSSI next &mdash; does it track RSRP, rise against it, or sit flat?</li>
+      <li>Compute RSRQ from the identity and sanity-check the measurement.</li>
+      <li>Compare SINR per branch (V and H) &mdash; symmetric or deficit?</li>
+      <li>Check rank/PMI to separate channel-conditioning from everything else.</li>
+      <li>Only then open the scheduler / OLLA / DCI traces. Most SINR questions are answered before
+        step 6.</li>
+    </ol></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Treating RSRP drop as the explanation</b> &mdash; it may be coincidence; check RSSI/RSRQ.</li>
+      <li><b>Missing CRS-domain interference</b> because RSSI looks fine during a quiet-hour measurement.</li>
+      <li><b>Blaming the far cell</b> for a mod-3 conflict on the near neighbour.</li>
+      <li><b>Chasing noise-floor asymmetry on the network side</b> when the deficit is actually a bench-level
+        receiver-chain issue.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

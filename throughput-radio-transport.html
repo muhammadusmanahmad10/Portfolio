@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCP/UDP Throughput &amp; the Radio-Transport Boundary | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Radio-transport boundary &middot; concept I own</div>
+  <h1>TCP/UDP Throughput &amp; the Radio-Transport Boundary</h1>
+  <p class="lede">
+    On ATG the throughput story almost always crosses the radio-transport boundary: a UE can be well-served
+    by the radio and still have the user see low throughput, because TCP window / RTT is capping the pipe.
+    Separating a radio-limited problem from a transport-limited one is a cross-layer discipline with a few
+    sharp tells &mdash; DL buffer occupancy, MCS/BLER cross-check, and a UDP sanity test.
+  </p>
+  <div class="chips">
+    <span class="chip">Throughput ≈ window / RTT</span>
+    <span class="chip">Bandwidth-delay product (BDP)</span>
+    <span class="chip">DL buffer occupancy</span>
+    <span class="chip">MCS/BLER cross-check</span>
+    <span class="chip">UDP vs TCP</span>
+  </div>
+
+  <section>
+    <h2>The BDP formula &mdash; what TCP can actually use</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>TCP steady-state throughput ≈ <code>Window / RTT</code> (per connection, before loss).</li>
+        <li><b>BDP</b> (bandwidth-delay product) = <code>Bandwidth &times; RTT</code> &mdash; the amount of
+          in-flight data the pipe can hold. The TCP window must be &ge; BDP to keep the pipe full.</li>
+        <li>Example: 10 Mbps path with 80 ms RTT &rarr; BDP = 100 kB. A default 64 kB window underfills; you see
+          ~6.4 Mbps per connection regardless of what the radio can do.</li>
+        <li>On ATG, where DL radio can hit ~10 Mbps and RTT to a distant server is ~100 ms, <b>single-connection TCP
+          will cap well below radio capacity unless the window is tuned</b> or multiple parallel streams are used.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>DL buffer occupancy &mdash; the tell for &ldquo;radio-limited vs transport-limited&rdquo;</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>The eNB&rsquo;s DL MAC buffer holds PDCP/RLC PDUs waiting to be scheduled on PDSCH.</li>
+        <li><b>Buffer occupancy high, scheduler actively draining:</b> the radio is the bottleneck. Air interface
+          is working flat out; throughput reflects MCS &times; Rank &times; RBs.</li>
+        <li><b>Buffer occupancy low / near-zero while the user complains of low throughput:</b> the eNB is
+          starved &mdash; transport is sending too little. The radio could carry more but isn&rsquo;t being
+          asked to.</li>
+        <li><b>Rule of thumb:</b> if link occupancy (fraction of grants using the full RB allocation) is
+          &lt; 10% while the aircraft sits in healthy radio, the bottleneck is above PDCP.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>MCS/BLER cross-check &mdash; eliminate the radio explanation</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>If MCS is stable and BLER is near the OLLA target, the air interface is delivering as expected;
+          any throughput shortfall is above the radio.</li>
+        <li>If MCS is oscillating (OLLA chasing) or BLER is high, the radio is contributing to the shortfall
+          regardless of transport.</li>
+        <li>The combination <b>stable MCS + healthy BLER + low buffer occupancy</b> is the signature of a
+          transport-limited user; no amount of radio tuning will help.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>UDP vs TCP &mdash; the isolation test</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>UDP has no congestion-control feedback loop &mdash; the sender pushes at the configured rate.
+          A UDP iperf that delivers more throughput than a TCP iperf over the same path proves the air interface
+          can carry the data; the TCP shortfall is window / RTT / loss-recovery.</li>
+        <li>Conversely, if UDP also underperforms (and MCS/BLER are healthy), the issue is further downstream
+          &mdash; backhaul, SGW/PGW, or further.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case &mdash; iperf-server migration that looked like a radio regression</h2>
+    <div class="panel case good">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>After migrating the iperf server from Denver to Melbourne, DL TCP throughput dropped
+          from ~6 Mbps to ~2 Mbps. Initial suspicion: radio regression on the new load.</dd>
+        <dt>Evidence I collected</dt><dd>
+          <ul class="clean" style="margin:0">
+            <li><b>DL buffer occupancy ~5%</b> during the 2 Mbps TCP run &mdash; the eNB was being
+              fed almost nothing to send. Classic transport starvation.</li>
+            <li><b>MCS and BLER unchanged</b> between the Denver and Melbourne runs &mdash; radio delivered the
+              same quality.</li>
+            <li><b>Rank-2 (2C2L) usage reduced</b> &mdash; a secondary effect of lower offered load: the scheduler
+              had less to carry, so rank-2 engaged less often.</li>
+            <li><b>UDP iperf to Melbourne delivered ~8 Mbps</b> over the same path, same time. Air interface
+              could carry it.</li>
+          </ul>
+        </dd>
+        <dt>Root cause</dt><dd>Longer RTT to Melbourne (~160 ms vs ~40 ms to Denver). At the UE&rsquo;s default
+          TCP window, throughput was capped by window / RTT. The radio hadn&rsquo;t changed; the transport
+          topology had.</dd>
+        <dt>Recommendation</dt><dd>Larger TCP receive window, or parallel streams, or co-locate the iperf server
+          closer to the test region for apples-to-apples radio comparisons.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> a throughput regression without any change in MCS or BLER is
+        almost always transport. Buffer occupancy is the one metric that makes it obvious.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Comparing TCP runs across different RTTs</b> and calling the difference a radio regression.</li>
+      <li><b>Not capturing buffer occupancy</b> &mdash; without it the radio-vs-transport question stays open.</li>
+      <li><b>Chasing rank-2 share</b> as a problem &mdash; rank adapts to offered load, so low rank-2 with low
+        offered load is a symptom, not a cause.</li>
+      <li><b>Forgetting the UDP sanity test</b> &mdash; one UDP iperf settles the air-interface question.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flight-Test Analysis &amp; Radio-vs-Attitude Behaviour | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Flight-test analysis &middot; concept I own</div>
+  <h1>Flight-Test Analysis &amp; Radio-vs-Attitude Behaviour</h1>
+  <p class="lede">
+    On every ATG flight-test the diagnostic question is the same: <i>why did the radio do what it
+    did at that moment?</i> My approach is to walk a strict diagnostic chain &mdash; RSRP
+    &rarr; SINR/RSRQ &rarr; CQI &rarr; MCS/Rank/PMI &rarr; BLER &rarr; throughput &mdash; and overlay it
+    against aircraft altitude, roll and bank so each anomaly can be classified: coverage, interference,
+    receiver, link-adaptation, mobility or transport.
+  </p>
+  <div class="chips">
+    <span class="chip">RSRP &middot; SINR &middot; RSRQ</span>
+    <span class="chip">CQI &middot; MCS &middot; Rank &middot; PMI</span>
+    <span class="chip">BLER &middot; throughput</span>
+    <span class="chip">Altitude &middot; roll &middot; bank</span>
+    <span class="chip">Wideband vs sub-band SINR</span>
+  </div>
+
+  <section>
+    <h2>The diagnostic chain &mdash; what each metric actually tells me</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>RSRP</b> &mdash; per-RE reference-signal power. On a single-frequency network this often doesn&rsquo;t
+          move much because many cells are visible at similar range &mdash; so RSRP alone is weak as a serving-cell
+          discriminator.</li>
+        <li><b>RSSI</b> &mdash; total band power (serving + neighbours + noise). Rising RSSI with flat RSRP is
+          the fingerprint of rising interference.</li>
+        <li><b>RSRQ = N &middot; RSRP / RSSI</b> &mdash; the ratio captures how much of the band is &ldquo;ours&rdquo;
+          vs other cells + noise.</li>
+        <li><b>SINR</b> &mdash; the operating quantity on ATG. Wideband SINR tells the overall story; sub-band SINR
+          reveals selective fading / per-RB interference.</li>
+        <li><b>CQI</b> &mdash; UE&rsquo;s request for MCS, derived from SINR estimates and target BLER. Lags SINR
+          by several TTIs; recovers slowly after sudden changes.</li>
+        <li><b>MCS &amp; Rank &amp; PMI</b> &mdash; the eNB&rsquo;s chosen modulation, number of layers and precoder.
+          Rank-1 under equal-RSRP suggests receiver or correlation problems; rank-2 requires enough SINR
+          on both branches.</li>
+        <li><b>BLER</b> &mdash; residual errors after HARQ. Sustained BLER with healthy SINR points above the radio
+          (OLLA / scheduler / DCI issues).</li>
+        <li><b>Throughput</b> &mdash; the ceiling imposed by MCS &times; Rank &times; allocated RBs minus HARQ overhead,
+          minus whatever transport adds on top.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Flight phases &mdash; how each metric moves</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Climb.</b> Elevation angle to the serving cell improves then flattens; RSRP may rise briefly then
+          stabilize; neighbour cells enter and leave the measurement set quickly &mdash; the serving-cell roster
+          churns.</li>
+        <li><b>Cruise.</b> Stable geometry at ~35,000 ft; RSRP mostly flat; <b>SINR dominates the variance</b> because the
+          interference picture shifts as the aircraft tracks along the ground-site string.</li>
+        <li><b>Banking.</b> Roll angles of 15&ndash;30&deg; rotate the fuselage antennas by that amount; the
+          V and H polarization branches swap tilt relative to the serving cell, producing transient 3&ndash;10 dB
+          fades on one branch &mdash; often visible as a rank-2 &rarr; rank-1 drop with a brief MCS collapse.</li>
+        <li><b>Cell-edge.</b> Dominance goes away as the UE sits between cells at near-equal RSRP &mdash;
+          where SINR falls, CQI/MCS follow, and (if TTT is too long) handover arrives too late to escape RLF.</li>
+        <li><b>Descent.</b> Mirror of climb, with the added risk of SIB-acquisition failures on a congested
+          target as the UE reaches terminal altitudes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Transient fades from roll / bank &mdash; what the data looks like</h2>
+    <div class="panel case">
+      <p>During a sustained bank, the aircraft antenna array rotates relative to the serving cell. Two things
+        happen on the trace:</p>
+      <ul class="clean">
+        <li><b>Branch-asymmetric RSRP.</b> One branch drops 3&ndash;10 dB while the other stays steady &mdash;
+          classic polarization rotation / antenna-pattern fingerprint.</li>
+        <li><b>Rank collapse.</b> MIMO rank-2 drops to rank-1 because one layer is no longer viable;
+          throughput roughly halves for the duration.</li>
+        <li><b>CQI/MCS lag.</b> CQI takes a second or two to respond, so throughput sometimes recovers
+          after SINR has already stabilized post-bank.</li>
+      </ul>
+      <p><span class="tag-good">Takeaway:</span> a short, branch-asymmetric SINR dip that aligns with a bank
+        angle in the attitude trace is not a network fault &mdash; it&rsquo;s geometry. Don&rsquo;t chase it.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Wideband vs sub-band SINR</h2>
+    <div class="panel">
+      <p>ATG&rsquo;s narrowband DL (~9 RB) still exhibits frequency-selective behaviour. Reporting wideband
+        SINR hides sub-band variation that matters for scheduler decisions.</p>
+      <ul class="clean">
+        <li><b>Wideband SINR high but MCS low</b> is a signature of selective sub-band interference
+          &mdash; a neighbour cell punching through on specific RBs.</li>
+        <li><b>Sub-band CQI should match the scheduler&rsquo;s allocation strategy</b>. When it doesn&rsquo;t,
+          the scheduler is leaving throughput on the table.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reading a full-flight MATLAB plot set</h2>
+    <div class="panel">
+      <p>Per flight I generate a standardized plot set via the MATLAB scripts
+        (see <a href="matlab-flight-scripts.html">MATLAB Flight-Test Analysis Scripts</a>):</p>
+      <ul class="clean">
+        <li>Altitude + roll + bank over time.</li>
+        <li>Serving-cell / PCI timeline (stepped).</li>
+        <li>RSRP, RSRQ, RSSI, SINR per branch (V and H).</li>
+        <li>CQI, MCS, rank/layers per codeword.</li>
+        <li>BLER UL / DL.</li>
+        <li>DL / UL throughput, overlaid with scheduled RBs.</li>
+        <li>Mobility events (A3 trigger, HO command, HO complete, re-establishment, RLF) as markers.</li>
+      </ul>
+      <p>Reading order: <b>attitude &rarr; serving-cell &rarr; RSRP/SINR &rarr; CQI/MCS/rank &rarr; BLER &rarr; throughput &rarr; mobility events</b>.
+        Any claim written on an executive summary comes from this sequence.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Chasing a bank-angle transient as a network fault.</b> Always overlay attitude first.</li>
+      <li><b>Reading wideband SINR as complete.</b> Always check sub-band for selective interference.</li>
+      <li><b>Blaming the radio for scheduler behaviour.</b> If SINR is stable and throughput is erratic,
+        the fault is above the radio.</li>
+      <li><b>Letting CQI lag mislead the report.</b> After a handover, allow several seconds before concluding
+        the post-HO MCS is &ldquo;too low&rdquo;.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

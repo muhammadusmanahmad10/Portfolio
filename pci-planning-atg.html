@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCI Planning for 2-TX ATG Cells | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">PCI planning &middot; concept I own</div>
+  <h1>PCI Planning for 2-TX ATG Cells &mdash; mod-3 / mod-6 / Frame Offset</h1>
+  <p class="lede">
+    On the single-frequency ATG network, PCI planning isn&rsquo;t just about mod-6 CRS collisions &mdash; on
+    2-TX (2T2R) cells, which CRS subcarriers are actually occupied is governed by <b>PCI mod 3</b>, and
+    PSS follows the same mod-3 pattern. Two cells with the same mod-3 collide on both CRS <i>and</i> PSS,
+    corrupting channel estimation and sync for both. I identified that the ATG 2T2R cells had been planned
+    on mod-6 alone and drove a PCI re-plan to remove mod-3 conflicts &mdash; measurably improving SINR and
+    cutting cell-edge RLF / re-establishment failures.
+  </p>
+  <div class="chips">
+    <span class="chip">PCI mod 6 (CRS shift)</span>
+    <span class="chip">PCI mod 3 (CRS REs on 2-TX)</span>
+    <span class="chip">PSS = PCI mod 3</span>
+    <span class="chip">Frame offset</span>
+    <span class="chip">SINR improvement</span>
+  </div>
+
+  <section>
+    <h2>Three independent mod relationships</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>PCI mod 6 &mdash; CRS <i>frequency shift</i>.</b> Determines which of the six possible frequency
+          positions the CRS (Cell-specific Reference Signal) sits at. Two cells with the same mod-6
+          overlap their CRS REs at <i>all</i> antenna-port configurations.</li>
+        <li><b>PCI mod 3 &mdash; CRS <i>REs occupied on 2-TX cells</i>, and PSS.</b> On 2-TX cells only two of
+          the three CRS positions in each block are populated (ports 0 and 1). Which two are populated is set
+          by PCI mod 3. PSS uses one of three Zadoff&ndash;Chu sequences selected by <code>N<sub>ID</sub><sup>(2)</sup> = PCI mod 3</code>.
+          Two cells with the same mod-3 collide on CRS <i>and</i> on PSS, corrupting channel estimation and
+          initial sync for both.</li>
+        <li><b>Frame offset / sub-frame offset.</b> Governs the time alignment of each cell&rsquo;s radio frame.
+          Offsetting frames between co-channel cells moves CRS collisions in time, which can partially mitigate
+          mod-6 overlap &mdash; but doesn&rsquo;t fix mod-3 because PSS is transmitted on fixed slots regardless.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why mod-3, not just mod-6, drives the ATG problem</h2>
+    <div class="panel">
+      <p>Terrestrial 4-TX LTE deployments typically plan on PCI mod 6 (all six CRS positions in play).
+        ATG is 2-TX (2T2R) &mdash; only two CRS REs out of the three in each block are populated, and PCI mod 3
+        picks which two. The cascading consequences:</p>
+      <ul class="clean">
+        <li>Two cells with the same mod-3 put CRS on the <b>same REs</b>, destroying each other&rsquo;s
+          channel estimates whenever both cells are visible.</li>
+        <li>PSS from both cells lands on the same Zadoff&ndash;Chu sequence, confusing the UE&rsquo;s initial
+          cell-search and PCI detection logic.</li>
+        <li>SIB-acquisition failures become more likely on mod-3-conflicted neighbours because the UE must
+          decode cell-specific channels while neighbour CRS is corrupting its estimates.</li>
+      </ul>
+      <p>On a mod-6 plan alone, two cells can share mod-3 (e.g. PCI 0 and PCI 3 both have mod 3 = 0) and look
+        &ldquo;different&rdquo; by mod-6 while still colliding on mod-3.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>When the damage appears (and why it&rsquo;s hidden until near-equal RSRP)</h2>
+    <div class="panel">
+      <p>A mod-3 conflict is only visible when the two cells arrive at the UE at near-equal RSRP. If one cell
+        is strongly dominant, the weaker one is below the noise floor on CRS/PSS REs and doesn&rsquo;t corrupt
+        anything. This is why mod-3 damage:</p>
+      <ul class="clean">
+        <li>Only shows up <b>at cell-edge</b> (or on an SFN where dominance is naturally weak).</li>
+        <li>Correlates with a specific ground-geometry (where two conflicted cells have similar range).</li>
+        <li>Can be invisible on dominant-coverage drive tests and only emerges in flight-test data where the
+          aircraft sits between cells for extended periods.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Case &mdash; PCI re-plan that measurably improved SINR</h2>
+    <div class="panel case good">
+      <dl class="kv">
+        <dt>Finding</dt><dd>The 2T2R ATG cells had been planned without accounting for PCI mod-3. Several
+          adjacent cells shared mod-3 &mdash; PCI 0/3, 1/4, 2/5, etc. &mdash; so CRS and PSS collided at cell-edge.</dd>
+        <dt>Evidence</dt><dd>Flight-test logs showed SINR depression at specific geometric locations that
+          mapped to pairs of mod-3-conflicted cells; additional RLFs with re-establishment-failure (T311) and
+          SIB-acquisition failures on the mod-3-conflicted neighbour.</dd>
+        <dt>Recommendation &amp; validation</dt><dd>Re-plan PCIs so that each cell&rsquo;s mod-3 differs from its
+          first-tier neighbours (ideally from the second tier too). Where re-planning the whole region was not
+          feasible, use <b>frame-offset</b> staggering to at least move CRS time-domain collisions &mdash; though
+          frame offset alone doesn&rsquo;t fix PSS.</dd>
+        <dt>Outcome</dt><dd>SINR improved measurably at the previously-problematic cell-edge geometries, and
+          cell-edge RLF / re-establishment-failure counts dropped on subsequent flight campaigns.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> on 2-TX cells, PCI planning must respect mod-3 (not just mod-6)
+        &mdash; especially on a single-frequency network where every neighbour is co-channel and dominance
+        cannot be assumed.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Frame offset &mdash; what it does and doesn&rsquo;t fix</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>Offsetting frames between co-channel cells shifts CRS collisions in <i>time</i>: a conflicted RE
+          now lands on a different subframe for one of the cells.</li>
+        <li>Helps with <b>mod-6 CRS</b> collisions and <b>mod-3 CRS</b> on PDSCH timing &mdash; mitigation, not cure.</li>
+        <li>Does <b>not</b> fix PSS collisions &mdash; PSS is transmitted on fixed symbols (subframes 0 and 5)
+          and uses <code>N<sub>ID</sub><sup>(2)</sup> = PCI mod 3</code>. Two cells with the same mod-3 sit on the
+          same PSS sequence regardless of frame offset.</li>
+        <li>Use frame offset as a mitigation when a full PCI re-plan is impractical, but address mod-3 as the
+          primary fix wherever feasible.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Planning by mod-6 alone on 2-TX cells</b> &mdash; misses the mod-3 collision entirely.</li>
+      <li><b>Testing only in the dominant-coverage lab setup</b> &mdash; the problem hides until the UE sees
+        two conflicted cells at near-equal RSRP.</li>
+      <li><b>Assuming frame-offset is a full substitute for PCI re-plan</b> &mdash; it&rsquo;s partial, PSS is still colliding.</li>
+      <li><b>Chasing the resulting SINR depression as interference from a far-off third cell</b> &mdash; always
+        check the near-equal-RSRP neighbour&rsquo;s mod-3 first.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

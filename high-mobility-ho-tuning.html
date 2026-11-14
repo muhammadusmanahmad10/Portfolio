@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High-Mobility Handover Tuning (TTT &amp; Hysteresis) | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">High-mobility handover &middot; concept I own</div>
+  <h1>High-Mobility Handover Tuning &mdash; TTT &amp; Hysteresis</h1>
+  <p class="lede">
+    On the ATG network, radio conditions degrade <b>fast</b> as the aircraft banks or passes cell-edge. The
+    conventional terrestrial reflex is a long Time-to-Trigger (TTT) to damp ping-pong &mdash; but in high
+    mobility that same long TTT lets the serving cell die before the handover command ever fires, causing
+    a class of radio-link failures. The fix is a <b>shorter TTT + A3 hysteresis margin</b>: trigger fast
+    enough to escape the degrading cell, and only trigger toward a target that is <i>genuinely</i> better.
+    I diagnosed this pattern and recommended / validated the parameter change, which removed most of the RLFs.
+  </p>
+  <div class="chips">
+    <span class="chip">A3 event</span>
+    <span class="chip">Time-to-Trigger (TTT)</span>
+    <span class="chip">Hysteresis margin</span>
+    <span class="chip">320 ms &rarr; 80 ms</span>
+    <span class="chip">RLF reduction</span>
+  </div>
+
+  <section>
+    <h2>The A3 event, in one place</h2>
+    <div class="panel">
+      <p>A3 fires when a neighbour cell becomes an <b>offset</b> better than the serving cell for the duration
+        of TTT. The decision in plain words:</p>
+      <ul class="clean">
+        <li><code>M<sub>n</sub> &gt; M<sub>s</sub> + Ofs + Ocn &minus; Ocs + Hyst</code></li>
+        <li><b>M<sub>s</sub></b> / <b>M<sub>n</sub></b> &mdash; serving and neighbour measurement quantity (RSRP or RSRQ).</li>
+        <li><b>Ofs / Ocs / Ocn</b> &mdash; frequency and per-cell offsets.</li>
+        <li><b>Hyst (hysteresis)</b> &mdash; a safety margin to avoid oscillation; must be sustained for <b>TTT</b>
+          before the UE reports. 3GPP TS 36.331 defines the event.</li>
+      </ul>
+      <p>TTT and hysteresis are the two knobs. On ATG they interact strongly with aircraft dynamics.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why a long TTT breaks on a banking aircraft</h2>
+    <div class="panel">
+      <p>Terrestrial networks often set TTT to several hundred milliseconds to filter out short fades. On an
+        aircraft turning onto a new heading, the conditions evolve on the order of a few hundred milliseconds:</p>
+      <ul class="clean">
+        <li>A 25&deg; bank rotates the aircraft antennas visibly in &lt;1 s.</li>
+        <li>Serving-cell RSRP can drop faster than the TTT window; by the time the condition has been sustained
+          for 320 ms, the serving cell is already too weak for the HO command itself to be reliably received or
+          for the UL re-establishment to succeed.</li>
+        <li>Result: radio-link failure fires (T310 expiry, then re-establishment that often fails because
+          nothing is strong enough to answer the Msg3 re-establishment request on the new cell).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>The fix &mdash; TTT 320 ms &rarr; 80 ms, plus hysteresis margin</h2>
+    <div class="panel case good">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>Repeated RLFs during banking turns and at cell-edge; downstream re-establishment
+          failures with T311 expiry; connected-time % below target on multi-cell flight tracks.</dd>
+        <dt>Diagnosis</dt><dd>Mapped RLF timestamps against the A3-trigger &rarr; HO-command sequence in the
+          flight logs. The A3 trigger was present but the HO command either never completed or arrived too
+          late for the UE to execute on a receivable RF path. I correlated the RLF density with roll/bank angle
+          and cell-edge geometry in the MATLAB plot set.</dd>
+        <dt>Change recommended &amp; validated</dt><dd>
+          <ul class="clean" style="margin:0">
+            <li><b>TTT: 320 ms &rarr; 80 ms.</b> HO decision now fires fast enough that the serving cell is
+              still viable when the command is issued.</li>
+            <li><b>A3 hysteresis margin: introduced where previously 0 dB.</b> Prevents triggering on a
+              neighbour that is only transiently better and forces the UE toward a genuinely stronger target.</li>
+          </ul>
+        </dd>
+        <dt>Outcome</dt><dd>Majority of the RLF cluster removed; connected-time %, HO-success % and
+          handover-failure % all improved on subsequent flight campaigns. No noticeable ping-pong increase
+          because the hysteresis margin absorbed short fluctuations.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> on high-mobility ATG, the conventional &ldquo;long TTT damps ping-pong&rdquo;
+        heuristic inverts. The right answer is <b>short TTT + hysteresis</b> &mdash; fire fast, fire only toward something
+        actually better.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why the two parameters must move together</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Short TTT alone</b> would trigger more handovers, including toward marginal neighbours, and
+          create ping-pong.</li>
+        <li><b>Hysteresis alone</b> doesn&rsquo;t help if the TTT is still long enough that the serving cell
+          dies first.</li>
+        <li><b>Together</b> they say: react faster, but only commit to a target that is clearly better &mdash;
+          which is exactly what the ATG geometry requires.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Related knobs on the ATG mobility chain</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>a3-Offset</b> &mdash; shifts the whole decision toward later / earlier HO. Used alongside
+        hysteresis; different mechanism (fixed offset vs safety margin).</li>
+      <li><b>Report-on-leave</b> / <b>cell-individual offsets</b> &mdash; used selectively to bias toward or away
+        from problem neighbours (e.g. mod-3-conflicted or known weak-coverage cells).</li>
+      <li><b>T310 / N310 / N311</b> &mdash; radio-link-failure timers; relevant because if TTT is too long,
+        T310 fires first and the HO never happens. See <a href="rlf-recovery-atg.html">RLF &amp; Recovery on ATG</a>.</li>
+      <li><b>T311</b> &mdash; re-establishment supervisor; if re-establishment fails before T311 expiry the UE
+        drops into full connection setup, breaking the user session visibly.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Treating ping-pong and RLF as the same problem.</b> They&rsquo;re opposite failure modes with
+        opposite parameter responses.</li>
+      <li><b>Tuning TTT without tuning hysteresis.</b> One without the other usually swaps failure modes
+        rather than fixing them.</li>
+      <li><b>Not correlating RLFs with attitude.</b> Many are bank-angle events masquerading as mobility faults.</li>
+      <li><b>Ignoring target-cell health at HO time.</b> If the target is mod-3-conflicted with the serving cell,
+        a fast HO can still fail. Mobility tuning only works on a clean PCI plan &mdash; see
+        <a href="pci-planning-atg.html">PCI Planning for 2-TX ATG Cells</a>.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

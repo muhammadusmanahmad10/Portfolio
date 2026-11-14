@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flight KPI &amp; Executive Reporting | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">KPI reporting &middot; deliverable I own</div>
+  <h1>Flight KPI &amp; Executive Reporting</h1>
+  <p class="lede">
+    Every flight ends with a per-flight executive summary shared with Gogo and vendor stakeholders. The job
+    of the summary is not to show data &mdash; it&rsquo;s to answer four questions: <i>was the user experience
+    good, where did it break, why, and what fixes are proposed</i>. The KPI set and the report structure below
+    are what I use to make that explicit, comparable across flights, and fast to act on.
+  </p>
+  <div class="chips">
+    <span class="chip">Connected-time %</span>
+    <span class="chip">Available-time %</span>
+    <span class="chip">HO-failure %</span>
+    <span class="chip">RLF counts by cause</span>
+    <span class="chip">DL / UL throughput</span>
+  </div>
+
+  <section>
+    <h2>The KPI set</h2>
+    <div class="panel">
+      <table class="cmp">
+        <tr><th>KPI</th><th>Definition</th><th>Why it matters</th></tr>
+        <tr><td><b>Connected-time %</b></td><td>Time in RRC_CONNECTED / total flight time.</td><td>The &ldquo;was the service there&rdquo; headline.</td></tr>
+        <tr><td><b>Available-time %</b></td><td>Connected + data plane up / total flight time.</td><td>Not all connected time is usable; this is what the user actually sees.</td></tr>
+        <tr><td><b>Handover-failure %</b></td><td>Failed HO / total HO attempts.</td><td>Mobility health &mdash; the core ATG risk area.</td></tr>
+        <tr><td><b>Connection-setup-failure %</b></td><td>Failed initial / re-attach setups.</td><td>Captures the dropouts that break sessions visibly.</td></tr>
+        <tr><td><b>Avg / Max DL throughput</b></td><td>Aggregated over flight.</td><td>The user-visible speed; max captures best-case radio behaviour.</td></tr>
+        <tr><td><b>Avg / Max UL throughput</b></td><td>As above, uplink.</td><td>Narrow-UL ATG has UL as the bottleneck for many apps.</td></tr>
+        <tr><td><b>RLF total</b></td><td>Count.</td><td>Headline fault count.</td></tr>
+        <tr><td><b>RLF by cause</b></td><td>T310 / RLC-maxReTx / MAC-RA splits.</td><td>Points at <i>which</i> part of the chain broke.</td></tr>
+        <tr><td><b>Re-establishment-failure count</b></td><td>Count.</td><td>Captures the dropouts the user actually experienced.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>The report structure</h2>
+    <div class="panel"><ol class="clean">
+      <li><b>Executive summary</b> &mdash; 3 bullets: was it good, where did it break, what&rsquo;s the ask.</li>
+      <li><b>KPI table</b> &mdash; the full set above, with the previous flight&rsquo;s numbers alongside for comparability.</li>
+      <li><b>Key findings</b> &mdash; 3&ndash;6 bullets with named root causes (e.g. &ldquo;3 RLFs clustered in the KBOS&ndash;KJFK
+        bank-angle region, T310 cause &mdash; PCI mod-3 conflict pair 12 / 15&rdquo;).</li>
+      <li><b>Plot pack reference</b> &mdash; link to the MATLAB-generated PDF plot pack for engineers.</li>
+      <li><b>Recommended actions</b> &mdash; concrete, owner-named: &ldquo;Gogo RF team: PCI re-plan sector 12 to mod-3 ≠ 15&rdquo;,
+        &ldquo;Vendor: schedule-side investigation on CQI recovery lag after HO&rdquo;.</li>
+      <li><b>Open items from previous flights</b> &mdash; defect IDs, status, next check.</li>
+    </ol></div>
+  </section>
+
+  <section>
+    <h2>Making it comparable across flights</h2>
+    <div class="panel"><ul class="clean">
+      <li>Same KPI set every flight, same formula.</li>
+      <li>Same plot pack layout.</li>
+      <li>KPIs reported alongside the previous flight&rsquo;s numbers for trend.</li>
+      <li>Defect IDs carry forward until closed &mdash; see <a href="vendor-defect-tracking.html">Vendor Escalation &amp; Defect Tracking</a>.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Audience discipline</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Executive readers</b> &mdash; need the 3-bullet summary and the KPI deltas, not the plots.</li>
+      <li><b>Engineering readers</b> &mdash; need the plot pack and the specific message-level evidence.</li>
+      <li><b>Vendor teams</b> &mdash; need the defect ID, the trace reference, and the proposed reproducer.</li>
+      <li>One report, three audiences &mdash; which is why the structure above is layered.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

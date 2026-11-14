@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Interference Testing (Spirent/Vertex) &amp; RoT | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Lab interference &amp; RoT &middot; concept I own</div>
+  <h1>Lab Interference Testing (Spirent / Vertex) &amp; RoT</h1>
+  <p class="lede">
+    Lab validation of ATG loads has to reproduce the one condition that flight test exposes most: elevated
+    interference. I use Spirent / Vertex channel emulators to inject UL / DL interference at calibrated
+    levels &mdash; defined via noise-floor math and the Rise-over-Thermal (RoT) convention &mdash; then
+    verify the injection landed by reading eNB UL RSSI. Getting the math right is what separates a
+    meaningful lab result from a decorative one.
+  </p>
+  <div class="chips">
+    <span class="chip">Noise-floor math</span>
+    <span class="chip">Bandwidth correction</span>
+    <span class="chip">C/N convention</span>
+    <span class="chip">RoT (normal/moderate/heavy)</span>
+    <span class="chip">UL RSSI verification</span>
+  </div>
+
+  <section>
+    <h2>Noise-floor math &mdash; the starting line</h2>
+    <div class="panel"><ul class="clean">
+      <li>Thermal noise floor: <code>&minus;174 dBm/Hz</code> at 290 K.</li>
+      <li>Bandwidth correction: <code>+ 10 &middot; log<sub>10</sub>(BW_Hz)</code>. For 1 Hz &rarr; 0 dB,
+        for 180 kHz (one RB) &rarr; +52.6 dB, for 10 MHz &rarr; +70 dB.</li>
+      <li>Receiver noise figure: <code>+ NF</code>. ATG eNB NF is typically a few dB.</li>
+      <li><b>Total noise floor</b> = <code>&minus;174 + 10&middot;log<sub>10</sub>(BW) + NF</code>.</li>
+      <li>Example: ATG UL 6 RB (1.08 MHz) with NF 4 dB &rarr; floor ≈ &minus;174 + 60.3 + 4 = &minus;109.7 dBm.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Bandwidth correction &mdash; 6-RB vs 10 MHz</h2>
+    <div class="panel">
+      <p>A classic mistake is to quote noise power at 10 MHz when the ATG UL is only 6 RB. The correction:</p>
+      <ul class="clean">
+        <li>10 MHz floor &mdash; use for comparability with terrestrial spec sheets.</li>
+        <li>6-RB floor &mdash; use for ATG-specific budget calculations. 10&middot;log<sub>10</sub>(10 MHz / 1.08 MHz) ≈ 9.7 dB
+          lower floor than the 10 MHz figure.</li>
+        <li>Always state the bandwidth you&rsquo;re computing noise over &mdash; a dB figure without a BW is undefined.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>The C/N convention &mdash; which denominator?</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>C/N</b> &mdash; Carrier-to-Noise. Numerator = signal power <i>as delivered</i>, denominator = thermal noise floor (optionally with NF).</li>
+      <li><b>C/(N+I)</b> &mdash; add interference to the denominator. This is what the eNB actually experiences in the lab and in the air.</li>
+      <li><b>SINR</b> as reported by the eNB uses C/(N+I) and is what link adaptation tracks.</li>
+      <li>When writing lab test cases, be explicit: &ldquo;C/N at &minus;10 dB&rdquo; means C at noise-floor minus 10 dB,
+        which is a different setup than &ldquo;C/(N+I) at &minus;10 dB&rdquo;.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>RoT &mdash; Rise over Thermal</h2>
+    <div class="panel">
+      <p>RoT measures how far the total UL received power on the eNB has risen above the thermal noise floor
+        &mdash; i.e. how &ldquo;hot&rdquo; the UL band is from UE transmissions, interference and noise.</p>
+      <table class="cmp">
+        <tr><th>RoT band</th><th>Typical dB</th><th>Operating meaning</th></tr>
+        <tr><td><b>Normal</b></td><td>0&ndash;3 dB</td><td>Lightly loaded; most UL budget spent on noise.</td></tr>
+        <tr><td><b>Moderate</b></td><td>3&ndash;6 dB</td><td>Loaded cell; scheduler closer to its limits; UL throughput sensitive to additional interference.</td></tr>
+        <tr><td><b>Heavy</b></td><td>&gt; 6 dB</td><td>UL near the stability edge; additional interference causes rapid degradation. Terrestrial networks typically cap here.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Injecting interference &mdash; UL and DL</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>DL interference</b> &mdash; Spirent / Vertex injects into the UE&rsquo;s RX path, simulating a
+        neighbour cell&rsquo;s CRS/PDSCH leaking into the serving cell. Validates how the UE reports CQI
+        and how the eNB reacts via OLLA.</li>
+      <li><b>UL interference</b> &mdash; inject into the eNB&rsquo;s RX path, simulating other UEs or external
+        emitters in the UL band. Validates RoT behaviour, scheduler fairness and UL BLER response.</li>
+      <li><b>Calibrated levels</b> &mdash; set injection relative to the eNB&rsquo;s thermal floor, not an
+        absolute dBm value. Absolute-dBm setups drift as the lab chain changes.</li>
+      <li><b>Verification</b> &mdash; read the eNB&rsquo;s UL RSSI counter before and after injection. Delta
+        should match the intended RoT lift. If it doesn&rsquo;t, the injection didn&rsquo;t land where expected
+        &mdash; cables, attenuators or combiners.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>A sane lab protocol</h2>
+    <div class="panel"><ol class="clean">
+      <li>Measure baseline UL RSSI with no injection &mdash; this is your empirical thermal floor + residual lab noise.</li>
+      <li>Compute the required injected-power level for the target RoT (e.g. +3 dB or +6 dB over baseline).</li>
+      <li>Inject, re-read UL RSSI, confirm the delta.</li>
+      <li>Only then run the DUT test case &mdash; the test result is only meaningful if the interference actually landed.</li>
+      <li>Document injected level, bandwidth, pattern (CW, AWGN, modulated) and verification RSSI.</li>
+    </ol></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Quoting noise power without a bandwidth.</b> Undefined.</li>
+      <li><b>Setting injection in absolute dBm.</b> Hidden lab-chain changes drift the intended C/N without warning.</li>
+      <li><b>Mixing C/N with C/(N+I)</b> in the same test plan.</li>
+      <li><b>Skipping the UL RSSI verification step.</b> The injection may be entirely absent.</li>
+      <li><b>Pushing RoT into Heavy</b> and reporting results without noting that terrestrial networks
+        wouldn&rsquo;t operate there &mdash; the data is useful but needs context.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

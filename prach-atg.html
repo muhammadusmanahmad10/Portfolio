@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UL Random Access &amp; PRACH for ATG | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">PRACH for ATG &middot; concept I own</div>
+  <h1>UL Random Access &amp; PRACH for ATG</h1>
+  <p class="lede">
+    PRACH is the one place where ATG&rsquo;s combination of <b>100+ km cell radius</b> and <b>500+ kt aircraft
+    speed</b> stretches 3GPP defaults to their edges. Preamble format, Ncs / zero-correlation-zone, cell-radius
+    parameter and the high-speed (restricted) set all interact &mdash; a terrestrial default lifted into ATG
+    is a sure path to MAC-RA failures that look like UL coverage problems but are really PRACH-config problems.
+  </p>
+  <div class="chips">
+    <span class="chip">PRACH format (0/1/2/3)</span>
+    <span class="chip">Ncs / ZCZ</span>
+    <span class="chip">Cell radius</span>
+    <span class="chip">High-speed / restricted set</span>
+    <span class="chip">PRACH frequency offset</span>
+  </div>
+
+  <section>
+    <h2>Preamble format &mdash; the time budget</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Format 0</b> &mdash; 1 subframe (1 ms), ~14 km max cell radius. The terrestrial default.</li>
+        <li><b>Format 1</b> &mdash; 2 subframes, ~77 km.</li>
+        <li><b>Format 2</b> &mdash; 2 subframes with repetition, ~29 km.</li>
+        <li><b>Format 3</b> &mdash; 3 subframes, ~100 km. This is the ATG baseline because of the 100+ km inter-site.</li>
+      </ul>
+      <p>The preamble must be long enough that even from the far edge of the cell, the signal reaches the eNB
+        and the detection correlator can catch it within the receive window. A too-short format at 100 km means
+        preambles miss the detection window entirely &mdash; the UE tries and times out with MAC-RA.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ncs / zero-correlation-zone &mdash; separating preambles across round-trip time</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li><b>Zadoff&ndash;Chu sequences</b> have the property that cyclic shifts of the same root are mutually
+          orthogonal &mdash; so one root sequence can carry many &ldquo;virtual preambles&rdquo;.</li>
+        <li><b>Ncs</b> (cyclic shift) defines the <i>spacing</i> between those virtual preambles in the
+          time-domain &mdash; equivalently, the <b>maximum round-trip delay</b> you can tolerate before shifted
+          preambles bleed into each other.</li>
+        <li><b>Zero-correlation-zone (ZCZ)</b> = <code>Ncs &middot; T<sub>s</sub></code> &mdash; the delay window
+          the cell is sized for.</li>
+        <li>Too-small Ncs at 100 km round-trip means preambles alias, detection collapses, MAC-RA fails.</li>
+        <li>Too-large Ncs wastes preamble codes (fewer virtual preambles per root), forcing more root-sequence
+          rotations and risking root collisions with neighbour cells.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cell-radius parameter &mdash; what to tell the eNB</h2>
+    <div class="panel">
+      <ul class="clean">
+        <li>The <b>cell-radius / coverage</b> config is the OAM knob that tells the eNB what round-trip delay
+          to plan for &mdash; it feeds Ncs selection, timing-advance range, and detection-window placement.</li>
+        <li>On ATG, cell radius must be set honestly &mdash; 100+ km, not the terrestrial 30 km default.</li>
+        <li>A mismatched cell radius is the single most common root cause of &ldquo;UE can&rsquo;t PRACH to that
+          cell&rdquo; stories on long-range sites.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>High-speed / restricted cyclic-shift set &mdash; Doppler</h2>
+    <div class="panel">
+      <p>Zadoff&ndash;Chu sequences lose their ideal auto-correlation under Doppler shift. At ATG speeds
+        (~500 kt = ~260 m/s, which at 800 MHz is ~700 Hz of Doppler), a PRACH preamble sent on one cyclic shift
+        can correlate with a neighbouring shift at the eNB &mdash; preambles alias.</p>
+      <ul class="clean">
+        <li>The <b>high-speed flag</b> (<i>prach-ConfigIndex &rarr; HighSpeedFlag</i>) tells the eNB to use the
+          <b>restricted</b> cyclic-shift set, which skips the vulnerable shifts and avoids the Doppler-induced
+          aliasing.</li>
+        <li>With HighSpeedFlag off at ATG speeds, preamble detection becomes unreliable at high aircraft
+          speeds &mdash; MAC-RA failures that only appear in cruise, not in lab tests.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>How misconfig cascades into MAC-RA RLFs</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Trigger</dt><dd>UE attempts random access on a target cell during RRC re-establishment after a
+          handover or RLF.</dd>
+        <dt>Observed</dt><dd>MAC-RA attempts increment, no RAR received within RA-response-window; UE retries
+          up to preambleTransMax; MAC-RA cause code emitted, RRC re-establishment never completes, T311 expires,
+          UE drops to full setup.</dd>
+        <dt>Typical root cause</dt><dd>One of: (a) PRACH format too short for 100 km propagation, (b) Ncs too
+          small so preambles alias at long RTT, (c) cell-radius parameter set to terrestrial default,
+          (d) HighSpeedFlag off at cruise speed, (e) PRACH placement in UL bandwidth colliding with PUCCH SRS.</dd>
+        <dt>Diagnostic</dt><dd>Reproduce in the lab with aircard + long-delay channel emulator; verify eNB UL
+          RSSI shows the preamble arriving; walk Ncs / format / radius in the config until MAC-RA succeeds.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Lifting a terrestrial PRACH config into ATG.</b> Cell radius, format and Ncs all have to be
+        re-chosen.</li>
+      <li><b>Leaving HighSpeedFlag off.</b> Works in lab; fails in cruise.</li>
+      <li><b>Chasing a UL coverage problem</b> when the symptom is actually a PRACH detection failure.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

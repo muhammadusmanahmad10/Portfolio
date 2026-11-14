@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Escalation &amp; Defect Tracking | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">Vendor escalation &middot; discipline I own</div>
+  <h1>Vendor Escalation &amp; Defect Tracking</h1>
+  <p class="lede">
+    New loads ship with new defects. Flight-test and lab exposure both generate them. The job of the ATE
+    engineer is to <b>catch the defect with evidence</b>, <b>escalate it to the vendor with everything they
+    need to reproduce</b>, and <b>track it across loads until it&rsquo;s fixed and validated</b>. The quality of
+    a vendor defect submission is what determines whether the next load fixes the problem or carries it
+    forward another cycle.
+  </p>
+  <div class="chips">
+    <span class="chip">Evidence-based escalation</span>
+    <span class="chip">Reproducer design</span>
+    <span class="chip">Cross-load tracking</span>
+    <span class="chip">Fix validation</span>
+    <span class="chip">Diagnosed / recommended / validated</span>
+  </div>
+
+  <section>
+    <h2>Anatomy of a vendor defect I submit</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Title</b> &mdash; one sentence, names the observed behaviour and the condition.</li>
+      <li><b>Build / load IDs</b> &mdash; GBSS software version, aircard firmware version, exact test-bed config.</li>
+      <li><b>Reproducer</b> &mdash; step-by-step lab procedure, documented so another engineer can run it unchanged.</li>
+      <li><b>Observed vs expected</b> &mdash; what the trace actually shows, what the spec / previous load produced.</li>
+      <li><b>Evidence</b> &mdash; log captures (eNB side + aircard side + Wireshark), KPI snapshots, MATLAB plots
+        with the event marked.</li>
+      <li><b>Impact</b> &mdash; which KPIs this moves, what user experience looks like.</li>
+      <li><b>Suspected root cause</b> &mdash; if I have a theory, I say so. Clear about what&rsquo;s diagnostic vs what&rsquo;s speculative.</li>
+      <li><b>Workaround</b> &mdash; if any; parameter change that masks it; operational mitigation.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Diagnosed / recommended / validated &mdash; wording discipline</h2>
+    <div class="panel">
+      <p>These three words describe different ownership:</p>
+      <ul class="clean">
+        <li><b>Diagnosed</b> &mdash; I found what&rsquo;s broken (e.g. scheduler keeping MCS too high in low-headroom).
+          I did <i>not</i> change the vendor&rsquo;s code.</li>
+        <li><b>Recommended</b> &mdash; I proposed a parameter change or an algorithm change (e.g. TTT 320 ms &rarr; 80 ms).</li>
+        <li><b>Validated</b> &mdash; I verified a change (vendor fix or a recommended parameter change) produced the
+          expected outcome on subsequent loads or flights.</li>
+      </ul>
+      <p>I keep this wording explicit in every defect and every write-up so there&rsquo;s no implication that I
+        own vendor code I don&rsquo;t own.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reproducer design &mdash; what makes a defect &ldquo;actionable&rdquo;</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Deterministic.</b> Same inputs &rarr; same output. Flaky reproducers get deprioritised and die in the queue.</li>
+      <li><b>Lab-runnable if possible.</b> A flight-only reproducer takes weeks; a lab reproducer takes an hour.
+        Where I can emulate the field condition (via Spirent / Vertex channel emulator), I always provide the
+        lab setup.</li>
+      <li><b>Minimal.</b> Strip to the smallest sequence that still shows the behaviour.</li>
+      <li><b>Instrumented.</b> The reproducer includes the exact log channels and counter captures the vendor
+        will want.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Cross-load tracking</h2>
+    <div class="panel"><ul class="clean">
+      <li>Every open defect carries a vendor ID and a local ID across loads.</li>
+      <li>Per new load, I re-run the regression set that contains the open defect&rsquo;s reproducer. Three outcomes:
+        <ul class="clean" style="margin-top:4px">
+          <li><b>Fixed:</b> close with fix-validation note.</li>
+          <li><b>Partially improved:</b> keep open, update severity, re-run next load.</li>
+          <li><b>Unchanged:</b> keep open, follow up with vendor; if it ages past N loads, escalate severity.</li>
+        </ul>
+      </li>
+      <li>The vendor defect list is reviewed per load and reported alongside the executive flight summary &mdash; see
+        <a href="flight-kpi-reporting.html">Flight KPI &amp; Executive Reporting</a>.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Fix validation &mdash; what &ldquo;done&rdquo; actually means</h2>
+    <div class="panel"><ul class="clean">
+      <li>A vendor fix is not &ldquo;done&rdquo; because the vendor says so. It&rsquo;s done when the reproducer
+        no longer produces the behaviour, <i>and</i> no regression appears in the surrounding test cases.</li>
+      <li>Fix-validation evidence is log captures of the same reproducer on the new load, with the previous
+        behaviour visibly absent.</li>
+      <li>I write the validation note explicitly so the defect record stays useful as institutional knowledge
+        (&ldquo;fixed in load X.Y.Z by a change to the OLLA target per codeword; validated via reproducer L-123 showing
+        BLER returns to target after 1.5 s&rdquo;).</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Pitfalls I stay aware of</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Submitting a defect without a reproducer.</b> It will sit in the queue.</li>
+      <li><b>Claiming &ldquo;fixed&rdquo; based on absence of the symptom on one flight.</b> One flight isn&rsquo;t
+        a regression test. Re-run the reproducer.</li>
+      <li><b>Using &ldquo;owned&rdquo; language on code I didn&rsquo;t write.</b> Diagnosed / recommended / validated are the
+        honest verbs.</li>
+      <li><b>Losing track of aged open items.</b> Every load reviews the full open list, not just new findings.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATG Flight-Test Case Library | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">ATG flight-test cases &middot; deliverable I own</div>
+  <h1>ATG Flight-Test Case Library</h1>
+  <p class="lede">
+    A running catalogue of real investigations I ran against live 800 MHz LTE ATG flight-test data and aircard logs.
+    Each case follows the same structure &mdash; <b>Symptom &rarr; Evidence &rarr; Diagnostic reasoning &rarr;
+    Root cause &rarr; Outcome / escalation</b> &mdash; so another engineer can lift it and reuse it. Where I
+    recommended / validated a parameter change, I say so; where I escalated to the vendor, I say that too. The
+    phrasing is deliberately honest about what I did vs what the vendor owned.
+  </p>
+  <div class="chips">
+    <span class="chip">7 cases (A-G)</span>
+    <span class="chip">Scheduler &middot; Mobility &middot; Transport</span>
+    <span class="chip">PCI mod-3</span>
+    <span class="chip">TTT / hysteresis</span>
+    <span class="chip">PRACH / MAC-RA</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case A &mdash; Post-handover CQI / MCS recovery lag</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>After a successful handover, DL / UL throughput visibly dipped for several seconds
+          even though RSRP / SINR had already recovered on the target cell. KPIs showed handover-success but
+          user-experienced throughput dropped.</dd>
+        <dt>Evidence</dt><dd>MATLAB plot pack overlay &mdash; SINR recovers to steady-state within &lt;1 s of HO
+          complete, but CQI reports stayed depressed for 3&ndash;5 s and MCS tracked the CQI, not the SINR.
+          BLER was normal during the depressed-MCS window.</dd>
+        <dt>Diagnostic reasoning</dt><dd>The radio is healthy (SINR + BLER tell that story), so the shortfall
+          isn&rsquo;t coverage or interference. The shortfall maps 1-to-1 to CQI/MCS trajectory. That&rsquo;s
+          a <b>vendor OLLA / CQI-filtering issue in the post-HO window</b> &mdash; the filter is too conservative
+          after the handover reset.</dd>
+        <dt>Root cause</dt><dd>Suspected scheduler-side CQI filter reset / OLLA reinitialisation at HO. Not a
+          radio fault.</dd>
+        <dt>Outcome / escalation</dt><dd><b>Escalated to vendor</b> with the labelled plot pack and the
+          post-HO window highlighted. Documented impact on executive KPIs (avg DL throughput). Tracked across
+          loads for fix validation (<a href="vendor-defect-tracking.html">Vendor Defect Tracking</a>).</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> post-HO throughput depression with healthy SINR is a
+        scheduler / OLLA post-reset story, not a radio story.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case B &mdash; Sustained high UL &amp; DL BLER tracked to scheduler</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>Sustained PUSCH and PDSCH BLER well above the OLLA target on multiple flights,
+          with RSRP and SINR in the normal operating range.</dd>
+        <dt>Evidence</dt><dd>SINR stable &mdash; no interference spike; MCS running at values that the local
+          SINR did not support (link adaptation was not matching conditions); UL power headroom was sufficient.
+          HARQ residual BLER was correspondingly high.</dd>
+        <dt>Diagnostic reasoning</dt><dd>If MCS is consistently too aggressive for the SINR, OLLA isn&rsquo;t
+          doing its job. Pattern seen on both DL and UL &rarr; points to a scheduler behaviour, not a per-UE
+          problem.</dd>
+        <dt>Root cause</dt><dd>Suspected vendor scheduler / OLLA target misconfiguration &mdash; too aggressive
+          an initial MCS for the observed CQI mapping.</dd>
+        <dt>Outcome / escalation</dt><dd><b>Escalated to vendor</b> with evidence: SINR trace, MCS trace, BLER
+          trace, and the per-codeword gap for 2C2L. Did not change the vendor&rsquo;s scheduler myself.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> sustained BLER that doesn&rsquo;t respond to SINR is
+        a scheduler problem, not a radio problem. The place to file the defect is the scheduler team.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case C &mdash; Erratic DL throughput with stable SINR</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>DL throughput was erratic (large swings minute-to-minute) while SINR and radio
+          metrics were stable. User experience inconsistent.</dd>
+        <dt>Evidence</dt><dd>SINR tight around a stable value; RSRP steady; MCS oscillating between the OLLA
+          limits; DL buffer occupancy also fluctuating; BLER only moderately moving.</dd>
+        <dt>Diagnostic reasoning</dt><dd>Radio is quiet, so the throughput swings don&rsquo;t come from the air.
+          MCS oscillation + buffer occupancy swing + stable SINR = scheduler decision volatility, not radio
+          volatility.</dd>
+        <dt>Root cause</dt><dd>Suspected vendor scheduler behaviour &mdash; OLLA / proportional-fair volatility
+          or an interaction with per-UE PRB allocation.</dd>
+        <dt>Outcome / escalation</dt><dd><b>Escalated to vendor</b> with the SINR-vs-throughput overlay traces
+          and MCS oscillation evidence.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> erratic throughput with stable SINR and healthy BLER points
+        above the radio. The diagnostic is the <i>correlation</i>: throughput variance that doesn&rsquo;t track
+        radio variance.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case D &mdash; TCP throughput drop after iperf-server migration (transport, not radio)</h2>
+    <div class="panel case good">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>After the iperf server was migrated from Denver to Melbourne, DL TCP throughput
+          dropped from ~6 Mbps to ~2 Mbps. Initial interpretation: radio regression on the new load.</dd>
+        <dt>Evidence</dt><dd>
+          <ul class="clean" style="margin:0">
+            <li><b>DL buffer occupancy ~5%</b> &mdash; link occupancy near-zero; eNB was starved of data to send.</li>
+            <li><b>MCS unchanged</b> between pre- and post-migration runs.</li>
+            <li><b>Rank-2 (2C2L) usage reduced</b> &mdash; a secondary effect of lower offered load.</li>
+            <li><b>UDP iperf to Melbourne delivered ~8 Mbps</b> over the same path &mdash; the radio could carry
+              the data.</li>
+          </ul>
+        </dd>
+        <dt>Diagnostic reasoning</dt><dd>TCP throughput ≈ window / RTT. The RTT from the aircraft to Melbourne
+          is ~160 ms vs ~40 ms to Denver. With the default UE TCP window, throughput is <b>bandwidth-delay-product
+          limited</b>, not radio limited. Low link occupancy confirms the eNB is being under-fed by transport.</dd>
+        <dt>Root cause</dt><dd>Transport, not radio. BDP cap at the new RTT with the default TCP window.</dd>
+        <dt>Outcome / recommendation</dt><dd><b>Recommended</b> larger TCP receive window, parallel streams for
+          user-level testing, and co-locating the iperf server near the test region for radio comparisons.
+          See <a href="throughput-radio-transport.html">Radio-Transport Boundary</a>.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> buffer occupancy + MCS stability + UDP sanity test are the
+        three tells that separate radio from transport. One flight-trace analysis saved weeks of chasing a
+        non-existent radio regression.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case E &mdash; No-dominance coverage-hole mobility collapse</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>A ~2-minute region where the UE sat with multiple cells at near-equal RSRP (no
+          dominant server). Continuous uplink RLFs (MAC-RA and RLC max-ReTx) and re-establishment failures
+          (T311 expiry) with SIB-acquisition failures on a mod-3-conflicted PCI.</dd>
+        <dt>Evidence</dt><dd>Attitude flat &mdash; not a bank-angle event. RSRPs within 2 dB of each other on
+          3&ndash;4 cells; none strong enough to dominate; SINR depressed throughout the region; RLF cause-code
+          mix skewed toward MAC-RA and RLC max-ReTx; SIB-acquisition failures on the PCI pair with mod-3 conflict.</dd>
+        <dt>Diagnostic reasoning</dt><dd>No-dominance zones on a single-frequency network cause chronic SINR
+          depression. Mod-3 conflicts amplify it on 2-TX cells. Re-establishment fails because no candidate
+          cell can read SIBs cleanly and no cell is strong enough to handle Msg3 PRACH reliably.</dd>
+        <dt>Root cause</dt><dd>Network geometry (no established dominance) + PCI mod-3 conflict on the near
+          neighbour pair.</dd>
+        <dt>Outcome / recommendation</dt><dd><b>Recommended</b> (a) adjust tilts / power on two cells to
+          establish dominance, and (b) PCI re-plan to remove the mod-3 conflict. See
+          <a href="pci-planning-atg.html">PCI Planning for 2-TX ATG Cells</a>.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> no-dominance regions are a network-planning problem, not a UE
+        problem. On a single-frequency network they&rsquo;re the hardest to fix and the most expensive to
+        leave.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case F &mdash; Vertical-branch constant SINR deficit</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>A sustained ~5 dB SINR deficit on the vertical-polarization branch with equal
+          RSRP across V and H branches, across multiple flights and cells.</dd>
+        <dt>Evidence</dt><dd>RSRP V ≈ RSRP H (within &lt;1 dB); SINR V &lt; SINR H by ~5 dB consistently; rank-2
+          engages less often because the vertical branch caps the second layer; happens across geographic
+          regions, not tied to specific cells.</dd>
+        <dt>Diagnostic reasoning</dt><dd>Equal RSRP but unequal SINR means the <i>signal</i> arrives on both
+          branches but the <i>noise + interference floor</i> is higher on one. That&rsquo;s a <b>receiver-side</b>
+          problem, not a propagation problem. The fact that it&rsquo;s the same deficit across geographic regions
+          rules out site-specific interference.</dd>
+        <dt>Root cause (suspected)</dt><dd>Elevated noise floor / desense on the vertical receive chain on the
+          aircard &mdash; LNA, filter, cable, or connector on that branch.</dd>
+        <dt>Outcome / recommendation</dt><dd><b>Recommended</b> a bench noise-figure / sensitivity test of the
+          vertical receive chain on the aircard hardware. Escalated with the SINR-branch evidence. See
+          <a href="interference-vs-fade.html">Interference vs Fade Diagnosis</a>.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> constant branch asymmetry with equal RSRP is a receiver
+        chain issue. Don&rsquo;t chase it in the network.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Case G &mdash; UL random-access RLFs tied to PRACH for ATG geometry</h2>
+    <div class="panel case">
+      <dl class="kv">
+        <dt>Symptom</dt><dd>MAC-RA RLFs during re-establishment attempts after handover failure &mdash; the UE
+          tries to recover on a nearby cell, PRACH fails, T311 expires, UE drops to full connection setup.</dd>
+        <dt>Evidence</dt><dd>Preamble attempts in the trace, no RAR response, retries up to preambleTransMax,
+          MAC-RA cause emitted. The affected cells were long-range (100+ km edge), and the Doppler-equivalent
+          speeds were cruise speeds.</dd>
+        <dt>Diagnostic reasoning</dt><dd>At 100+ km the PRACH round-trip must fit in the preamble detection
+          window. If the configured cell-radius / format / Ncs doesn&rsquo;t cover the real range, preambles
+          miss the window. At cruise Doppler, the high-speed restricted cyclic-shift set must be on, or
+          preambles alias.</dd>
+        <dt>Root cause (suspected)</dt><dd>PRACH configuration tuned for shorter-range / lower-Doppler scenarios
+          than ATG actually uses.</dd>
+        <dt>Outcome / recommendation</dt><dd><b>Recommended</b> verification of PRACH format (3 for 100+ km),
+          Ncs sized for the full cell radius, cell-radius parameter honest, and HighSpeedFlag on. Where lab-reproducible,
+          validated candidate fixes via channel-emulator setup. See <a href="prach-atg.html">UL Random Access &amp; PRACH for ATG</a>.</dd>
+      </dl>
+      <p><span class="tag-good">Takeaway:</span> MAC-RA failures that only appear in cruise, not in lab, are
+        PRACH-config stories &mdash; especially cell-radius and HighSpeedFlag.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>Related cases &mdash; the wins I converted into parameter changes</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>TTT / hysteresis RLF fix</b> &mdash; a dedicated writeup of the mobility-tuning change I recommended
+        and validated: <a href="high-mobility-ho-tuning.html">High-Mobility Handover Tuning (TTT &amp; Hysteresis)</a>.</li>
+      <li><b>PCI mod-3 de-confliction SINR improvement</b> &mdash; dedicated writeup:
+        <a href="pci-planning-atg.html">PCI Planning for 2-TX ATG Cells</a>.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>

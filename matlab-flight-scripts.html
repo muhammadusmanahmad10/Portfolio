@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATLAB Flight-Test Analysis Scripts | M. Usman Ahmad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span><a href="index.html">&larr; Technical Portfolio</a> &nbsp;/&nbsp; ATG Air Interface Lab &amp; Flight Test</span>
+    <span class="name">Muhammad Usman Ahmad &middot; RAN Engineer</span>
+  </div>
+
+  <div class="eyebrow">MATLAB automation &middot; tooling I built</div>
+  <h1>MATLAB Flight-Test Analysis Scripts</h1>
+  <p class="lede">
+    Every flight produces hours of raw log data across multiple metrics. To turn that into a repeatable
+    per-flight analysis story I built a MATLAB script set that ingests the aircard logs,
+    aligns them against aircraft attitude, and produces a standard plot pack and KPI table used in every
+    executive report. The scripts replace hours of manual inspection and let the engineering work focus
+    on root-cause, not data-wrangling.
+  </p>
+  <div class="chips">
+    <span class="chip">MATLAB</span>
+    <span class="chip">RF metrics ingest</span>
+    <span class="chip">PCI / serving-cell timeline</span>
+    <span class="chip">Attitude overlay</span>
+    <span class="chip">Mobility event markers</span>
+  </div>
+
+  <section>
+    <h2>Inputs the scripts ingest</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Aircard log</b> &mdash; per-TTI UE measurement reports (RSRP/RSRQ/RSSI/SINR per branch, CQI, MCS, rank/PMI,
+        BLER UL/DL, serving PCI, neighbour PCI list, PUSCH power/headroom, RLF cause codes).</li>
+      <li><b>Aircraft telemetry</b> &mdash; altitude, latitude/longitude, groundspeed, heading, roll, pitch, yaw at
+        sub-second cadence.</li>
+      <li><b>Mobility log</b> &mdash; A3 trigger times, HO commands, HO complete, re-establishment attempts,
+        RLF timestamps.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Standard plot pack produced per flight</h2>
+    <div class="panel">
+      <ol class="clean">
+        <li><b>Altitude + roll + bank over time</b> (always top panel &mdash; context).</li>
+        <li><b>Serving-cell / PCI timeline</b> (stepped) with HO events annotated.</li>
+        <li><b>RSRP / RSRQ / RSSI / SINR</b> per branch (V and H), two plots.</li>
+        <li><b>CQI / MCS / rank</b> per codeword.</li>
+        <li><b>BLER UL / DL.</b></li>
+        <li><b>DL / UL throughput</b> with scheduled RBs overlay.</li>
+        <li><b>PUSCH power and headroom.</b></li>
+        <li><b>Mobility event markers</b> &mdash; A3 trigger, HO Cmd, HO Cmp, Re-est Req, Re-est Cmp, RLF &mdash; as vertical lines.</li>
+        <li><b>Flight track on a map</b> coloured by SINR.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>KPI table generated per flight</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Connected-time %</b> &mdash; UE in RRC_CONNECTED vs flight duration.</li>
+      <li><b>Available-time %</b> &mdash; usable radio + data plane available.</li>
+      <li><b>Handover-failure %</b> &mdash; failed HO attempts / total HO attempts.</li>
+      <li><b>Connection-setup-failure %.</b></li>
+      <li><b>Avg / max DL throughput, avg / max UL throughput.</b></li>
+      <li><b>Counts:</b> RLF total, RLF by cause (T310 / RLC / MAC-RA), re-establishment-failure, HO-failure.</li>
+    </ul>
+    <p>These feed directly into the executive report &mdash; see <a href="flight-kpi-reporting.html">Flight KPI &amp; Executive Reporting</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Design choices I locked in</h2>
+    <div class="panel"><ul class="clean">
+      <li><b>Time alignment first.</b> All logs are aligned to a common timestamp before any plotting. A misaligned
+        telemetry clock makes attitude-vs-SINR analysis useless.</li>
+      <li><b>Branch-per-branch plotting.</b> V and H branches are always separated; the average hides the
+        branch-asymmetry cases.</li>
+      <li><b>Event markers on every panel.</b> HO and RLF markers propagate to every plot so the eye follows
+        them automatically.</li>
+      <li><b>Standard output filename pattern</b> &mdash; <code>flight_YYYY-MM-DD_route_tailnumber.pdf</code> &mdash;
+        so files are sortable and searchable years later.</li>
+      <li><b>One function per plot</b> &mdash; makes it easy to add a new panel without touching the others.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>What the scripts replaced</h2>
+    <div class="panel"><ul class="clean">
+      <li>Manual CSV trimming in Excel &mdash; too slow for multi-hour flights.</li>
+      <li>Inconsistent plots per analyst &mdash; the standard plot pack is the same every time.</li>
+      <li>Missed attitude-correlation findings &mdash; by overlaying attitude on every plot, bank-angle events
+        can&rsquo;t be mistaken for network faults.</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    <span>Muhammad Usman Ahmad &middot; RAN Engineer</span>
+    <span><a href="index.html">&larr; Back to portfolio</a></span>
+  </div>
+
+</div>
+</body>
+</html>
